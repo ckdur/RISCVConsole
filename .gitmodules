@@ -1,0 +1,9 @@
+[submodule "chipyard"]
+	path = hardware/chipyard
+	url = https://github.com/ucb-bar/chipyard.git
+[submodule "riscv-isa-sim"]
+	path = software/riscv-isa-sim
+	url = https://github.com/riscv/riscv-isa-sim.git
+[submodule "riscv-tests"]
+	path = software/riscv-tests
+	url = https://github.com/riscv/riscv-tests.git
