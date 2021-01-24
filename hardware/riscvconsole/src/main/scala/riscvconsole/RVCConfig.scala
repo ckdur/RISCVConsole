@@ -7,7 +7,7 @@ class RVCPeripheralsConfig extends Config((site, here, up) => {
   case sifive.blocks.devices.uart.PeripheryUARTKey => Seq(
     new sifive.blocks.devices.uart.UARTParams(0x10000000))
   case sifive.blocks.devices.gpio.PeripheryGPIOKey => Seq(
-    new sifive.blocks.devices.gpio.GPIOParams(0x10001000, 8))
+    new sifive.blocks.devices.gpio.GPIOParams(0x10001000, 14))
   case freechips.rocketchip.subsystem.PeripheryMaskROMKey => Seq(
     freechips.rocketchip.devices.tilelink.MaskROMParams(0x10000, "MyBootROM"))
 })

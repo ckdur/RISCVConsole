@@ -74,7 +74,7 @@ ifeq ($(SUB_PROJECT),icenet)
 	TB                ?= TestDriver
 	TOP               ?= UnitTestSuite
 endif
-# For the RISCV console
+# For the RISCV console (TODO: SImulation)
 ifeq ($(SUB_PROJECT),riscvconsole)
 	SBT_PROJECT       ?= riscvconsole
 	MODEL             ?= RVCPlatform
@@ -85,6 +85,18 @@ ifeq ($(SUB_PROJECT),riscvconsole)
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= TestDriver
 	TOP               ?= RVCSystem
+endif
+# For the RISCV console (in ULX3S)
+ifeq ($(SUB_PROJECT),ulx3s)
+	SBT_PROJECT       ?= riscvconsole
+	MODEL             ?= ulx3sTop
+	VLOG_MODEL        ?= ulx3sTop
+	MODEL_PACKAGE     ?= riscvconsole.fpga
+	CONFIG            ?= RVCConfig
+	CONFIG_PACKAGE    ?= riscvconsole.system
+	GENERATOR_PACKAGE ?= chipyard
+	TB                ?= TestDriver
+	TOP               ?= RVCPlatform
 endif
 
 #########################################################################################
