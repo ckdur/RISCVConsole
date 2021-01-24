@@ -77,14 +77,14 @@ endif
 # For the RISCV console
 ifeq ($(SUB_PROJECT),riscvconsole)
 	SBT_PROJECT       ?= riscvconsole
-	MODEL             ?= TestHarness
-	VLOG_MODEL        ?= TestHarness
-	MODEL_PACKAGE     ?= chipyard
-	CONFIG            ?= RocketConfig
-	CONFIG_PACKAGE    ?= chipyard
+	MODEL             ?= RVCPlatform
+	VLOG_MODEL        ?= RVCPlatform
+	MODEL_PACKAGE     ?= riscvconsole.system
+	CONFIG            ?= RVCConfig
+	CONFIG_PACKAGE    ?= riscvconsole.system
 	GENERATOR_PACKAGE ?= chipyard
 	TB                ?= TestDriver
-	TOP               ?= ChipTop
+	TOP               ?= RVCSystem
 endif
 
 #########################################################################################
