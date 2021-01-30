@@ -119,6 +119,10 @@ harness_macro_temp: $(HARNESS_SMEMS_CONF) | top_macro_temp
 $(sim_common_files): $(sim_files) $(sim_top_blackboxes) $(sim_harness_blackboxes)
 	awk '{print $1;}' $^ | sort -u | grep -v '.*\.\(svh\|h\)$$' > $@
 
+$(top_and_harness_files): $(sim_top_blackboxes) $(sim_harness_blackboxes) $(sim_vsrcs)
+	echo -n $(sim_vsrcs) " " > $@
+	awk '{print $1;}' $(sim_top_blackboxes) $(sim_harness_blackboxes) | sort -u | grep -v '.*\.\(svh\|h\)$$' | awk 'BEGIN { ORS=" " }; { print $1 }' >> $@
+
 #########################################################################################
 # helper rule to just make verilog files
 #########################################################################################
