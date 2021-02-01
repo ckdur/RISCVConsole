@@ -43,17 +43,24 @@ EICG_wrapper = $(build_dir)/EICG_wrapper.v
 synthesis: $(build_dir)/$(MODEL).json
 
 $(build_dir)/$(MODEL).json: $(sim_vsrcs) $(top_and_harness_files) $(ROM_FILE)
-	export ALL_VSRC="`cat $(top_and_harness_files)` $(ROM_FILE) $(EICG_wrapper)"
-	yosys -p "read_verilog $$ALL_VSRC; synth_ecp5 -noccu2 -nomux -nodram -json $(build_dir)/$(MODEL).json"
+	yosys -p "read_verilog `cat $(top_and_harness_files)` $(ROM_FILE) $(EICG_wrapper); synth_ecp5 -noccu2 -nomux -nodram -json $(build_dir)/$(MODEL).json" | tee $(build_dir)/yosys.log
 
 pnr: $(build_dir)/$(MODEL).config
 
 $(build_dir)/$(MODEL).config: $(build_dir)/$(MODEL).json $(sim_dir)/ulx3s_v20.lpf
 	nextpnr-ecp5 --85k --json $(build_dir)/$(MODEL).json \
 		--lpf $(sim_dir)/ulx3s_v20.lpf \
-		--textcfg $(build_dir)/ulx3s_out.config 
+		--textcfg $(build_dir)/$(MODEL).config | tee $(build_dir)/nextpnr.log
 
-.PHONY: clean
+pack: $(build_dir)/$(MODEL).bit
+
+$(build_dir)/$(MODEL).bit: $(build_dir)/$(MODEL).config
+	ecppack $(build_dir)/$(MODEL).config $(build_dir)/$(MODEL).bit
+
+program: $(build_dir)/$(MODEL).bit
+	fujprog $(build_dir)/$(MODEL).bit
+
+.PHONY: clean program
 clean:
 	rm -rf $(gen_dir)
 

@@ -6,6 +6,7 @@ import riscvconsole.shell.latticeLib._
 import riscvconsole.system._
 import chipsalliance.rocketchip.config._
 import sifive.blocks.devices.pinctrl._
+import riscvconsole.util._
 
 class ulx3sTop(implicit p: Parameters) extends ulx3sShell {
   val clock = clk_25mhz

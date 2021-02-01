@@ -2,6 +2,7 @@ package riscvconsole.system
 
 import chipsalliance.rocketchip.config._
 import freechips.rocketchip.subsystem.WithRV32
+import freechips.rocketchip.devices.debug._
 
 class RVCPeripheralsConfig extends Config((site, here, up) => {
   case sifive.blocks.devices.uart.PeripheryUARTKey => Seq(
@@ -12,8 +13,15 @@ class RVCPeripheralsConfig extends Config((site, here, up) => {
     freechips.rocketchip.devices.tilelink.MaskROMParams(0x10000, "MyBootROM"))
 })
 
+class RemoveDebugClockGating extends Config((site, here, up) => {
+  case DebugModuleKey => up(DebugModuleKey).map{ debug =>
+    debug.copy(clockGate = false)
+  }
+})
+
 class RVCConfig extends Config(
   new RVCPeripheralsConfig ++
+    new RemoveDebugClockGating ++
     new freechips.rocketchip.subsystem.WithJtagDTM ++
     new freechips.rocketchip.subsystem.WithNoMemPort ++              // no top-level memory port at 0x80000000
     new freechips.rocketchip.subsystem.WithNoMMIOPort ++           // no top-level MMIO master port (overrides default set in rocketchip)
