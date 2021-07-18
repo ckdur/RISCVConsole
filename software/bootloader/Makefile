@@ -18,7 +18,7 @@ elf: bootloader.elf
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 # The linker step
-bootloader.elf: start.o
+bootloader.elf: start.o main.o
 	$(CC) $^ -o bootloader.elf $(LDFLAGS)
 
 bin: bootloader.bin
@@ -32,7 +32,7 @@ bootloader.hex: bootloader.bin
 	od -t x4 -An -w4 -v $< > $@
 
 clean:
-	rm -rf *.elf *.o *.d
+	rm -rf *.elf *.o *.d *.hex *.bin
 
 .PHONY: clean
 

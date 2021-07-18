@@ -8,6 +8,7 @@ sim_dir=$(abspath .)
 
 SUB_PROJECT ?= arrow
 sim_name = verilator
+ROM_FILE ?= $(build_dir)/$(long_name).rom.v
 
 #########################################################################################
 # include shared variables
@@ -18,7 +19,7 @@ include $(base_dir)/variables.mk
 # vcs simulator types and rules
 #########################################################################################
 .PHONY: default
-default: $(sim_vsrcs) $(top_and_harness_files)
+default: $(sim_vsrcs) $(top_and_harness_files) $(ROM_FILE)
 
 #########################################################################################
 # import other necessary rules and variables
@@ -28,10 +29,9 @@ include $(base_dir)/common.mk
 #########################################################################################
 # Rule for ROM file
 #########################################################################################
-ROM_FILE ?= $(build_dir)/$(long_name).rom.v
 ROM_CONF_FILE ?= $(build_dir)/$(long_name).rom.conf
 $(ROM_FILE): $(ROM_CONF_FILE) $(bldr_dir)/bootloader.hex
-	python $(base_dir)/hardware/vlsi_rom_gen $(ROM_CONF_FILE) $(bldr_dir)/bootloader.hex > $(ROM_FILE)
+	python2 $(base_dir)/hardware/vlsi_rom_gen $(ROM_CONF_FILE) $(bldr_dir)/bootloader.hex > $(ROM_FILE)
 
 $(ROM_CONF_FILE): $(FIRRTL_FILE)
 	touch $(ROM_CONF_FILE)

@@ -12,15 +12,15 @@ class ArrowShell extends RawModule {
   val sw = IO(Vec(4, Input(Bool())))
 
   val HSMC_D = IO(Vec(4, Analog(1.W)))
-  val HSMC_GXB_RX_p = IO(Vec(8, Analog(1.W)))
-  val HSMC_GXB_TX_p = IO(Vec(8, Analog(1.W)))
-  val HSMC_GXB_RX_n = IO(Vec(8, Analog(1.W)))
-  val HSMC_GXB_TX_n = IO(Vec(8, Analog(1.W)))
+  //val HSMC_GXB_RX_p = IO(Vec(8, Analog(1.W)))
+  //val HSMC_GXB_TX_p = IO(Vec(8, Analog(1.W)))
+  //val HSMC_GXB_RX_n = IO(Vec(8, Analog(1.W)))
+  //val HSMC_GXB_TX_n = IO(Vec(8, Analog(1.W)))
   val HSMC_RX_p = IO(Vec(16, Analog(1.W)))
   val HSMC_TX_p = IO(Vec(16, Analog(1.W)))
   val HSMC_RX_n = IO(Vec(16, Analog(1.W)))
   val HSMC_TX_n = IO(Vec(16, Analog(1.W)))
 
-  val HPS_UART_RX = IO(Input(Bool()))
-  val HPS_UART_TX = IO(Output(Bool()))
+  //val HPS_UART_RX = IO(Input(Bool()))
+  //val HPS_UART_TX = IO(Output(Bool()))
 }

@@ -47,8 +47,8 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
     TDO_as_base.o.ie := false.B
     ALT_IOBUF(HSMC_D(3), TDO_as_base)
 
-    platform.io.uart_rxd := HPS_UART_RX  //input
-    HPS_UART_TX := platform.io.uart_txd  //output
+    platform.io.uart_rxd := ALT_IOBUF(HSMC_RX_p(0))  //input
+    ALT_IOBUF(HSMC_TX_p(0), platform.io.uart_txd)
 
     platform.io.jtag_RSTn := sw(0)       //reset for the jtag
   }
