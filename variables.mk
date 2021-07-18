@@ -98,6 +98,18 @@ ifeq ($(SUB_PROJECT),ulx3s)
 	TB                ?= TestDriver
 	TOP               ?= RVCPlatform
 endif
+# For the RISCV console (in Arrow)
+ifeq ($(SUB_PROJECT),arrow)
+	SBT_PROJECT       ?= riscvconsole
+	MODEL             ?= ArrowTop
+	VLOG_MODEL        ?= ArrowTop
+	MODEL_PACKAGE     ?= riscvconsole.fpga
+	CONFIG            ?= ArrowConfig
+	CONFIG_PACKAGE    ?= riscvconsole.system
+	GENERATOR_PACKAGE ?= chipyard
+	TB                ?= TestDriver
+	TOP               ?= RVCPlatform
+endif
 
 #########################################################################################
 # path to rocket-chip and testchipip
