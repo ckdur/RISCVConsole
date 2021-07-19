@@ -7,11 +7,13 @@ import freechips.rocketchip.subsystem._
 import sifive.blocks.devices.gpio._
 import sifive.blocks.devices.uart._
 import freechips.rocketchip.devices.tilelink._
+import testchipip._
 
 class RVCSystem(implicit p: Parameters) extends RVCSubsystem
   with HasPeripheryGPIO
   with HasPeripheryUART
   with CanHaveMasterAXI4MemPort
+  with CanHavePeripherySerial
 {
   val maskromparam = p(PeripheryMaskROMKey)
   val maskrom = maskromparam.map{
@@ -24,6 +26,7 @@ class RVCSystem(implicit p: Parameters) extends RVCSubsystem
 class RVCSystemModuleImp[+L <: RVCSystem](_outer: L) extends RVCSubsystemModuleImp(_outer)
   with HasPeripheryGPIOModuleImp
   with HasPeripheryUARTModuleImp
+  with CanHavePeripherySerialModuleImp
 {
   global_reset_vector := outer.maskromparam(0).address.U
 }
