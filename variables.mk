@@ -94,7 +94,7 @@ ifeq ($(SUB_PROJECT),ulx3s)
 	MODEL_PACKAGE     ?= riscvconsole.fpga
 	CONFIG            ?= RVCConfig
 	CONFIG_PACKAGE    ?= riscvconsole.system
-	GENERATOR_PACKAGE ?= chipyard
+	GENERATOR_PACKAGE ?= riscvconsole
 	TB                ?= TestDriver
 	TOP               ?= RVCPlatform
 endif
@@ -106,7 +106,7 @@ ifeq ($(SUB_PROJECT),arrow)
 	MODEL_PACKAGE     ?= riscvconsole.fpga
 	CONFIG            ?= ArrowConfig
 	CONFIG_PACKAGE    ?= riscvconsole.system
-	GENERATOR_PACKAGE ?= chipyard
+	GENERATOR_PACKAGE ?= riscvconsole
 	TB                ?= TestDriver
 	TOP               ?= RVCPlatform
 endif

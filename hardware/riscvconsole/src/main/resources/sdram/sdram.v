@@ -44,7 +44,7 @@ module sdram
     parameter    SDRAM_START_DELAY     = 100000 / (1000 / SDRAM_MHZ), // 100uS
     parameter    SDRAM_REFRESH_CYCLES  = (64000*SDRAM_MHZ) / SDRAM_REFRESH_CNT-1,
     parameter    SDRAM_READ_LATENCY    = 2,
-    parameter    SDRAM_TARGET          = "XILINX"
+    parameter    SDRAM_TARGET          = "LATTICE"
 )
 
 //-----------------------------------------------------------------
@@ -716,6 +716,21 @@ begin
       (
         .O(sdram_data_in_w[i]),
         .IO(sdram_data_io[i]),
+        .I(data_q[i]),
+        .T(data_rd_en_q)
+      );
+    end
+end
+else if (SDRAM_TARGET == "LATTICE")
+begin
+    assign sdram_clk_o     = ~clk_i;
+    for (i=0; i < 16; i = i + 1) 
+    begin
+      BB
+      u_data_buf
+      (
+        .O(sdram_data_in_w[i]),
+        .B(sdram_data_io[i]),
         .I(data_q[i]),
         .T(data_rd_en_q)
       );

@@ -2,6 +2,7 @@ package riscvconsole.devices.sdram
 
 import chisel3._
 import chisel3.experimental.{Analog, IntParam, StringParam, attach}
+import chisel3.util.HasBlackBoxResource
 import freechips.rocketchip.config._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.prci.{ClockGroup, ClockSinkDomain}
@@ -16,7 +17,7 @@ case class sdram_bb_cfg
   SDRAM_COL_W: Int = 9,
   SDRAM_BANK_W: Int = 2,
   SDRAM_DQM_W: Int = 2,
-  SDRAM_TARGET: String = "GENERIC"
+  SDRAM_TARGET: String = "LATTICE"
 ) {
   val SDRAM_BANKS = 1 << SDRAM_BANK_W
   val SDRAM_ROW_W = SDRAM_ADDR_W - SDRAM_COL_W - SDRAM_BANK_W
@@ -55,7 +56,7 @@ trait HasWishboneIf{
   val ack_o = Output(Bool())
 }
 
-class sdram(val cfg: sdram_bb_cfg) extends BlackBox(
+class sdram(val cfg: sdram_bb_cfg) extends BlackBox (
   Map(
     "SDRAM_MHZ" -> IntParam(cfg.SDRAM_MHZ),
     "SDRAM_ADDR_W" -> IntParam(cfg.SDRAM_ADDR_W),
@@ -70,11 +71,12 @@ class sdram(val cfg: sdram_bb_cfg) extends BlackBox(
     "SDRAM_READ_LATENCY" -> IntParam(cfg.SDRAM_READ_LATENCY),
     "SDRAM_TARGET" -> StringParam(cfg.SDRAM_TARGET),
   )
-) {
+) with HasBlackBoxResource {
   val io = IO(new Bundle with HasSDRAMIf with HasWishboneIf {
     val clk_i = Input(Clock())
     val rst_i = Input(Bool())
   })
+  addResource("/sdram/sdram.v")
 }
 
 // Periphery
