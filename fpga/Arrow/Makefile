@@ -24,3 +24,7 @@ include $(base_dir)/common.mk
 .PHONY: default
 default: $(sim_vsrcs) $(top_and_harness_files) $(ROM_FILE)
 
+.PHONY: clean
+clean:
+	rm -rf $(gen_dir)
+
