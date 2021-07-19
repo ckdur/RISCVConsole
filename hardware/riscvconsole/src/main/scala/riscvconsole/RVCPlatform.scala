@@ -6,6 +6,7 @@ import chipsalliance.rocketchip.config.Parameters
 import freechips.rocketchip.devices.debug._
 import freechips.rocketchip.diplomacy.LazyModule
 import freechips.rocketchip.jtag.JTAGIO
+import riscvconsole.devices.sdram.{SDRAMIf, SDRAMKey}
 import sifive.blocks.devices.gpio._
 import sifive.blocks.devices.pinctrl._
 import sifive.blocks.devices.uart._
@@ -22,6 +23,9 @@ class RVCPlatform(implicit p: Parameters) extends Module
     // Jtag port
     val jtag = Flipped(new JTAGIO(false))
     val jtag_RSTn = Input(Bool())
+
+    // SDRAM port
+    val sdram = Vec(p(SDRAMKey).size, new SDRAMIf)
   })
 
   val sys = Module(LazyModule(new RVCSystem).module)
@@ -42,4 +46,6 @@ class RVCPlatform(implicit p: Parameters) extends Module
   val uart: UARTPortIO = sys.uart(0)
   io.uart_txd := uart.txd
   uart.rxd := io.uart_rxd
+
+  (io.sdram zip sys.sdramio).map{case (port, sys) => port <> sys}
 }

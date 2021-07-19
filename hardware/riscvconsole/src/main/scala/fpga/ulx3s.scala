@@ -40,5 +40,7 @@ class ulx3sTop(implicit p: Parameters) extends ulx3sShell {
     platform.io.uart_rxd := ftdi_rxd
 
     platform.io.jtag_RSTn := sw(0)
+
+    sdram <> platform.io.sdram.head
   }
 }

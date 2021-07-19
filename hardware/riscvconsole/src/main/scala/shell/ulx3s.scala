@@ -2,6 +2,7 @@ package riscvconsole.shell.ulx3s
 
 import chisel3._
 import chisel3.experimental.Analog
+import riscvconsole.devices.sdram.SDRAMIf
 
 class ulx3sShell extends RawModule {
   val clk_25mhz = IO(Input(Clock()))
@@ -16,6 +17,8 @@ class ulx3sShell extends RawModule {
 
   val gp = IO(Vec(28, Analog(1.W)))
   val gn = IO(Vec(28, Analog(1.W)))
+
+  val sdram = IO(new SDRAMIf)
 
   // TODO: Put the PLL
 }
