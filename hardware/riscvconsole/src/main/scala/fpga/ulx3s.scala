@@ -9,7 +9,7 @@ import sifive.blocks.devices.pinctrl._
 import riscvconsole.util._
 
 class ulx3sTop(implicit p: Parameters) extends ulx3sShell {
-  val clock = clk_25mhz
+  val clock = clk_50mhz
   val reset = (!btn(0)) // Inverted logic
 
   withClockAndReset(clock, reset) {
@@ -36,8 +36,8 @@ class ulx3sTop(implicit p: Parameters) extends ulx3sShell {
     TDO_as_base.o.ie := false.B
     BB(gp(3), TDO_as_base)
 
-    ftdi_txd := platform.io.uart_txd
-    platform.io.uart_rxd := ftdi_rxd
+    ftdi_rxd := platform.io.uart_txd // ftdi_received -> fpga_transmitted
+    platform.io.uart_rxd := ftdi_txd // ftdi_transmitted -> fpga_received
 
     platform.io.jtag_RSTn := sw(0)
 

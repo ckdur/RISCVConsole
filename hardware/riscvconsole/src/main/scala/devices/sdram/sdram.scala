@@ -6,7 +6,7 @@ import chisel3.util.HasBlackBoxResource
 import freechips.rocketchip.config._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.prci.{ClockGroup, ClockSinkDomain}
-import freechips.rocketchip.subsystem.{Attachable, BaseSubsystem, MBUS}
+import freechips.rocketchip.subsystem.{Attachable, BaseSubsystem, MBUS, SBUS}
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.util.HeterogeneousBag
 
@@ -199,7 +199,7 @@ case class SDRAMAttachParams
 
   def attachTo(where: Attachable)(implicit p: Parameters): SDRAM = where {
     val name = s"sdram_${SDRAMObject.nextId()}"
-    val mbus = where.locateTLBusWrapper(MBUS)
+    val mbus = where.locateTLBusWrapper(SBUS)
     val sdramClockDomainWrapper = LazyModule(new ClockSinkDomain(take = None))
     val sdram = sdramClockDomainWrapper { LazyModule(new SDRAM(device, mbus.blockBytes, mbus.beatBytes)) }
     sdram.suggestName(name)

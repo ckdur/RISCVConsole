@@ -202,7 +202,7 @@ bldr_dir=$(soft_dir)/bootloader
 ROM_FILE ?= $(build_dir)/$(long_name).rom.v
 ROM_CONF_FILE ?= $(build_dir)/$(long_name).rom.conf
 $(ROM_FILE): $(ROM_CONF_FILE) $(bldr_dir)/bootloader.hex
-	python $(base_dir)/hardware/vlsi_rom_gen $(ROM_CONF_FILE) $(bldr_dir)/bootloader.hex > $(ROM_FILE)
+	python2 $(base_dir)/hardware/vlsi_rom_gen $(ROM_CONF_FILE) $(bldr_dir)/bootloader.hex > $(ROM_FILE)
 
 $(ROM_CONF_FILE): $(FIRRTL_FILE)
 	touch $(ROM_CONF_FILE)
