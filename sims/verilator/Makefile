@@ -3,7 +3,7 @@ SBT_PROJECT       ?= riscvconsole
 MODEL             ?= RVCHarness
 VLOG_MODEL        ?= RVCHarness
 MODEL_PACKAGE     ?= riscvconsole.system
-CONFIG            ?= ArrowConfig
+CONFIG            ?= RVCHarnessConfig
 CONFIG_PACKAGE    ?= riscvconsole.system
 GENERATOR_PACKAGE ?= riscvconsole
 TB                ?= TestDriver
@@ -56,7 +56,7 @@ include $(base_dir)/common.mk
 VERILATOR := verilator --cc --exe
 
 CXXFLAGS := \
-	$(CXXFLAGS) -O1 -std=c++11 \
+	$(CXXFLAGS) -O1 -std=c++11 -g \
 	-I$(RISCV)/include \
 	-I$(dramsim_dir) \
 	-D__STDC_FORMAT_MACROS \

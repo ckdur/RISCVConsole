@@ -19,7 +19,7 @@ class ulx3sShell extends RawModule {
   val gp = IO(Vec(28, Analog(1.W)))
   val gn = IO(Vec(28, Analog(1.W)))
 
-  val sdram = IO(new SDRAMIf)
+  val sdram = IO(new ULX3SSDRAM)
 
   // Put the PLL
   val pll = withClockAndReset(clk_25mhz, false.B) {

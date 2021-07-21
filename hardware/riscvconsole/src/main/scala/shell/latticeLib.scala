@@ -3,6 +3,7 @@ package riscvconsole.shell.latticeLib
 import chisel3._
 import chisel3.experimental._
 import chisel3.util.HasBlackBoxInline
+import riscvconsole.devices.sdram.SDRAMIf
 import sifive.blocks.devices.pinctrl._
 
 class BB extends BlackBox{
@@ -14,18 +15,18 @@ class BB extends BlackBox{
   })
 
   def asInput() : Bool = {
-    io.T := false.B
+    io.T := true.B
     io.I := false.B
     io.O
   }
 
   def asOutput(o: Bool) : Unit = {
-    io.T := true.B
+    io.T := false.B
     io.I := o
   }
 
   def fromBase(e: BasePin) : Unit = {
-    io.T := e.o.oe
+    io.T := !e.o.oe
     io.I := e.o.oval
     e.i.ival := io.O
   }
@@ -376,5 +377,37 @@ object ecp5pll {
       "PLL_LOCK_MODE" -> IntParam(0)
     )
     Module(new ecp5pll(params, cfg))
+  }
+}
+
+class ULX3SSDRAM extends Bundle {
+  val sdram_clk_o = Output(Bool())
+  val sdram_cke_o = Output(Bool())
+  val sdram_cs_o = Output(Bool())
+  val sdram_ras_o = Output(Bool())
+  val sdram_cas_o = Output(Bool())
+  val sdram_we_o = Output(Bool())
+  val sdram_dqm_o = Output(UInt(2.W))
+  val sdram_addr_o = Output(UInt(13.W))
+  val sdram_ba_o = Output(UInt(2.W))
+  val sdram_data_io = Vec(16, Analog(1.W))
+  def from_SDRAMIf(io: SDRAMIf) = {
+    sdram_clk_o := io.sdram_clk_o
+    sdram_cke_o := io.sdram_cke_o
+    sdram_cs_o := io.sdram_cs_o
+    sdram_ras_o := io.sdram_ras_o
+    sdram_cas_o := io.sdram_cas_o
+    sdram_we_o := io.sdram_we_o
+    sdram_dqm_o := io.sdram_dqm_o
+    sdram_addr_o := io.sdram_addr_o
+    sdram_ba_o := io.sdram_ba_o
+    io.sdram_data_i := VecInit((io.sdram_data_o.asBools() zip sdram_data_io).map{
+      case (o, an) =>
+        val b = Module(new BB)
+        b.io.T := !io.sdram_drive_o
+        b.io.I := o
+        attach(b.io.B, an)
+        b.io.O
+    }).asUInt()
   }
 }

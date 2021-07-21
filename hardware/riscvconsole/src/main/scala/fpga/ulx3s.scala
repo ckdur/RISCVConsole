@@ -41,6 +41,6 @@ class ulx3sTop(implicit p: Parameters) extends ulx3sShell {
 
     platform.io.jtag_RSTn := sw(0)
 
-    sdram <> platform.io.sdram.head
+    sdram.from_SDRAMIf( platform.io.sdram.head )
   }
 }

@@ -43,8 +43,7 @@ module sdram
     parameter    SDRAM_REFRESH_CNT     = 2 ** SDRAM_ROW_W,
     parameter    SDRAM_START_DELAY     = 100000 / (1000 / SDRAM_MHZ), // 100uS
     parameter    SDRAM_REFRESH_CYCLES  = (64000*SDRAM_MHZ) / SDRAM_REFRESH_CNT-1,
-    parameter    SDRAM_READ_LATENCY    = 2,
-    parameter    SDRAM_TARGET          = "LATTICE"
+    parameter    SDRAM_READ_LATENCY    = 2
 )
 
 //-----------------------------------------------------------------
@@ -75,7 +74,9 @@ module sdram
     output [1:0]    sdram_dqm_o,
     output [12:0]   sdram_addr_o,
     output [1:0]    sdram_ba_o,
-    inout [15:0]    sdram_data_io
+    input  [15:0]   sdram_data_i,
+    output [15:0]   sdram_data_o,
+    output          sdram_drive_o
 );
 
 //-----------------------------------------------------------------
@@ -682,68 +683,10 @@ assign stall_o = ~(state_q == STATE_READ || state_q == STATE_WRITE0);
 //-----------------------------------------------------------------
 genvar i;
 
-generate 
-if (SDRAM_TARGET == "XILINX")
-begin
-    // 180 degree phase delayed sdram clock output
-    ODDR2 
-    #(
-        .DDR_ALIGNMENT("NONE"),
-        .INIT(1'b0),
-        .SRTYPE("SYNC")
-    )
-    u_clock_delay
-    (
-        .Q(sdram_clk_o),
-        .C0(clk_i),
-        .C1(~clk_i),
-        .CE(1'b1),
-        .R(1'b0),
-        .S(1'b0),
-        .D0(1'b0),
-        .D1(1'b1)
-    );
-
-    for (i=0; i < 16; i = i + 1) 
-    begin
-      IOBUF 
-      #(
-        .DRIVE(12),
-        .IOSTANDARD("LVTTL"),
-        .SLEW("FAST")
-      )
-      u_data_buf
-      (
-        .O(sdram_data_in_w[i]),
-        .IO(sdram_data_io[i]),
-        .I(data_q[i]),
-        .T(data_rd_en_q)
-      );
-    end
-end
-else if (SDRAM_TARGET == "LATTICE")
-begin
-    assign sdram_clk_o     = ~clk_i;
-    for (i=0; i < 16; i = i + 1) 
-    begin
-      BB
-      u_data_buf
-      (
-        .O(sdram_data_in_w[i]),
-        .B(sdram_data_io[i]),
-        .I(data_q[i]),
-        .T(data_rd_en_q)
-      );
-    end
-end
-else
-begin
-    assign sdram_clk_o     = ~clk_i;
-    assign sdram_data_io   = data_rd_en_q ? 16'bz : data_q;
-    assign sdram_data_in_w = sdram_data_io;
-end
-endgenerate
-
+assign sdram_clk_o     = clk_i;
+assign sdram_drive_o   = !data_rd_en_q;
+assign sdram_data_o    = data_q;
+assign sdram_data_in_w = sdram_data_i;
 assign sdram_cke_o  = cke_q;
 assign sdram_cs_o   = command_q[3];
 assign sdram_ras_o  = command_q[2];
