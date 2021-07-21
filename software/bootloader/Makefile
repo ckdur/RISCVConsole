@@ -18,7 +18,7 @@ elf: bootloader.elf
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 # The linker step
-bootloader.elf: start.o main.o
+bootloader.elf: start.o main.o print.o
 	$(CC) $^ -o bootloader.elf $(LDFLAGS)
 
 bin: bootloader.bin

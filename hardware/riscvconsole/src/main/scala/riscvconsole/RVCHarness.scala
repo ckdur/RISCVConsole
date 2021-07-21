@@ -8,6 +8,7 @@ import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.devices.debug._
+import riscvconsole.devices.sdram._
 import sifive.blocks.devices.gpio.GPIOPortIO
 import sifive.blocks.devices.uart._
 import testchipip._
@@ -32,12 +33,9 @@ class RVCHarness()(implicit p: Parameters) extends Module {
   }
 
   // Debug tie off (This also handles the reset system)
-  Debug.tieoffDebug(dut.debug, dut.resetctrl, Some(dut.psd))
-  dut.debug.foreach { d =>
-    d.clockeddmi.foreach({ cdmi => cdmi.dmi.req.bits := DontCare; cdmi.dmiClock := clock })
-    d.dmactiveAck := DontCare
-    d.clock := clock
-  }
+  val debug_success = WireInit(false.B)
+  Debug.connectDebug(dut.debug, dut.resetctrl, dut.psd, clock, reset.asBool(), debug_success)
+  when (debug_success) { io.success := true.B }
 
   // Serial interface (if existent) will be connected here
   io.success := false.B
@@ -64,4 +62,5 @@ class RVCHarness()(implicit p: Parameters) extends Module {
     }
   }
 
+  dut.sdramio.foreach(sdramsim(_, reset.asBool()))
 }

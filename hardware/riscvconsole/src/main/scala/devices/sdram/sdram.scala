@@ -2,29 +2,29 @@ package riscvconsole.devices.sdram
 
 import chisel3._
 import chisel3.experimental.{Analog, IntParam, StringParam, attach}
-import chisel3.util.HasBlackBoxResource
+import chisel3.util.{HasBlackBoxResource, RegEnable}
 import freechips.rocketchip.config._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.prci.{ClockGroup, ClockSinkDomain}
-import freechips.rocketchip.subsystem.{Attachable, BaseSubsystem, MBUS}
+import freechips.rocketchip.subsystem.{Attachable, BaseSubsystem, MBUS, SBUS}
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.util.HeterogeneousBag
 
 case class sdram_bb_cfg
 (
-  SDRAM_MHZ: Int = 50,
+  SDRAM_HZ: BigInt = 50000000,
   SDRAM_ADDR_W: Int = 24,
   SDRAM_COL_W: Int = 9,
   SDRAM_BANK_W: Int = 2,
-  SDRAM_DQM_W: Int = 2,
-  SDRAM_TARGET: String = "LATTICE"
+  SDRAM_DQM_W: Int = 2
 ) {
+  val SDRAM_MHZ = SDRAM_HZ/1000000
   val SDRAM_BANKS = 1 << SDRAM_BANK_W
   val SDRAM_ROW_W = SDRAM_ADDR_W - SDRAM_COL_W - SDRAM_BANK_W
   val SDRAM_REFRESH_CNT = 1 << SDRAM_ROW_W
-  val SDRAM_START_DELAY = 100000 / (1000 / SDRAM_MHZ)
+  val SDRAM_START_DELAY = 100000 / (1000 / SDRAM_MHZ) // 100 uS
   val SDRAM_REFRESH_CYCLES = (64000*SDRAM_MHZ) / SDRAM_REFRESH_CNT-1
-  val SDRAM_READ_LATENCY = 2
+  val SDRAM_READ_LATENCY = 3
 }
 
 trait HasSDRAMIf{
@@ -38,7 +38,9 @@ trait HasSDRAMIf{
   val sdram_dqm_o = Output(UInt(2.W))
   val sdram_addr_o = Output(UInt(13.W))
   val sdram_ba_o = Output(UInt(2.W))
-  val sdram_data_io = Analog(15.W)
+  val sdram_data_o = Output(UInt(16.W))
+  val sdram_data_i = Input(UInt(16.W))
+  val sdram_drive_o = Output(Bool())
 }
 
 class SDRAMIf extends Bundle with HasSDRAMIf
@@ -68,8 +70,7 @@ class sdram(val cfg: sdram_bb_cfg) extends BlackBox (
     "SDRAM_REFRESH_CNT" -> IntParam(cfg.SDRAM_REFRESH_CNT),
     "SDRAM_START_DELAY" -> IntParam(cfg.SDRAM_START_DELAY),
     "SDRAM_REFRESH_CYCLES" -> IntParam(cfg.SDRAM_REFRESH_CYCLES),
-    "SDRAM_READ_LATENCY" -> IntParam(cfg.SDRAM_READ_LATENCY),
-    "SDRAM_TARGET" -> StringParam(cfg.SDRAM_TARGET),
+    "SDRAM_READ_LATENCY" -> IntParam(cfg.SDRAM_READ_LATENCY)
   )
 ) with HasBlackBoxResource {
   val io = IO(new Bundle with HasSDRAMIf with HasWishboneIf {
@@ -132,7 +133,9 @@ class SDRAM(cfg: SDRAMConfig, blockBytes: Int, beatBytes: Int)(implicit p: Param
     port.sdram_dqm_o := sdramimp.io.sdram_dqm_o
     port.sdram_addr_o := sdramimp.io.sdram_addr_o
     port.sdram_ba_o := sdramimp.io.sdram_ba_o
-    attach(port.sdram_data_io, sdramimp.io.sdram_data_io)
+    sdramimp.io.sdram_data_i := port.sdram_data_i
+    port.sdram_data_o := sdramimp.io.sdram_data_o
+    port.sdram_drive_o := sdramimp.io.sdram_drive_o
 
     // WB side
     // Obtain the TL bundle
@@ -140,41 +143,51 @@ class SDRAM(cfg: SDRAMConfig, blockBytes: Int, beatBytes: Int)(implicit p: Param
 
     // Flow control
     val d_full = RegInit(false.B) // Transaction pending
+    val d_valid_held = RegInit(false.B) // Held valid of D channel if not ready
     val d_size = Reg(UInt()) // Saved size
     val d_source = Reg(UInt()) // Saved source
     val d_hasData = Reg(Bool()) // Saved source
-    val d_data = Reg(UInt()) // Saved data
-
-    // hasData helds if there is a write transaction
-    val hasData = tl_edge.hasData(tl_in.a.bits)
-
-    // A channel to the Wishbone (Same handshake)
-    sdramimp.io.stb_i := tl_in.a.valid && !d_full
-    sdramimp.io.cyc_i := tl_in.a.valid && !d_full
-    tl_in.a.ready := sdramimp.io.ack_o
-    // Replicate the bits as best as we can
-    sdramimp.io.addr_i := tl_in.a.bits.address
-    sdramimp.io.data_i := tl_in.a.bits.data
-    sdramimp.io.we_i := hasData
-    sdramimp.io.sel_i := tl_in.a.bits.mask
-
-    // Save relevant information from a to the response in d
-    when (tl_in.a.fire()) { // sdramimp.io.cyc_i && sdramimp.io.ack_o equivalent
-      d_size   := tl_in.a.bits.size
-      d_source := tl_in.a.bits.source
-      d_hasData := hasData
-      d_data    := sdramimp.io.data_o
-    }
 
     // d_full logic: It is full if there is 1 transaction not completed
     // this is, of course, waiting until D responses for every individual A transaction
     when (tl_in.d.fire()) { d_full := false.B }
-    when (tl_in.a.fire()) { d_full := true.B }
+    when (tl_in.a.fire() && !sdramimp.io.stall_o) { d_full := true.B }
 
-    // Respond to D
+    // The D valid is the WB ack and the valid held (if D not ready yet)
+    tl_in.d.valid := d_valid_held
+    // Try to latch true the D valid held.
+    // If we use fire for the "false" latch, it lasts at least 1 cycle
+    val ack = (sdramimp.io.ack_o)
+    when(ack) { d_valid_held := true.B }
+    when(tl_in.d.fire()) { d_valid_held := false.B }
+
+    // The A ready should be 1 only if there is no transaction
+    tl_in.a.ready := !d_full && !sdramimp.io.stall_o
+
+    // hasData helds if there is a write transaction
+    val hasData = tl_edge.hasData(tl_in.a.bits)
+
+    // Response data to D
+    val d_data = RegEnable(sdramimp.io.data_o, ack)
+
+    // Save the size and the source from the A channel for the D channel
+    when (tl_in.a.fire()) {
+      d_size   := tl_in.a.bits.size
+      d_source := tl_in.a.bits.source
+      d_hasData := hasData
+    }
+
+    // Response characteristics
     tl_in.d.bits := tl_edge.AccessAck(d_source, d_size, d_data)
     tl_in.d.bits.opcode := Mux(d_hasData, TLMessages.AccessAck, TLMessages.AccessAckData)
-    tl_in.d.valid := d_full
+
+    // Connections to the wb transactions
+    sdramimp.io.stb_i := tl_in.a.valid // We trigger the transaction only here
+    sdramimp.io.cyc_i := tl_in.a.valid // We trigger the transaction only here
+    sdramimp.io.addr_i := tl_in.a.bits.address
+    sdramimp.io.data_i := tl_in.a.bits.data
+    sdramimp.io.we_i := hasData // Is write?
+    sdramimp.io.sel_i := tl_in.a.bits.mask
 
     // Tie off unused channels
     tl_in.b.valid := false.B
@@ -199,7 +212,7 @@ case class SDRAMAttachParams
 
   def attachTo(where: Attachable)(implicit p: Parameters): SDRAM = where {
     val name = s"sdram_${SDRAMObject.nextId()}"
-    val mbus = where.locateTLBusWrapper(MBUS)
+    val mbus = where.locateTLBusWrapper(SBUS)
     val sdramClockDomainWrapper = LazyModule(new ClockSinkDomain(take = None))
     val sdram = sdramClockDomainWrapper { LazyModule(new SDRAM(device, mbus.blockBytes, mbus.beatBytes)) }
     sdram.suggestName(name)
