@@ -683,7 +683,7 @@ assign stall_o = ~(state_q == STATE_READ || state_q == STATE_WRITE0);
 //-----------------------------------------------------------------
 genvar i;
 
-assign sdram_clk_o     = clk_i;
+assign sdram_clk_o     = ~clk_i;
 assign sdram_drive_o   = !data_rd_en_q;
 assign sdram_data_o    = data_q;
 assign sdram_data_in_w = sdram_data_i;
