@@ -62,5 +62,9 @@ class RVCHarness()(implicit p: Parameters) extends Module {
     }
   }
 
+  // SPI
+  dut.spi.foreach(_.dq.foreach(_.i := false.B)) // Tie down for now
+
+  // SDRAM
   dut.sdramio.foreach(sdramsim(_, reset.asBool()))
 }

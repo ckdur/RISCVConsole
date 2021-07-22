@@ -7,9 +7,9 @@ LINKER_SCRIPT=link.ld
 CFLAGS=-g -march=rv32imac -mabi=ilp32 -mcmodel=medany
 LDFLAGS=-march=rv32imac -mabi=ilp32 -mcmodel=medany -T $(LINKER_SCRIPT) -nostartfiles --specs=nano.specs
 
-all: bootloader.hex
+all: $(BUILD_DIR)/bootloader.hex
 
-elf: bootloader.elf
+elf: $(BUILD_DIR)/bootloader.elf
 
 %.o : %.S
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -18,17 +18,17 @@ elf: bootloader.elf
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 # The linker step
-bootloader.elf: start.o main.o print.o
-	$(CC) $^ -o bootloader.elf $(LDFLAGS)
+$(BUILD_DIR)/bootloader.elf: start.o main.o print.o
+	$(CC) $^ -o $@ $(LDFLAGS)
 
-bin: bootloader.bin
+bin: $(BUILD_DIR)/bootloader.bin
 
-bootloader.bin: bootloader.elf
+$(BUILD_DIR)/bootloader.bin: $(BUILD_DIR)/bootloader.elf
 	$(OBJCOPY) -O binary $< $@
 
-hex: bootloader.hex
+hex: $(BUILD_DIR)/bootloader.hex
 
-bootloader.hex: bootloader.bin
+$(BUILD_DIR)/bootloader.hex: $(BUILD_DIR)/bootloader.bin
 	od -t x4 -An -w4 -v $< > $@
 
 clean:

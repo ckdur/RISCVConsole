@@ -197,12 +197,13 @@ $(dramsim_lib):
 #########################################################################################
 # Rule for ROM file
 #########################################################################################
+bldr_dir=$(soft_dir)/sdboot
+HEX_FILE=$(build_dir)/sdboot.hex
 soft_dir=$(base_dir)/software
-bldr_dir=$(soft_dir)/bootloader
 ROM_FILE ?= $(build_dir)/$(long_name).rom.v
 ROM_CONF_FILE ?= $(build_dir)/$(long_name).rom.conf
-$(ROM_FILE): $(ROM_CONF_FILE) $(bldr_dir)/bootloader.hex
-	python2 $(base_dir)/hardware/vlsi_rom_gen $(ROM_CONF_FILE) $(bldr_dir)/bootloader.hex > $(ROM_FILE)
+$(ROM_FILE): $(ROM_CONF_FILE) $(HEX_FILE)
+	python2 $(base_dir)/hardware/vlsi_rom_gen $(ROM_CONF_FILE) $(HEX_FILE) > $(ROM_FILE)
 
 $(ROM_CONF_FILE): $(FIRRTL_FILE)
 	touch $(ROM_CONF_FILE)
@@ -210,8 +211,6 @@ $(ROM_CONF_FILE): $(FIRRTL_FILE)
 # The EICG_wrapper needs to be added manually, because verilator...
 EICG_wrapper = $(build_dir)/EICG_wrapper.v
 
-$(bldr_dir)/bootloader.hex:
-	make -C $(bldr_dir) clean
-	make -C $(bldr_dir) hex
+$(HEX_FILE):
+	make -C $(bldr_dir) BUILD_DIR=$(build_dir) long_name=$(long_name) hex
 
-.PHONY: $(bldr_dir)/bootloader.hex

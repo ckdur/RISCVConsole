@@ -21,6 +21,14 @@ class ulx3sShell extends RawModule {
 
   val sdram = IO(new ULX3SSDRAM)
 
+  val sd = IO(new Bundle{
+    val clk = Analog(1.W)
+    val cmd = Analog(1.W)
+    val d = Vec(4, Analog(1.W))
+    val wp = Analog(1.W)
+    val cdn = Analog(1.W)
+  })
+
   // Put the PLL
   val pll = withClockAndReset(clk_25mhz, false.B) {
     ecp5pll(ecp5pllConfig(

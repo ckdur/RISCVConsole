@@ -182,8 +182,8 @@ class SDRAM(cfg: SDRAMConfig, blockBytes: Int, beatBytes: Int)(implicit p: Param
     tl_in.d.bits.opcode := Mux(d_hasData, TLMessages.AccessAck, TLMessages.AccessAckData)
 
     // Connections to the wb transactions
-    sdramimp.io.stb_i := tl_in.a.valid // We trigger the transaction only here
-    sdramimp.io.cyc_i := tl_in.a.valid // We trigger the transaction only here
+    sdramimp.io.stb_i := tl_in.a.valid & !d_full // We trigger the transaction only here
+    sdramimp.io.cyc_i := tl_in.a.valid & !d_full // We trigger the transaction only here
     sdramimp.io.addr_i := tl_in.a.bits.address
     sdramimp.io.data_i := tl_in.a.bits.data
     sdramimp.io.we_i := hasData // Is write?
@@ -212,7 +212,7 @@ case class SDRAMAttachParams
 
   def attachTo(where: Attachable)(implicit p: Parameters): SDRAM = where {
     val name = s"sdram_${SDRAMObject.nextId()}"
-    val mbus = where.locateTLBusWrapper(SBUS)
+    val mbus = where.locateTLBusWrapper(MBUS)
     val sdramClockDomainWrapper = LazyModule(new ClockSinkDomain(take = None))
     val sdram = sdramClockDomainWrapper { LazyModule(new SDRAM(device, mbus.blockBytes, mbus.beatBytes)) }
     sdram.suggestName(name)

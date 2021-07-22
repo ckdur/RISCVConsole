@@ -6,7 +6,9 @@ import chipsalliance.rocketchip.config.Parameters
 import freechips.rocketchip.subsystem._
 import sifive.blocks.devices.gpio._
 import sifive.blocks.devices.uart._
+import sifive.blocks.devices.spi._
 import freechips.rocketchip.devices.tilelink._
+import freechips.rocketchip.diplomacy.{Resource, ResourceAddress, ResourceBinding, ValName}
 import riscvconsole.devices.sdram._
 import testchipip._
 
@@ -17,6 +19,17 @@ class RVCSystem(implicit p: Parameters) extends RVCSubsystem
   with CanHaveMasterAXI4MemPort
   with CanHavePeripherySerial
 {
+  val spiDevs = p(PeripherySPIKey).map { ps =>
+    SPIAttachParams(ps).attachTo(this)
+  }
+  val spiNodes = spiDevs.map ( _.ioNode.makeSink() )
+  spiDevs.zipWithIndex.foreach { case (ps, i) =>
+    val mmc = new MMCDevice(ps.device, 5) // Only the first one is mmc
+    ResourceBinding {
+      Resource(mmc, "reg").bind(ResourceAddress(0))
+    }
+  }
+
   val maskromparam = p(PeripheryMaskROMKey)
   val maskrom = maskromparam.map{
     case par =>
@@ -31,5 +44,6 @@ class RVCSystemModuleImp[+L <: RVCSystem](_outer: L) extends RVCSubsystemModuleI
   with HasSDRAMModuleImp
   with CanHavePeripherySerialModuleImp
 {
+  val spi  = outer.spiNodes.zipWithIndex.map  { case(n,i) => n.makeIO()(ValName(s"spi_$i")).asInstanceOf[SPIPortIO] }
   global_reset_vector := outer.maskromparam(0).address.U
 }

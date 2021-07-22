@@ -51,5 +51,12 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
     ALT_IOBUF(HSMC_TX_p(0), platform.io.uart_txd)
 
     platform.io.jtag_RSTn := sw(0)       //reset for the jtag
+
+    ALT_IOBUF(HSMC_TX_p(1), platform.io.spi(0).sck )
+    ALT_IOBUF(HSMC_TX_p(2), platform.io.spi(0).cs(0) )
+    ALT_IOBUF(HSMC_TX_p(3), platform.io.spi(0).dq(0))
+    ALT_IOBUF(HSMC_TX_p(4), platform.io.spi(0).dq(1))
+    ALT_IOBUF(HSMC_TX_p(5), platform.io.spi(0).dq(2))
+    ALT_IOBUF(HSMC_TX_p(6), platform.io.spi(0).dq(3))
   }
 }
