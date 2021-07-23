@@ -18,6 +18,10 @@ class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
     SDRAMConfig(
       address = 0x80000000L,
       sdcfg = sdram_bb_cfg(SDRAM_HZ = site(SystemBusKey).dtsFrequency.getOrElse(100000000L))))
+
+  case SRAMKey => Seq(
+    SRAMConfig(address = 0x82200000L, size = 0x4000)
+  )
 })
 
 class SetFrequency(freq: BigInt) extends Config((site, here, up) => {
@@ -28,6 +32,7 @@ class SetFrequency(freq: BigInt) extends Config((site, here, up) => {
 
 class RemoveSDRAM extends Config((site, here, up) => {
   case SDRAMKey => Nil
+  case SRAMKey => Nil
 })
 
 class RemoveDebugClockGating extends Config((site, here, up) => {
@@ -40,6 +45,7 @@ class RVCConfig extends Config(
   new RVCPeripheralsConfig ++
     new SetFrequency(50000000) ++
     new RemoveDebugClockGating ++
+    new freechips.rocketchip.subsystem.WithTimebase(1000000) ++
     new freechips.rocketchip.subsystem.WithNBreakpoints(1) ++
     new freechips.rocketchip.subsystem.WithJtagDTM ++
     new freechips.rocketchip.subsystem.WithNoMemPort ++              // no top-level memory port at 0x80000000
@@ -67,6 +73,7 @@ class ArrowConfig extends Config(
   new RemoveSDRAM ++
     new RVCPeripheralsConfig(10) ++
     new RemoveDebugClockGating ++
+    new freechips.rocketchip.subsystem.WithTimebase(1000000) ++
     new freechips.rocketchip.subsystem.WithNBreakpoints(1) ++
     new freechips.rocketchip.subsystem.WithJtagDTM ++
     new freechips.rocketchip.subsystem.WithNoMemPort ++              // no top-level memory port at 0x80000000
