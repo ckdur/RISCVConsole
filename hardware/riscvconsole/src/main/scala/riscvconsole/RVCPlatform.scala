@@ -32,9 +32,11 @@ class RVCPlatform(implicit p: Parameters) extends Module
     val spi = MixedVec( p(PeripherySPIKey).map{A => new SPIPins(() => new BasePin(), A)} )
   })
 
-  val sys = Module(LazyModule(new RVCSystem).module)
+  val greset = WireInit(false.B)
+  val sys = withReset(greset){ Module(LazyModule(new RVCSystem).module) }
+  greset := reset.toBool() || sys.debug.get.ndreset // Put the ndreset from debug here
 
-  sys.resetctrl.foreach { rstctrl => rstctrl.hartIsInReset.foreach(_ := reset.toBool())}
+  sys.resetctrl.foreach { rstctrl => rstctrl.hartIsInReset.foreach(_ := greset)}
 
   Debug.connectDebugClockHelper(sys.debug.get, reset, clock)
   io.jtag <> sys.debug.get.systemjtag.get.jtag

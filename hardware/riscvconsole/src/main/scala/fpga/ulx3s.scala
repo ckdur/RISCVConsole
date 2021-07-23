@@ -47,7 +47,9 @@ class ulx3sTop(implicit p: Parameters) extends ulx3sShell {
     BB(sd.d(3), platform.io.spi(0).cs(0))
     BB(sd.cmd, platform.io.spi(0).dq(0))
     BB(sd.d(0), platform.io.spi(0).dq(1))
-    BB(sd.wp, platform.io.spi(0).dq(2))
-    BB(sd.cdn, platform.io.spi(0).dq(3))
+    //BB(sd.wp, platform.io.spi(0).dq(2))
+    //BB(sd.cdn, platform.io.spi(0).dq(3))
+    platform.io.spi(0).dq(2).i.ival := false.B
+    platform.io.spi(0).dq(3).i.ival := false.B
   }
 }

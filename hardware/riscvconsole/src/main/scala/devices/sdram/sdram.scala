@@ -85,7 +85,7 @@ class sdram(val cfg: sdram_bb_cfg) extends BlackBox (
 case class SDRAMConfig // Periphery Config
 (
   address: BigInt,
-  size: BigInt = 0x10000000L, // 1/16th of 32-bit
+  size: BigInt = 0x2000000L, // 32Mb (256Mbits)
   sdcfg: sdram_bb_cfg = sdram_bb_cfg()
 )
 

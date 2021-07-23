@@ -40,6 +40,7 @@ class RVCConfig extends Config(
   new RVCPeripheralsConfig ++
     new SetFrequency(50000000) ++
     new RemoveDebugClockGating ++
+    new freechips.rocketchip.subsystem.WithNBreakpoints(1) ++
     new freechips.rocketchip.subsystem.WithJtagDTM ++
     new freechips.rocketchip.subsystem.WithNoMemPort ++              // no top-level memory port at 0x80000000
     new freechips.rocketchip.subsystem.WithNoMMIOPort ++           // no top-level MMIO master port (overrides default set in rocketchip)
@@ -55,7 +56,7 @@ class RVCConfig extends Config(
     new freechips.rocketchip.subsystem.WithL1DCacheWays(1) ++
     new freechips.rocketchip.subsystem.WithBufferlessBroadcastHub() ++
     // Processor options
-    new freechips.rocketchip.subsystem.WithNSmallCores(1) ++            // single rocket-core with small cache
+    new freechips.rocketchip.subsystem.WithNMedCores(1) ++            // single rocket-core with VM support
     new freechips.rocketchip.subsystem.WithRV32 ++
     new freechips.rocketchip.subsystem.WithCoherentBusTopology ++  // Hierarchical buses with broadcast L2
     new freechips.rocketchip.system.BaseConfig)                    // "base" rocketchip system
@@ -66,6 +67,7 @@ class ArrowConfig extends Config(
   new RemoveSDRAM ++
     new RVCPeripheralsConfig(10) ++
     new RemoveDebugClockGating ++
+    new freechips.rocketchip.subsystem.WithNBreakpoints(1) ++
     new freechips.rocketchip.subsystem.WithJtagDTM ++
     new freechips.rocketchip.subsystem.WithNoMemPort ++              // no top-level memory port at 0x80000000
     new freechips.rocketchip.subsystem.WithNoMMIOPort ++           // no top-level MMIO master port (overrides default set in rocketchip)

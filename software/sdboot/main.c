@@ -25,7 +25,7 @@ int main(void)
 	  copy();
 	}
 
-	kputs("BOOT");
+	kputs("\nBOOTING RATONA:\n");
 
 	__asm__ __volatile__ ("fence.i" : : : "memory");
 	return 0;

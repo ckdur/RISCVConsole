@@ -8,7 +8,7 @@ import sifive.blocks.devices.gpio._
 import sifive.blocks.devices.uart._
 import sifive.blocks.devices.spi._
 import freechips.rocketchip.devices.tilelink._
-import freechips.rocketchip.diplomacy.{Resource, ResourceAddress, ResourceBinding, ValName}
+import freechips.rocketchip.diplomacy.{Description, Device, Resource, ResourceAddress, ResourceAnchors, ResourceBinding, ResourceBindings, ResourceString, SimpleDevice, ValName}
 import riscvconsole.devices.sdram._
 import testchipip._
 
@@ -28,6 +28,14 @@ class RVCSystem(implicit p: Parameters) extends RVCSubsystem
     ResourceBinding {
       Resource(mmc, "reg").bind(ResourceAddress(0))
     }
+  }
+  val chosen = new Device {
+    def describe(resources: ResourceBindings): Description = {
+      Description("chosen", Map("bootargs" -> Seq(ResourceString("console=hvc0 earlycon=sbi"))))
+    }
+  }
+  ResourceBinding {
+    Resource(chosen, "bootargs").bind(ResourceString(""))
   }
 
   val maskromparam = p(PeripheryMaskROMKey)

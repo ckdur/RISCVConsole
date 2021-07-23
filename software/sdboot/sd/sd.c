@@ -211,6 +211,7 @@ int sd_copy(void* dst, uint32_t src_lba, size_t size)
   volatile uint8_t *p = dst;
   long i = size;
   int rc = 0;
+  long sizekb = size << 1;
 
   uint8_t crc = 0;
   crc = crc7(crc, SD_CMD(SD_CMD_READ_BLOCK_MULTIPLE));
@@ -246,8 +247,9 @@ int sd_copy(void* dst, uint32_t src_lba, size_t size)
     }
     
     if (SPIN_UPDATE(i)) {
-			kputc('\b');
-			kputc(spinner[SPIN_INDEX(i)]);
+			kputc('\r'); 
+			kputc(spinner[SPIN_INDEX(i)]); 
+			kprintf(" %x <- %xkB / %xkB", (uint32_t)p, (size-i+1) << 1, sizekb);
 		}
   } while (--i > 0);
 
