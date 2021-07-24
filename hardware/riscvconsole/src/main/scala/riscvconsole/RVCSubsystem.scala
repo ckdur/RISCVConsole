@@ -21,25 +21,8 @@ trait HasRVCTiles extends HasTiles
 
   val module: HasRVCTilesModuleImp
 
-  protected val rocketTileParams = p(RocketTilesKey)
-  private val rocketCrossings = perTileOrGlobalSetting(p(RocketCrossingKey), rocketTileParams.size)
-
-  val allTilesInfo = (rocketTileParams) zip (rocketCrossings)
-
-  val tiles = allTilesInfo.sortWith(_._1.hartId < _._1.hartId).map {
-    case (param, crossing) => {
-
-      val tile = param match {
-        case r: RocketTileParams => {
-          LazyModule(new RocketTile(r, crossing, PriorityMuxHartIdFromSeq(rocketTileParams), logicalTreeNode))
-        }
-      }
-      connectMasterPortsToSBus(tile, crossing)
-      connectSlavePortsToCBus(tile, crossing)
-      connectInterrupts(tile, debugOpt, clintOpt, plicOpt)
-
-      tile
-    }
+  Seq(PBUS, FBUS, MBUS, CBUS).foreach { loc =>
+    tlBusWrapperLocationMap.lift(loc).foreach { _.clockGroupNode := asyncClockGroupsNode }
   }
 
   def coreMonitorBundles = tiles.map {
@@ -63,18 +46,11 @@ class RVCSubsystem(implicit p: Parameters) extends BaseSubsystem
 }
 
 class RVCSubsystemModuleImp[+L <: RVCSubsystem](_outer: L) extends BaseSubsystemModuleImp(_outer)
-  with HasResetVectorWire
   with HasRVCTilesModuleImp
 {
-  tile_inputs.zip(outer.hartIdList).foreach { case(wire, i) =>
-    wire.hartid := i.U
-    wire.reset_vector := global_reset_vector
-  }
-
-  // create file with boom params
+  // create file with core params
   ElaborationArtefacts.add("""core.config""", outer.tiles.map(x => x.module.toString).mkString("\n"))
-
   // Generate C header with relevant information for Dromajo
   // This is included in the `dromajo_params.h` header file
-  DromajoHelper.addArtefacts
+  DromajoHelper.addArtefacts(InSubsystem)
 }

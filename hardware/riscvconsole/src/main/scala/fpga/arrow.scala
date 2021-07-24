@@ -17,6 +17,9 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
   {
     val platform = Module(new RVCPlatform) //RVC:RISCV console(Full View)
 
+    // default all gpio
+    platform.io.gpio.foreach(_.i.po.foreach(_ := false.B))
+
     //connect the led
     (led zip platform.io.gpio.slice(0, 4)).foreach
     {
@@ -52,8 +55,12 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
 
     platform.io.jtag_RSTn := sw(0)       //reset for the jtag
 
+    platform.io.spi.foreach(_.sck.i.po.foreach(_ := false.B))
+    platform.io.spi.foreach(_.cs.foreach(_.i.po.foreach(_ := false.B)))
+    platform.io.spi.foreach(_.dq.foreach(_.i.po.foreach(_ := false.B)))
+
     ALT_IOBUF(HSMC_TX_p(1), platform.io.spi(0).sck )
-    ALT_IOBUF(HSMC_TX_p(2), platform.io.spi(0).cs(0) )
+    ALT_IOBUF(HSMC_TX_p(2), platform.io.spi(0).cs(0))
     ALT_IOBUF(HSMC_TX_p(3), platform.io.spi(0).dq(0))
     ALT_IOBUF(HSMC_TX_p(4), platform.io.spi(0).dq(1))
     ALT_IOBUF(HSMC_TX_p(5), platform.io.spi(0).dq(2))

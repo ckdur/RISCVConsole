@@ -16,6 +16,9 @@ class ulx3sTop(implicit p: Parameters) extends ulx3sShell {
     val platform = Module(new RVCPlatform)
     platform.suggestName("platform")
 
+    // default all gpio
+    platform.io.gpio.foreach(_.i.po.foreach(_ := false.B))
+
     (led zip platform.io.gpio.slice(0, 8)).foreach{
       case (l,pin) =>
         l := pin.o.oval & pin.o.oe
@@ -34,6 +37,7 @@ class ulx3sTop(implicit p: Parameters) extends ulx3sShell {
     TDO_as_base.o.oe := platform.io.jtag.TDO.driven
     TDO_as_base.o.oval := platform.io.jtag.TDO.data
     TDO_as_base.o.ie := false.B
+    TDO_as_base.i.po.foreach(_ := false.B)
     BB(gp(3), TDO_as_base)
 
     ftdi_rxd := platform.io.uart_txd // ftdi_received -> fpga_transmitted
@@ -42,6 +46,10 @@ class ulx3sTop(implicit p: Parameters) extends ulx3sShell {
     platform.io.jtag_RSTn := sw(0)
 
     sdram.from_SDRAMIf( platform.io.sdram.head )
+
+    platform.io.spi.foreach(_.sck.i.po.foreach(_ := false.B))
+    platform.io.spi.foreach(_.cs.foreach(_.i.po.foreach(_ := false.B)))
+    platform.io.spi.foreach(_.dq.foreach(_.i.po.foreach(_ := false.B)))
 
     platform.io.spi.foreach{ spi =>
       BB(sd.clk, spi.sck)
@@ -53,6 +61,10 @@ class ulx3sTop(implicit p: Parameters) extends ulx3sShell {
       spi.dq(2).i.ival := false.B
       spi.dq(3).i.ival := false.B
     }
+
+    platform.io.spiflash.foreach(_.sck.i.po.foreach(_ := false.B))
+    platform.io.spiflash.foreach(_.cs.foreach(_.i.po.foreach(_ := false.B)))
+    platform.io.spiflash.foreach(_.dq.foreach(_.i.po.foreach(_ := false.B)))
 
     platform.io.spiflash.foreach { qspi =>
       BB(gp(4), qspi.sck)

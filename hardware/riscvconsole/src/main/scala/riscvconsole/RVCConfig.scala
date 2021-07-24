@@ -1,8 +1,9 @@
 package riscvconsole.system
 
 import chipsalliance.rocketchip.config._
-import freechips.rocketchip.subsystem.{PeripheryBusKey, SystemBusKey, WithRV32}
+import freechips.rocketchip.subsystem.{InSubsystem, PeripheryBusKey, SubsystemDriveAsyncClockGroupsKey, SystemBusKey}
 import freechips.rocketchip.devices.debug._
+import freechips.rocketchip.devices.tilelink.MaskROMLocated
 import riscvconsole.devices.sdram._
 
 class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
@@ -14,7 +15,7 @@ class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
     sifive.blocks.devices.spi.SPIParams(0x10002000))
   //case sifive.blocks.devices.spi.PeripherySPIFlashKey => Seq(
   //  sifive.blocks.devices.spi.SPIFlashParams(0x10003000, 0x20000000L))
-  case freechips.rocketchip.subsystem.PeripheryMaskROMKey => Seq(
+  case MaskROMLocated(InSubsystem) => Seq(
     freechips.rocketchip.devices.tilelink.MaskROMParams(0x20000000L, "MyBootROM"))
   case SDRAMKey => Seq(
     SDRAMConfig(
@@ -22,6 +23,7 @@ class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
       sdcfg = sdram_bb_cfg(SDRAM_HZ = site(SystemBusKey).dtsFrequency.getOrElse(100000000L))))
   case SRAMKey => Seq(SRAMConfig(address = 0x82200000L, size = 0x4000))
   //case freechips.rocketchip.subsystem.PeripheryMaskROMKey => Seq()
+  case SubsystemDriveAsyncClockGroupsKey => None
 })
 
 class SetFrequency(freq: BigInt) extends Config((site, here, up) => {
@@ -52,6 +54,7 @@ class RVCConfig extends Config(
     new freechips.rocketchip.subsystem.WithNoMemPort ++              // no top-level memory port at 0x80000000
     new freechips.rocketchip.subsystem.WithNoMMIOPort ++           // no top-level MMIO master port (overrides default set in rocketchip)
     new freechips.rocketchip.subsystem.WithNoSlavePort ++          // no top-level MMIO slave port (overrides default set in rocketchip)
+    new freechips.rocketchip.subsystem.WithDontDriveBusClocksFromSBus ++
     //new freechips.rocketchip.subsystem.WithInclusiveCache(nBanks = 1, nWays = 2, capacityKB = 16) ++       // use Sifive L2 cache
     new freechips.rocketchip.subsystem.WithNExtTopInterrupts(0) ++ // no external interrupts
     // Cache options
@@ -81,6 +84,7 @@ class ArrowConfig extends Config(
     new freechips.rocketchip.subsystem.WithNoMemPort ++              // no top-level memory port at 0x80000000
     new freechips.rocketchip.subsystem.WithNoMMIOPort ++           // no top-level MMIO master port (overrides default set in rocketchip)
     new freechips.rocketchip.subsystem.WithNoSlavePort ++          // no top-level MMIO slave port (overrides default set in rocketchip)
+    new freechips.rocketchip.subsystem.WithDontDriveBusClocksFromSBus ++
     //new freechips.rocketchip.subsystem.WithInclusiveCache(nBanks = 1, nWays = 2, capacityKB = 16) ++       // use Sifive L2 cache
     new freechips.rocketchip.subsystem.WithNExtTopInterrupts(0) ++ // no external interrupts
     new freechips.rocketchip.subsystem.With1TinyCore ++            // single rocket-core with scratchpad

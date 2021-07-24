@@ -9,7 +9,7 @@ import freechips.rocketchip.subsystem._
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.devices.debug._
 import riscvconsole.devices.sdram._
-import sifive.blocks.devices.gpio.GPIOPortIO
+import sifive.blocks.devices.gpio.{GPIOPortIO, IOFPortIO}
 import sifive.blocks.devices.uart._
 import testchipip._
 
@@ -26,7 +26,7 @@ class RVCHarness()(implicit p: Parameters) extends Module {
   p(ExtMem).foreach{ extmem =>
     val memSize = extmem.master.size
     val lineSize = p(CacheBlockBytes)
-    val mem = Module(new SimDRAM(memSize, lineSize, ldut.mem_axi4.head.params))
+    val mem = Module(new SimDRAM(memSize, lineSize, p(SystemBusKey).dtsFrequency.getOrElse(100000000L), ldut.mem_axi4.head.params))
     mem.io.axi <> ldut.mem_axi4.head
     mem.io.clock := clock
     mem.io.reset := reset
@@ -39,8 +39,13 @@ class RVCHarness()(implicit p: Parameters) extends Module {
 
   // Serial interface (if existent) will be connected here
   io.success := false.B
-  val ser_success = SerialAdapter.connectSimSerial(dut.serial, clock, reset)
-  when (ser_success) { io.success := true.B }
+
+  (ldut.serial_tl zip ldut.serdesser).foreach { case (port, serdesser) =>
+    val bits = SerialAdapter.asyncQueue(port, clock, reset)
+    val ram = SerialAdapter.connectHarnessRAM(serdesser, bits, reset)
+    val ser_success = SerialAdapter.connectSimSerial(ram.module.io.tsi_ser, clock, reset)
+    when (ser_success) { io.success := true.B }
+  }
 
   // UART
   UARTAdapter.connect(uart = dut.uart.map(_.asInstanceOf[UARTPortIO]), baudrate = BigInt(115200))
@@ -49,17 +54,12 @@ class RVCHarness()(implicit p: Parameters) extends Module {
   dut.gpio.foreach{case gpio:GPIOPortIO =>
     gpio.pins.foreach{ case pin =>
       pin.i.ival := false.B
+      pin.i.po.foreach(_ := false.B)
     }
-    gpio.iof_0.foreach{ case iof =>
-      iof.foreach{ case u =>
-        u.default()
-      }
-    }
-    gpio.iof_1.foreach{ case iof =>
-      iof.foreach{ case u =>
-        u.default()
-      }
-    }
+  }
+  dut.iof.foreach { case iof: IOFPortIO =>
+    iof.iof_0.foreach(_.default())
+    iof.iof_1.foreach(_.default())
   }
 
   // SPI

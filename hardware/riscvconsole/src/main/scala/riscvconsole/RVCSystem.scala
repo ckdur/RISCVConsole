@@ -9,6 +9,7 @@ import sifive.blocks.devices.uart._
 import sifive.blocks.devices.spi._
 import freechips.rocketchip.devices.tilelink._
 import freechips.rocketchip.diplomacy._
+import freechips.rocketchip.prci._
 import freechips.rocketchip.tilelink.{TLFragmenter, TLRAM}
 import riscvconsole.devices.sdram._
 import testchipip._
@@ -26,7 +27,7 @@ class RVCSystem(implicit p: Parameters) extends RVCSubsystem
   with HasPeripherySPIFlash
   with HasSDRAM
   with CanHaveMasterAXI4MemPort
-  with CanHavePeripherySerial
+  with CanHavePeripheryTLSerial
 {
   val spiDevs = p(PeripherySPIKey).map { ps =>
     SPIAttachParams(ps).attachTo(this)
@@ -49,11 +50,7 @@ class RVCSystem(implicit p: Parameters) extends RVCSubsystem
     Resource(chosen, "bootargs").bind(ResourceString(""))
   }
 
-  val maskromparam = p(PeripheryMaskROMKey)
-  val maskrom = maskromparam.map{
-    case par =>
-      MaskROM.attach(par, pbus)
-  }
+  val maskROMs = p(MaskROMLocated(location)).map { MaskROM.attach(_, this, CBUS) }
 
   val srams = p(SRAMKey).zipWithIndex.map { case(sramcfg, i) =>
     val sram = LazyModule(new TLRAM(AddressSet.misaligned(sramcfg.address, sramcfg.size).head, cacheable = true))
@@ -61,6 +58,17 @@ class RVCSystem(implicit p: Parameters) extends RVCSubsystem
     mbus.coupleTo(s"sram_${i}") { bus => sram.node := TLFragmenter(4, mbus.blockBytes) := bus }
     sram
   }
+
+  val maskROMResetVectorSourceNode = BundleBridgeSource[UInt]()
+  tileResetVectorNexusNode := maskROMResetVectorSourceNode
+
+  // Create the ClockGroupSource (only 1...)
+  val clockGroup = ClockGroupSourceNode(List.fill(1) { ClockGroupSourceParameters() })
+  // Create the Aggregator. This will just take the SourceNode, then just replicate it in a Nexus
+  val clocksAggregator = LazyModule(new ClockGroupAggregator("allClocks")).node
+  // Connect it to the asyncClockGroupsNode, with the aggregator
+  asyncClockGroupsNode :*= clocksAggregator := clockGroup
+
   override lazy val module = new RVCSystemModuleImp(this)
 }
 
@@ -69,10 +77,15 @@ class RVCSystemModuleImp[+L <: RVCSystem](_outer: L) extends RVCSubsystemModuleI
   with HasPeripheryUARTModuleImp
   with HasPeripherySPIFlashModuleImp
   with HasSDRAMModuleImp
-  with CanHavePeripherySerialModuleImp
   with HasRTCModuleImp
 {
   val spi  = outer.spiNodes.zipWithIndex.map  { case(n,i) => n.makeIO()(ValName(s"spi_$i")).asInstanceOf[SPIPortIO] }
-  val possible_addresses = outer.maskromparam.map(_.address) ++ p(PeripherySPIFlashKey).map(_.fAddress)
-  global_reset_vector := possible_addresses(0).U
+  val possible_addresses = outer.p(MaskROMLocated(outer.location)).map(_.address) ++ p(PeripherySPIFlashKey).map(_.fAddress)
+  outer.maskROMResetVectorSourceNode.bundle := possible_addresses(0).U
+
+  val extclocks = outer.clockGroup.out.flatMap(_._1.member.data)
+  extclocks.foreach{ o =>
+    o.clock := clock
+    o.reset := reset
+  }
 }

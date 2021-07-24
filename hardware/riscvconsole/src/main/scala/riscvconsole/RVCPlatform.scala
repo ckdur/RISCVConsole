@@ -57,10 +57,20 @@ class RVCPlatform(implicit p: Parameters) extends Module
   uart.rxd := io.uart_rxd
 
   val spi = sys.spi
-  (spi zip io.spi).foreach{ case (a, b) => SPIPinsFromPort(b, a, sys.clock, sys.reset.toBool(), 3)}
+  (spi zip io.spi).foreach{ case (a, b) =>
+    b.sck.default()
+    b.cs.foreach(_.default())
+    b.dq.foreach(_.default())
+    SPIPinsFromPort(b, a, sys.clock, sys.reset.toBool(), 3)
+  }
 
   val spiflash = sys.qspi
-  (spiflash zip io.spiflash).foreach{ case (a, b) => SPIPinsFromPort(b, a, sys.clock, sys.reset.toBool(), 3)}
+  (spiflash zip io.spiflash).foreach{ case (a, b) =>
+    b.sck.default()
+    b.cs.foreach(_.default())
+    b.dq.foreach(_.default())
+    SPIPinsFromPort(b, a, sys.clock, sys.reset.toBool(), 3)
+  }
 
   (io.sdram zip sys.sdramio).map{case (port, sys) => port <> sys}
 }
