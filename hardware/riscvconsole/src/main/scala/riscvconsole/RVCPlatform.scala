@@ -9,7 +9,7 @@ import freechips.rocketchip.jtag.JTAGIO
 import riscvconsole.devices.sdram.{SDRAMIf, SDRAMKey}
 import sifive.blocks.devices.gpio._
 import sifive.blocks.devices.pinctrl._
-import sifive.blocks.devices.spi.{PeripherySPIKey, SPIPins, SPIPinsFromPort, SPIPortIO}
+import sifive.blocks.devices.spi._
 import sifive.blocks.devices.uart._
 
 class RVCPlatform(implicit p: Parameters) extends Module
@@ -30,6 +30,9 @@ class RVCPlatform(implicit p: Parameters) extends Module
 
     // SPI for SD
     val spi = MixedVec( p(PeripherySPIKey).map{A => new SPIPins(() => new BasePin(), A)} )
+
+    // SPIFlash for SD
+    val spiflash = MixedVec( p(PeripherySPIFlashKey).map{A => new SPIPins(() => new BasePin(), A)} )
   })
 
   val greset = WireInit(false.B)
@@ -55,6 +58,9 @@ class RVCPlatform(implicit p: Parameters) extends Module
 
   val spi = sys.spi
   (spi zip io.spi).foreach{ case (a, b) => SPIPinsFromPort(b, a, sys.clock, sys.reset.toBool(), 3)}
+
+  val spiflash = sys.qspi
+  (spiflash zip io.spiflash).foreach{ case (a, b) => SPIPinsFromPort(b, a, sys.clock, sys.reset.toBool(), 3)}
 
   (io.sdram zip sys.sdramio).map{case (port, sys) => port <> sys}
 }

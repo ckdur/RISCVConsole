@@ -16,6 +16,7 @@ CFLAGS+= -fno-common -g -DENTROPY=0 -DNONSMP_HART=0
 CFLAGS+= -I $(BOOTROM_DIR)/include -I. -I./gpt -I./boot -I./sd -I./kprintf $(ADD_OPTS) 
 LFLAGS=-static -nostdlib -L $(BOOTROM_DIR)/linker -T sdboot.elf.lds
 SDBOOT_TARGET_ADDR?=0x80000000UL
+SDBOOT_TARGET_JUMP?=0x81F00000UL
 SDBOOT_SOURCE_ADDR?=0x20000000
 BUILD_DIR?=./
 
@@ -36,7 +37,7 @@ dtb: $(dtb)
 
 elf := $(BUILD_DIR)/sdboot.elf
 $(elf): $(dtb) head.S kprintf/kprintf.c sd/sd.c boot/boot.c gpt/gpt.c main.c $(clk)
-	$(CC) $(CFLAGS) -include $(clk) -DDEVICE_TREE='"$(dtb)"' -DSDBOOT_TARGET_ADDR=$(SDBOOT_TARGET_ADDR) $(LFLAGS) -o $@ head.S sd/sd.c boot/boot.c gpt/gpt.c main.c kprintf/kprintf.c
+	$(CC) $(CFLAGS) -include $(clk) -DDEVICE_TREE='"$(dtb)"' -DSDBOOT_TARGET_ADDR=$(SDBOOT_TARGET_ADDR) -DSDBOOT_TARGET_JUMP=$(SDBOOT_TARGET_JUMP) $(LFLAGS) -o $@ head.S sd/sd.c boot/boot.c gpt/gpt.c main.c kprintf/kprintf.c
 
 .PHONY: elf
 elf: $(elf)

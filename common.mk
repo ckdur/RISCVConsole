@@ -202,8 +202,10 @@ HEX_FILE=$(build_dir)/sdboot.hex
 soft_dir=$(base_dir)/software
 ROM_FILE ?= $(build_dir)/$(long_name).rom.v
 ROM_CONF_FILE ?= $(build_dir)/$(long_name).rom.conf
+ROM_SCRIPT = $(base_dir)/hardware/vlsi_rom_gen_fpga
+#ROM_SCRIPT = $(base_dir)/hardware/vlsi_rom_gen
 $(ROM_FILE): $(ROM_CONF_FILE) $(HEX_FILE)
-	python2 $(base_dir)/hardware/vlsi_rom_gen $(ROM_CONF_FILE) $(HEX_FILE) > $(ROM_FILE)
+	python2 $(ROM_SCRIPT) $(ROM_CONF_FILE) $(HEX_FILE) > $(ROM_FILE)
 
 $(ROM_CONF_FILE): $(FIRRTL_FILE)
 	touch $(ROM_CONF_FILE)

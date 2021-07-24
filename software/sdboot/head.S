@@ -13,12 +13,12 @@ _prog_start:
   smp_pause(s1, s2)
   la t0, trap_entry
   csrw mtvec, t0		// 0x800004a in fsbl-1.0
-  li sp, (MEMORY_MEM_ADDR + MEMORY_MEM_SIZE - 0x1000)
+  li sp, (MEMORY_MEM2_ADDR + MEMORY_MEM2_SIZE)
   call main
   smp_resume(s1, s2)
   csrr a0, mhartid
   la a1, dtb
-  li s1, PAYLOAD_DEST
+  li s1, PAYLOAD_JUMP
   jr s1
 
 trap_entry:

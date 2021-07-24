@@ -12,16 +12,16 @@ class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
     sifive.blocks.devices.gpio.GPIOParams(0x10001000, gpio))
   case sifive.blocks.devices.spi.PeripherySPIKey => Seq(
     sifive.blocks.devices.spi.SPIParams(0x10002000))
+  //case sifive.blocks.devices.spi.PeripherySPIFlashKey => Seq(
+  //  sifive.blocks.devices.spi.SPIFlashParams(0x10003000, 0x20000000L))
   case freechips.rocketchip.subsystem.PeripheryMaskROMKey => Seq(
-    freechips.rocketchip.devices.tilelink.MaskROMParams(0x10000, "MyBootROM"))
+    freechips.rocketchip.devices.tilelink.MaskROMParams(0x20000000L, "MyBootROM"))
   case SDRAMKey => Seq(
     SDRAMConfig(
       address = 0x80000000L,
       sdcfg = sdram_bb_cfg(SDRAM_HZ = site(SystemBusKey).dtsFrequency.getOrElse(100000000L))))
-
-  case SRAMKey => Seq(
-    SRAMConfig(address = 0x82200000L, size = 0x4000)
-  )
+  case SRAMKey => Seq(SRAMConfig(address = 0x82200000L, size = 0x4000))
+  //case freechips.rocketchip.subsystem.PeripheryMaskROMKey => Seq()
 })
 
 class SetFrequency(freq: BigInt) extends Config((site, here, up) => {
@@ -45,7 +45,8 @@ class RVCConfig extends Config(
   new RVCPeripheralsConfig ++
     new SetFrequency(50000000) ++
     new RemoveDebugClockGating ++
-    new freechips.rocketchip.subsystem.WithTimebase(1000000) ++
+    new freechips.rocketchip.subsystem.WithRV32 ++
+    new freechips.rocketchip.subsystem.WithTimebase(10000000) ++
     new freechips.rocketchip.subsystem.WithNBreakpoints(1) ++
     new freechips.rocketchip.subsystem.WithJtagDTM ++
     new freechips.rocketchip.subsystem.WithNoMemPort ++              // no top-level memory port at 0x80000000
@@ -54,16 +55,16 @@ class RVCConfig extends Config(
     //new freechips.rocketchip.subsystem.WithInclusiveCache(nBanks = 1, nWays = 2, capacityKB = 16) ++       // use Sifive L2 cache
     new freechips.rocketchip.subsystem.WithNExtTopInterrupts(0) ++ // no external interrupts
     // Cache options
-    new freechips.rocketchip.subsystem.WithNTrackersPerBank(1) ++
-    new freechips.rocketchip.subsystem.WithNBanks(1) ++
-    new freechips.rocketchip.subsystem.WithL1ICacheSets(32) ++
-    new freechips.rocketchip.subsystem.WithL1DCacheSets(32) ++
-    new freechips.rocketchip.subsystem.WithL1ICacheWays(1) ++
-    new freechips.rocketchip.subsystem.WithL1DCacheWays(1) ++
-    new freechips.rocketchip.subsystem.WithBufferlessBroadcastHub() ++
+    //new freechips.rocketchip.subsystem.WithNTrackersPerBank(1) ++
+    //new freechips.rocketchip.subsystem.WithNBanks(1) ++
+    //new freechips.rocketchip.subsystem.WithL1ICacheSets(32) ++
+    //new freechips.rocketchip.subsystem.WithL1DCacheSets(32) ++
+    //new freechips.rocketchip.subsystem.WithL1ICacheWays(1) ++
+    //new freechips.rocketchip.subsystem.WithL1DCacheWays(1) ++
+    //new freechips.rocketchip.subsystem.WithBufferlessBroadcastHub() ++
     // Processor options
-    new freechips.rocketchip.subsystem.WithNMedCores(1) ++            // single rocket-core with VM support
-    new freechips.rocketchip.subsystem.WithRV32 ++
+    new freechips.rocketchip.subsystem.WithoutFPU() ++
+    new freechips.rocketchip.subsystem.WithNMedCores(1) ++            // single rocket-core with VM support and FPU
     new freechips.rocketchip.subsystem.WithCoherentBusTopology ++  // Hierarchical buses with broadcast L2
     new freechips.rocketchip.system.BaseConfig)                    // "base" rocketchip system
 
@@ -73,6 +74,7 @@ class ArrowConfig extends Config(
   new RemoveSDRAM ++
     new RVCPeripheralsConfig(10) ++
     new RemoveDebugClockGating ++
+    new freechips.rocketchip.subsystem.WithRV32 ++
     new freechips.rocketchip.subsystem.WithTimebase(1000000) ++
     new freechips.rocketchip.subsystem.WithNBreakpoints(1) ++
     new freechips.rocketchip.subsystem.WithJtagDTM ++
@@ -82,6 +84,5 @@ class ArrowConfig extends Config(
     //new freechips.rocketchip.subsystem.WithInclusiveCache(nBanks = 1, nWays = 2, capacityKB = 16) ++       // use Sifive L2 cache
     new freechips.rocketchip.subsystem.WithNExtTopInterrupts(0) ++ // no external interrupts
     new freechips.rocketchip.subsystem.With1TinyCore ++            // single rocket-core with scratchpad
-    new freechips.rocketchip.subsystem.WithRV32 ++
     new freechips.rocketchip.subsystem.WithIncoherentBusTopology ++  // Hierarchical buses without L2
     new freechips.rocketchip.system.BaseConfig)                    // "base" rocketchip system

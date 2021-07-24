@@ -23,6 +23,7 @@ case object SRAMKey extends Field[Seq[SRAMConfig]](Nil)
 class RVCSystem(implicit p: Parameters) extends RVCSubsystem
   with HasPeripheryGPIO
   with HasPeripheryUART
+  with HasPeripherySPIFlash
   with HasSDRAM
   with CanHaveMasterAXI4MemPort
   with CanHavePeripherySerial
@@ -55,7 +56,7 @@ class RVCSystem(implicit p: Parameters) extends RVCSubsystem
   }
 
   val srams = p(SRAMKey).zipWithIndex.map { case(sramcfg, i) =>
-    val sram = LazyModule(new TLRAM(AddressSet.misaligned(sramcfg.address, sramcfg.size).head))
+    val sram = LazyModule(new TLRAM(AddressSet.misaligned(sramcfg.address, sramcfg.size).head, cacheable = true))
     val mbus = locateTLBusWrapper(MBUS)
     mbus.coupleTo(s"sram_${i}") { bus => sram.node := TLFragmenter(4, mbus.blockBytes) := bus }
     sram
@@ -66,10 +67,12 @@ class RVCSystem(implicit p: Parameters) extends RVCSubsystem
 class RVCSystemModuleImp[+L <: RVCSystem](_outer: L) extends RVCSubsystemModuleImp(_outer)
   with HasPeripheryGPIOModuleImp
   with HasPeripheryUARTModuleImp
+  with HasPeripherySPIFlashModuleImp
   with HasSDRAMModuleImp
   with CanHavePeripherySerialModuleImp
   with HasRTCModuleImp
 {
   val spi  = outer.spiNodes.zipWithIndex.map  { case(n,i) => n.makeIO()(ValName(s"spi_$i")).asInstanceOf[SPIPortIO] }
-  global_reset_vector := outer.maskromparam(0).address.U
+  val possible_addresses = outer.maskromparam.map(_.address) ++ p(PeripherySPIFlashKey).map(_.fAddress)
+  global_reset_vector := possible_addresses(0).U
 }

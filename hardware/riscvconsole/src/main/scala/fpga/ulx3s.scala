@@ -43,13 +43,24 @@ class ulx3sTop(implicit p: Parameters) extends ulx3sShell {
 
     sdram.from_SDRAMIf( platform.io.sdram.head )
 
-    BB(sd.clk, platform.io.spi(0).sck)
-    BB(sd.d(3), platform.io.spi(0).cs(0))
-    BB(sd.cmd, platform.io.spi(0).dq(0))
-    BB(sd.d(0), platform.io.spi(0).dq(1))
-    //BB(sd.wp, platform.io.spi(0).dq(2))
-    //BB(sd.cdn, platform.io.spi(0).dq(3))
-    platform.io.spi(0).dq(2).i.ival := false.B
-    platform.io.spi(0).dq(3).i.ival := false.B
+    platform.io.spi.foreach{ spi =>
+      BB(sd.clk, spi.sck)
+      BB(sd.d(3), spi.cs(0))
+      BB(sd.cmd, spi.dq(0))
+      BB(sd.d(0), spi.dq(1))
+      //BB(sd.wp, spi.dq(2))
+      //BB(sd.cdn, spi.dq(3))
+      spi.dq(2).i.ival := false.B
+      spi.dq(3).i.ival := false.B
+    }
+
+    platform.io.spiflash.foreach { qspi =>
+      BB(gp(4), qspi.sck)
+      BB(gp(5), qspi.cs(0))
+      BB(gp(6), qspi.dq(0))
+      BB(gp(7), qspi.dq(1))
+      BB(gp(8), qspi.dq(2))
+      BB(gp(9), qspi.dq(3))
+    }
   }
 }
