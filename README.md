@@ -9,8 +9,8 @@ The intention is probably run some programs to do graphics via HDMI.
 Clone using:
 
 ```shell
-git clone https://github.com/ckdur/RISCVconsole.git
-cd RISCVconsole
+git clone https://github.com/ckdur/RISCVConsole.git
+cd RISCVConsole
 git submodule update --init
 cd hardware/chipyard
 ./scripts/init-submodules-no-riscv-tools.sh
@@ -65,4 +65,26 @@ Then, copy the firmware of the opensbi to the partition
 ```shell
 cd linux-custom
 sudo dd if=./opensbi/build/platform/ratona/firmware/fw_payload.bin of=/dev/sdX1 conv=fsync bs=4096
+```
+
+## Toolchain
+
+A compilation of 32-bit toolchain should work. The configuration that worked is as follows:
+
+```shell
+git clone https://github.com/riscv/riscv-gnu-toolchain.git
+cd riscv-gnu-toolchain
+sudo mkdir /opt/riscv32imac
+sudo chown -R $USER /opt/riscv32imac
+./configure --prefix=/opt/riscv32imac --with-arch=rv32imac --with-abi=ilp32
+make && make linux
+```
+
+## QEMU
+
+A test custom board was also done for QEMU. Compile it using:
+
+```shell
+cd linux-custom
+./run_qemu.sh
 ```
