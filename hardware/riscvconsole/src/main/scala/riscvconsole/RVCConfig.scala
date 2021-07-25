@@ -48,7 +48,7 @@ class RVCConfig extends Config(
     new SetFrequency(20000000) ++
     new RemoveDebugClockGating ++
     new freechips.rocketchip.subsystem.WithRV32 ++
-    new freechips.rocketchip.subsystem.WithTimebase(10000000) ++
+    new freechips.rocketchip.subsystem.WithTimebase(1000000) ++
     new freechips.rocketchip.subsystem.WithNBreakpoints(1) ++
     new freechips.rocketchip.subsystem.WithJtagDTM ++
     new freechips.rocketchip.subsystem.WithNoMemPort ++              // no top-level memory port at 0x80000000
