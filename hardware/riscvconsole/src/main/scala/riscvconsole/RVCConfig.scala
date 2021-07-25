@@ -20,7 +20,7 @@ class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
   case SDRAMKey => Seq(
     SDRAMConfig(
       address = 0x80000000L,
-      sdcfg = sdram_bb_cfg(SDRAM_HZ = site(SystemBusKey).dtsFrequency.getOrElse(100000000L))))
+      sdcfg = sdram_bb_cfg(SDRAM_HZ = 50000000L)))
   case SRAMKey => Seq(SRAMConfig(address = 0x82200000L, size = 0x4000))
   //case freechips.rocketchip.subsystem.PeripheryMaskROMKey => Seq()
   case SubsystemDriveAsyncClockGroupsKey => None
@@ -45,7 +45,7 @@ class RemoveDebugClockGating extends Config((site, here, up) => {
 
 class RVCConfig extends Config(
   new RVCPeripheralsConfig ++
-    new SetFrequency(50000000) ++
+    new SetFrequency(20000000) ++
     new RemoveDebugClockGating ++
     new freechips.rocketchip.subsystem.WithRV32 ++
     new freechips.rocketchip.subsystem.WithTimebase(10000000) ++

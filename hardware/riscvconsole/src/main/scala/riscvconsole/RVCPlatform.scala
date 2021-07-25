@@ -33,6 +33,8 @@ class RVCPlatform(implicit p: Parameters) extends Module
 
     // SPIFlash for SD
     val spiflash = MixedVec( p(PeripherySPIFlashKey).map{A => new SPIPins(() => new BasePin(), A)} )
+
+    val otherclock = Input(Clock())
   })
 
   val greset = WireInit(false.B)
@@ -73,4 +75,5 @@ class RVCPlatform(implicit p: Parameters) extends Module
   }
 
   (io.sdram zip sys.sdramio).map{case (port, sys) => port <> sys}
+  sys.otherclock := io.otherclock
 }

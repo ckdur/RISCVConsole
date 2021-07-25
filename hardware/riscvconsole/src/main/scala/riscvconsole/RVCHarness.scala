@@ -67,4 +67,5 @@ class RVCHarness()(implicit p: Parameters) extends Module {
 
   // SDRAM
   dut.sdramio.foreach(sdramsim(_, reset.asBool()))
+  dut.otherclock := clock
 }

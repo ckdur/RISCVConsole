@@ -33,7 +33,8 @@ class ulx3sShell extends RawModule {
   val pll = withClockAndReset(clk_25mhz, false.B) {
     ecp5pll(ecp5pllConfig(
       in_hz = 25000000,
-      out0_hz = 50000000
+      out0_hz = 50000000,
+      out1_hz = 20000000
     ))
   }
   pll.io.standby := false.B
@@ -42,5 +43,6 @@ class ulx3sShell extends RawModule {
   pll.io.phasestep := false.B
   pll.io.phaseloadreg := false.B
   val clk_50mhz = pll.io.clk_o(0)
+  val clk_20mhz = pll.io.clk_o(1)
   val locked = pll.io.locked
 }

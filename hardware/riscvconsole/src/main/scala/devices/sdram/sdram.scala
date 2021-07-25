@@ -89,7 +89,7 @@ case class SDRAMConfig // Periphery Config
   sdcfg: sdram_bb_cfg = sdram_bb_cfg()
 )
 
-class SDRAM(cfg: SDRAMConfig, blockBytes: Int, beatBytes: Int)(implicit p: Parameters) extends LazyModule {
+class SDRAM(cfg: SDRAMConfig, blockBytes: Int, beatBytes: Int)(implicit p: Parameters) extends LazyModule with HasClockDomainCrossing{
 
   val device = new MemoryDevice
   val tlcfg = TLSlaveParameters.v1(
@@ -115,6 +115,8 @@ class SDRAM(cfg: SDRAMConfig, blockBytes: Int, beatBytes: Int)(implicit p: Param
 
   // Connections of the node
   sdramnode := TLFragmenter(4, blockBytes) := TLWidthWidget(beatBytes) := node
+
+  val controlXing: TLInwardClockCrossingHelper = this.crossIn(node)
 
   lazy val module = new LazyModuleImp(this) {
     val sdramimp = Module(new sdram(cfg.sdcfg))
@@ -207,7 +209,7 @@ object SDRAMObject {
 case class SDRAMAttachParams
 (
   device: SDRAMConfig,
-  controlXType: ClockCrossingType = NoCrossing
+  controlXType: ClockCrossingType = AsynchronousCrossing()
 ){
 
   def attachTo(where: Attachable)(implicit p: Parameters): SDRAM = where {
@@ -230,7 +232,7 @@ case class SDRAMAttachParams
           sdramClockGroup
       })
 
-      sdram.node := bus
+      sdram.controlXing(controlXType) := bus
     }
 
     sdram

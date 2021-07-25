@@ -83,9 +83,17 @@ class RVCSystemModuleImp[+L <: RVCSystem](_outer: L) extends RVCSubsystemModuleI
   val possible_addresses = outer.p(MaskROMLocated(outer.location)).map(_.address) ++ p(PeripherySPIFlashKey).map(_.fAddress)
   outer.maskROMResetVectorSourceNode.bundle := possible_addresses(0).U
 
-  val extclocks = outer.clockGroup.out.flatMap(_._1.member.data)
-  extclocks.foreach{ o =>
+  println(s"Connecting clocks...")
+  val extclocks = outer.clockGroup.out.flatMap(_._1.member.elements)
+  val namedclocks = outer.clocksAggregator.out.flatMap(_._1.member.elements)
+  val otherclock = IO(Input(Clock()))
+  (extclocks zip namedclocks).foreach{ case ((_, o), (name, _)) =>
+    println(s"  Connecting ${name}")
     o.clock := clock
     o.reset := reset
+    if(name.contains("sdramClockGroup")) {
+      println("    Connected as otherclock")
+      o.clock := otherclock
+    }
   }
 }
