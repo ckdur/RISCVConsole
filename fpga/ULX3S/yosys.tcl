@@ -4,5 +4,5 @@ set ALL_VSRC [read $fp]
 close $fp
 
 yosys::read_verilog $ALL_VSRC
-yosys::synth_ecp5 -noccu2 -nomux -nodram -json $env(build_dir)/$env(MODEL).json
+yosys::synth_ecp5 -json $env(build_dir)/$env(MODEL).json
 

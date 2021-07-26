@@ -45,7 +45,7 @@ default: $(sim_vsrcs) $(top_and_harness_files)
 synthesis: $(build_dir)/$(MODEL).json
 
 $(build_dir)/$(MODEL).json: $(sim_vsrcs) $(top_and_harness_files) $(ROM_FILE)
-	yosys -p "read_verilog `cat $(top_and_harness_files)` $(ROM_FILE) $(EICG_wrapper); synth_ecp5 -noccu2 -nomux -nodram -json $(build_dir)/$(MODEL).json" | tee $(build_dir)/yosys.log
+	yosys -p "read_verilog `cat $(top_and_harness_files)` $(ROM_FILE) $(EICG_wrapper); synth_ecp5 -json $(build_dir)/$(MODEL).json" | tee $(build_dir)/yosys.log
 
 pnr: $(build_dir)/$(MODEL).config
 
