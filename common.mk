@@ -284,9 +284,8 @@ help:
 #########################################################################################
 # Rule for ROM file
 #########################################################################################
-bldr_dir=$(soft_dir)/sdboot
-HEX_FILE=$(build_dir)/sdboot.hex
-soft_dir=$(base_dir)/software
+bldr_dir?=$(soft_dir)/sdboot
+HEX_FILE?=$(build_dir)/sdboot.hex
 ROM_FILE ?= $(build_dir)/$(long_name).rom.v
 ROM_CONF_FILE ?= $(build_dir)/$(long_name).rom.conf
 ROM_SCRIPT = $(base_dir)/hardware/vlsi_rom_gen_fpga

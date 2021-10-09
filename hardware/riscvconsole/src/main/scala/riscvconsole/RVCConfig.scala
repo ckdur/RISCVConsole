@@ -34,7 +34,7 @@ class SetFrequency(freq: BigInt) extends Config((site, here, up) => {
 
 class RemoveSDRAM extends Config((site, here, up) => {
   case SDRAMKey => Nil
-  case SRAMKey => Nil
+  //case SRAMKey => Nil
 })
 
 class RemoveDebugClockGating extends Config((site, here, up) => {
@@ -76,6 +76,7 @@ class RVCHarnessConfig extends Config(new SetFrequency(100000000) ++ new RVCConf
 class ArrowConfig extends Config(
   new RemoveSDRAM ++
     new RVCPeripheralsConfig(10) ++
+    new SetFrequency(50000000) ++
     new RemoveDebugClockGating ++
     new freechips.rocketchip.subsystem.WithRV32 ++
     new freechips.rocketchip.subsystem.WithTimebase(1000000) ++
@@ -88,5 +89,5 @@ class ArrowConfig extends Config(
     //new freechips.rocketchip.subsystem.WithInclusiveCache(nBanks = 1, nWays = 2, capacityKB = 16) ++       // use Sifive L2 cache
     new freechips.rocketchip.subsystem.WithNExtTopInterrupts(0) ++ // no external interrupts
     new freechips.rocketchip.subsystem.With1TinyCore ++            // single rocket-core with scratchpad
-    new freechips.rocketchip.subsystem.WithIncoherentBusTopology ++  // Hierarchical buses without L2
+    new freechips.rocketchip.subsystem.WithCoherentBusTopology ++  // Hierarchical buses without L2
     new freechips.rocketchip.system.BaseConfig)                    // "base" rocketchip system

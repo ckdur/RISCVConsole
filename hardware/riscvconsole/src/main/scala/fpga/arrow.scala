@@ -48,6 +48,7 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
     TDO_as_base.o.oe := platform.io.jtag.TDO.driven
     TDO_as_base.o.oval := platform.io.jtag.TDO.data
     TDO_as_base.o.ie := false.B
+    TDO_as_base.i.po.foreach(_ := false.B)
     ALT_IOBUF(HSMC_D(3), TDO_as_base)
 
     platform.io.uart_rxd := ALT_IOBUF(HSMC_RX_p(0))  //input
@@ -59,11 +60,29 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
     platform.io.spi.foreach(_.cs.foreach(_.i.po.foreach(_ := false.B)))
     platform.io.spi.foreach(_.dq.foreach(_.i.po.foreach(_ := false.B)))
 
-    ALT_IOBUF(HSMC_TX_p(1), platform.io.spi(0).sck )
-    ALT_IOBUF(HSMC_TX_p(2), platform.io.spi(0).cs(0))
-    ALT_IOBUF(HSMC_TX_p(3), platform.io.spi(0).dq(0))
-    ALT_IOBUF(HSMC_TX_p(4), platform.io.spi(0).dq(1))
-    ALT_IOBUF(HSMC_TX_p(5), platform.io.spi(0).dq(2))
-    ALT_IOBUF(HSMC_TX_p(6), platform.io.spi(0).dq(3))
+    platform.io.spi.foreach { spi =>
+      ALT_IOBUF(HSMC_TX_p(1), spi.sck)
+      ALT_IOBUF(HSMC_TX_p(2), spi.cs(0))
+      ALT_IOBUF(HSMC_TX_p(3), spi.dq(0))
+      ALT_IOBUF(HSMC_TX_p(4), spi.dq(1))
+      ALT_IOBUF(HSMC_TX_p(5), spi.dq(2))
+      ALT_IOBUF(HSMC_TX_p(6), spi.dq(3))
+    }
+
+    platform.io.spiflash.foreach(_.sck.i.po.foreach(_ := false.B))
+    platform.io.spiflash.foreach(_.cs.foreach(_.i.po.foreach(_ := false.B)))
+    platform.io.spiflash.foreach(_.dq.foreach(_.i.po.foreach(_ := false.B)))
+
+    platform.io.spiflash.foreach { spi =>
+      ALT_IOBUF(HSMC_TX_p(7), spi.sck)
+      ALT_IOBUF(HSMC_TX_p(8), spi.cs(0))
+      ALT_IOBUF(HSMC_TX_p(9), spi.dq(0))
+      ALT_IOBUF(HSMC_TX_p(10), spi.dq(1))
+      ALT_IOBUF(HSMC_TX_p(11), spi.dq(2))
+      ALT_IOBUF(HSMC_TX_p(12), spi.dq(3))
+    }
+
+    // Other clock not connected
+    platform.io.otherclock := false.B.asClock()
   }
 }

@@ -37,7 +37,7 @@ include $(base_dir)/common.mk
 # vcs simulator types and rules
 #########################################################################################
 .PHONY: default
-default: $(sim_vsrcs) $(top_and_harness_files)
+default: $(sim_vsrcs) $(top_and_harness_files) $(ROM_FILE)
 
 #########################################################################################
 # Synthesis

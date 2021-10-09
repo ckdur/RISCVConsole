@@ -267,3 +267,5 @@ sim_vsrcs = \
 #########################################################################################
 timeout_cycles = 10000000
 bmark_timeout_cycles = 100000000
+
+soft_dir=$(base_dir)/software

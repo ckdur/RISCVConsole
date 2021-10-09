@@ -35,7 +35,7 @@ module {name}(
   `endif
 `endif
     $readmemh("{rom_hex_file}", rom);
-  end : init_and_load
+  end
 
 
   always @(posedge clock) begin

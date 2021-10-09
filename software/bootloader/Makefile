@@ -1,6 +1,7 @@
 RISCV_PREFIX=riscv64-unknown-elf-
 CC=$(RISCV_PREFIX)gcc
 OBJCOPY=$(RISCV_PREFIX)objcopy
+OBJDUMP=$(RISCV_PREFIX)objdump
 
 LINKER_SCRIPT=link.ld
 
@@ -25,6 +26,8 @@ bin: $(BUILD_DIR)/bootloader.bin
 
 $(BUILD_DIR)/bootloader.bin: $(BUILD_DIR)/bootloader.elf
 	$(OBJCOPY) -O binary $< $@
+	$(OBJDUMP) -d $^ > $@.dump
+#	- riscv32-unknown-elf-objdump -b binary -D $@ --adjust-vma=$(SDBOOT_SOURCE_ADDR) -m RISCV > $@.rv32.dump
 
 hex: $(BUILD_DIR)/bootloader.hex
 
