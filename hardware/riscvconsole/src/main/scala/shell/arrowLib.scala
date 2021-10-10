@@ -57,3 +57,15 @@ object ALT_IOBUF {
     m.fromBase(e)
   }
 }
+
+class AUD_CODEC_PORT extends Bundle {
+  val XCK = Output(Bool())
+  val BCLK = Analog(1.W)
+  val DACDAT = Output(Bool())
+  val DACLRCK = Analog(1.W)
+  val ADCDAT = Input(Bool())
+  val ADCLRCK = Analog(1.W)
+  val MUTE = Output(Bool())
+  val I2C_SCLK = Analog(1.W)
+  val I2C_SDAT = Analog(1.W)
+}

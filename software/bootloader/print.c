@@ -1,7 +1,8 @@
 #include "print.h"
+#include "platform.h"
 
 
-volatile uint32_t* uart = (volatile uint32_t*)0x10000000;
+volatile uint32_t* uart = (volatile uint32_t*)UART_CTRL_ADDR;
 
 
 #define IN_INIT_SECTION __attribute__((section(".init")))

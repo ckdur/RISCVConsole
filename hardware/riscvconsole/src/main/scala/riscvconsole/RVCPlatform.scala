@@ -11,6 +11,7 @@ import sifive.blocks.devices.gpio._
 import sifive.blocks.devices.pinctrl._
 import sifive.blocks.devices.spi._
 import sifive.blocks.devices.uart._
+import sifive.blocks.devices.i2c._
 
 class RVCPlatform(implicit p: Parameters) extends Module
 {
@@ -33,6 +34,9 @@ class RVCPlatform(implicit p: Parameters) extends Module
 
     // SPIFlash for SD
     val spiflash = MixedVec( p(PeripherySPIFlashKey).map{A => new SPIPins(() => new BasePin(), A)} )
+
+    // I2C
+    val i2c = MixedVec(p(PeripheryI2CKey).map{ A => new I2CPins(() => new BasePin() )})
 
     val otherclock = Input(Clock())
   })
@@ -72,6 +76,13 @@ class RVCPlatform(implicit p: Parameters) extends Module
     b.cs.foreach(_.default())
     b.dq.foreach(_.default())
     SPIPinsFromPort(b, a, sys.clock, sys.reset.toBool(), 3)
+  }
+
+  val i2c = sys.i2c
+  (i2c zip io.i2c).foreach { case (a, b) =>
+    b.scl.default()
+    b.sda.default()
+    I2CPinsFromPort(b, a, sys.clock, sys.reset.toBool(), 3)
   }
 
   (io.sdram zip sys.sdramio).map{case (port, sys) => port <> sys}

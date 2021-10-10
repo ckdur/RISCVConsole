@@ -7,6 +7,7 @@ import freechips.rocketchip.subsystem._
 import sifive.blocks.devices.gpio._
 import sifive.blocks.devices.uart._
 import sifive.blocks.devices.spi._
+import sifive.blocks.devices.i2c._
 import freechips.rocketchip.devices.tilelink._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.prci._
@@ -25,6 +26,7 @@ class RVCSystem(implicit p: Parameters) extends RVCSubsystem
   with HasPeripheryGPIO
   with HasPeripheryUART
   with HasPeripherySPIFlash
+  with HasPeripheryI2C
   with HasSDRAM
   with CanHaveMasterAXI4MemPort
   with CanHavePeripheryTLSerial
@@ -76,6 +78,7 @@ class RVCSystemModuleImp[+L <: RVCSystem](_outer: L) extends RVCSubsystemModuleI
   with HasPeripheryGPIOModuleImp
   with HasPeripheryUARTModuleImp
   with HasPeripherySPIFlashModuleImp
+  with HasPeripheryI2CModuleImp
   with HasSDRAMModuleImp
   with HasRTCModuleImp
 {

@@ -41,6 +41,7 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
         pin.i.ival := s
     }
 
+    // JTAG
     platform.io.jtag.TDI := ALT_IOBUF(HSMC_D(0))
     platform.io.jtag.TMS := ALT_IOBUF(HSMC_D(1))
     platform.io.jtag.TCK := ALT_IOBUF(HSMC_D(2)).asClock()
@@ -51,11 +52,12 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
     TDO_as_base.i.po.foreach(_ := false.B)
     ALT_IOBUF(HSMC_D(3), TDO_as_base)
 
-    platform.io.uart_rxd := ALT_IOBUF(HSMC_RX_p(0))  //input
-    ALT_IOBUF(HSMC_TX_p(0), platform.io.uart_txd)
+    platform.io.uart_rxd := ALT_IOBUF(HSMC_RX_p(0))  // HSMC_RX_p_0 / G12 / J3 - 36
+    ALT_IOBUF(HSMC_TX_p(0), platform.io.uart_txd)    // HSMC_TX_p_0 / A9 / J3 - 40
 
     platform.io.jtag_RSTn := sw(0)       //reset for the jtag
 
+    // SPI (for SD)
     platform.io.spi.foreach(_.sck.i.po.foreach(_ := false.B))
     platform.io.spi.foreach(_.cs.foreach(_.i.po.foreach(_ := false.B)))
     platform.io.spi.foreach(_.dq.foreach(_.i.po.foreach(_ := false.B)))
@@ -69,6 +71,7 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
       ALT_IOBUF(HSMC_TX_p(6), spi.dq(3))
     }
 
+    // SPI flash
     platform.io.spiflash.foreach(_.sck.i.po.foreach(_ := false.B))
     platform.io.spiflash.foreach(_.cs.foreach(_.i.po.foreach(_ := false.B)))
     platform.io.spiflash.foreach(_.dq.foreach(_.i.po.foreach(_ := false.B)))
@@ -81,6 +84,19 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
       ALT_IOBUF(HSMC_TX_p(11), spi.dq(2))
       ALT_IOBUF(HSMC_TX_p(12), spi.dq(3))
     }
+
+    // I2C in AudioCodec
+    platform.io.i2c.foreach(_.scl.i.po.foreach(_ := false.B))
+    platform.io.i2c.foreach(_.sda.i.po.foreach(_ := false.B))
+
+    platform.io.i2c.foreach{ i2c =>
+      ALT_IOBUF(AUD.I2C_SCLK, i2c.scl)
+      ALT_IOBUF(AUD.I2C_SDAT, i2c.sda)
+    }
+    AUD.XCK := false.B
+    AUD.DACDAT := false.B
+    platform.io.gpio(10).i.ival := false.B
+    AUD.MUTE := platform.io.gpio(10).o.oval
 
     // Other clock not connected
     platform.io.otherclock := false.B.asClock()

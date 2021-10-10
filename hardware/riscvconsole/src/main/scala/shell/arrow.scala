@@ -2,6 +2,7 @@ package riscvconsole.shell.arrow
 
 import chisel3._
 import chisel3.experimental.Analog
+import riscvconsole.shell.ArrowLib._
 
 
 class ArrowShell extends RawModule {
@@ -21,6 +22,5 @@ class ArrowShell extends RawModule {
   val HSMC_RX_n = IO(Vec(16, Analog(1.W)))
   val HSMC_TX_n = IO(Vec(16, Analog(1.W)))
 
-  //val HPS_UART_RX = IO(Input(Bool()))
-  //val HPS_UART_TX = IO(Output(Bool()))
+  val AUD = IO(new AUD_CODEC_PORT)
 }

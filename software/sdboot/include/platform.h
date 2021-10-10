@@ -9,6 +9,7 @@
 #include "devices/gpio.h"
 #include "devices/plic.h"
 #include "devices/spi.h"
+#include "devices/i2c.h"
 #include "devices/uart.h"
 
  // Some things missing from the official encoding.h
@@ -19,6 +20,9 @@
    #define MCAUSE_INT         0x8000000000000000UL
    #define MCAUSE_CAUSE       0x7FFFFFFFFFFFFFFFUL
 #endif
+
+#define TIMEBASE 1000000 // TODO: This should be derived from the dts
+#define F_CLK 50000000 // TODO: This should be derived from the dts
 
 /****************************************************************************
  * Platform definitions
@@ -46,6 +50,8 @@
 #define GPIO_CTRL_SIZE _AC(0x1000,UL)
 #define SPI_CTRL_ADDR _AC(0x10002000,UL)
 #define SPI_CTRL_SIZE _AC(0x1000,UL)
+#define I2C_CTRL_ADDR _AC(0x10003000,UL)
+#define I2C_CTRL_SIZE _AC(0x1000,UL)
 #define MEMORY_MEM_ADDR _AC(0x80000000,UL)
 #define MEMORY_MEM_SIZE _AC(0x2000000,UL)
 #define MEMORY_MEM2_ADDR _AC(0x82200000,UL)
@@ -71,6 +77,7 @@
 #define MEMORY_REG(offset) _REG32(MEMORY_CTRL_ADDR, offset)
 #define PLIC_REG(offset) _REG32(PLIC_CTRL_ADDR, offset)
 #define SPI_REG(offset) _REG32(SPI_CTRL_ADDR, offset)
+#define I2C_REG(offset) _REG32(I2C_CTRL_ADDR, offset)
 #define UART_REG(offset) _REG32(UART_CTRL_ADDR, offset)
 #define CLINT_REG64(offset) _REG64(CLINT_CTRL_ADDR, offset)
 #define DEBUG_REG64(offset) _REG64(DEBUG_CTRL_ADDR, offset)

@@ -13,10 +13,12 @@ class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
     sifive.blocks.devices.gpio.GPIOParams(0x10001000, gpio))
   case sifive.blocks.devices.spi.PeripherySPIKey => Seq(
     sifive.blocks.devices.spi.SPIParams(0x10002000))
+  case sifive.blocks.devices.i2c.PeripheryI2CKey => Seq(
+    sifive.blocks.devices.i2c.I2CParams(0x10003000))
   //case sifive.blocks.devices.spi.PeripherySPIFlashKey => Seq(
   //  sifive.blocks.devices.spi.SPIFlashParams(0x10003000, 0x20000000L))
   case MaskROMLocated(InSubsystem) => Seq(
-    freechips.rocketchip.devices.tilelink.MaskROMParams(0x20000000L, "MyBootROM"))
+    freechips.rocketchip.devices.tilelink.MaskROMParams(0x20000000L, "MyBootROM", 4096))
   case SDRAMKey => Seq(
     SDRAMConfig(
       address = 0x80000000L,
@@ -75,7 +77,7 @@ class RVCHarnessConfig extends Config(new SetFrequency(100000000) ++ new RVCConf
 
 class ArrowConfig extends Config(
   new RemoveSDRAM ++
-    new RVCPeripheralsConfig(10) ++
+    new RVCPeripheralsConfig(11) ++
     new SetFrequency(50000000) ++
     new RemoveDebugClockGating ++
     new freechips.rocketchip.subsystem.WithRV32 ++
