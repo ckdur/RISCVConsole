@@ -4,6 +4,7 @@ import chipsalliance.rocketchip.config._
 import freechips.rocketchip.subsystem.{InSubsystem, PeripheryBusKey, SubsystemDriveAsyncClockGroupsKey, SystemBusKey}
 import freechips.rocketchip.devices.debug._
 import freechips.rocketchip.devices.tilelink.MaskROMLocated
+import riscvconsole.devices.codec._
 import riscvconsole.devices.sdram._
 
 class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
@@ -24,6 +25,7 @@ class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
       address = 0x80000000L,
       sdcfg = sdram_bb_cfg(SDRAM_HZ = 50000000L)))
   case SRAMKey => Seq(SRAMConfig(address = 0x82200000L, size = 0x4000))
+  case PeripheryCodecKey => Seq(CodecParams(0x10004000))
   //case freechips.rocketchip.subsystem.PeripheryMaskROMKey => Seq()
   case SubsystemDriveAsyncClockGroupsKey => None
 })

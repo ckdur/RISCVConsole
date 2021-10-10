@@ -69,3 +69,13 @@ class AUD_CODEC_PORT extends Bundle {
   val I2C_SCLK = Analog(1.W)
   val I2C_SDAT = Analog(1.W)
 }
+
+class pll extends BlackBox {
+  val io = IO(new Bundle {
+    val refclk = Input(Clock())
+    val rst = Input(Bool())
+    val outclk_0 = Output(Clock())
+    val outclk_1 = Output(Clock())
+    val locked = Output(Bool())
+  })
+}

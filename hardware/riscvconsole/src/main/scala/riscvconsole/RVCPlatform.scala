@@ -6,6 +6,7 @@ import chipsalliance.rocketchip.config.Parameters
 import freechips.rocketchip.devices.debug._
 import freechips.rocketchip.diplomacy.LazyModule
 import freechips.rocketchip.jtag.JTAGIO
+import riscvconsole.devices.codec._
 import riscvconsole.devices.sdram.{SDRAMIf, SDRAMKey}
 import sifive.blocks.devices.gpio._
 import sifive.blocks.devices.pinctrl._
@@ -28,6 +29,9 @@ class RVCPlatform(implicit p: Parameters) extends Module
 
     // SDRAM port
     val sdram = Vec(p(SDRAMKey).size, new SDRAMIf)
+
+    // Codec port
+    val codec = Vec(p(PeripheryCodecKey).size, new CodecSignals(() => new BasePin()))
 
     // SPI for SD
     val spi = MixedVec( p(PeripherySPIKey).map{A => new SPIPins(() => new BasePin(), A)} )
@@ -83,6 +87,14 @@ class RVCPlatform(implicit p: Parameters) extends Module
     b.scl.default()
     b.sda.default()
     I2CPinsFromPort(b, a, sys.clock, sys.reset.toBool(), 3)
+  }
+
+  val codec = sys.codec
+  (codec zip io.codec).foreach { case (a, b) =>
+    b.AUD_BCLK.default()
+    b.AUD_ADCLRCK.default()
+    b.AUD_DACLRCK.default()
+    CodecPinsFromPort(b, a, sys.clock, sys.reset.toBool(), 3)
   }
 
   (io.sdram zip sys.sdramio).map{case (port, sys) => port <> sys}

@@ -75,5 +75,14 @@ class ulx3sTop(implicit p: Parameters) extends ulx3sShell {
       BB(gp(8), qspi.dq(2))
       BB(gp(9), qspi.dq(3))
     }
+    platform.io.codec.foreach { codec =>
+      codec.AUD_ADCDAT := false.B
+      codec.AUD_ADCLRCK.i.ival := false.B
+      codec.AUD_DACLRCK.i.ival := false.B
+      codec.AUD_BCLK.i.ival := false.B
+      codec.AUD_ADCLRCK.i.po.foreach(_ := false.B)
+      codec.AUD_DACLRCK.i.po.foreach(_ := false.B)
+      codec.AUD_BCLK.i.po.foreach(_ := false.B)
+    }
   }
 }

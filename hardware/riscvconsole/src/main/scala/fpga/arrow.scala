@@ -10,8 +10,11 @@ import riscvconsole.util._
 
 class ArrowTop(implicit p: Parameters) extends ArrowShell
 {
-  val clock = clk_OSC_50_B5B
-  val reset = (!btn(0))
+  val pll = Module(new pll)
+  pll.io.refclk := clk_OSC_50_B5B
+  pll.io.rst := !btn(0)
+  val clock = pll.io.outclk_0
+  val reset = !pll.io.locked
 
   withClockAndReset(clock, reset)
   {
@@ -93,10 +96,22 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
       ALT_IOBUF(AUD.I2C_SCLK, i2c.scl)
       ALT_IOBUF(AUD.I2C_SDAT, i2c.sda)
     }
-    AUD.XCK := false.B
-    AUD.DACDAT := false.B
+
+    // Codec in AudioCodec
+    AUD.XCK := pll.io.outclk_1.asBool() // 5MHz
     platform.io.gpio(10).i.ival := false.B
     AUD.MUTE := platform.io.gpio(10).o.oval
+    platform.io.codec.foreach { codec =>
+      codec.AUD_ADCLRCK.i.po.foreach(_ := false.B)
+      codec.AUD_DACLRCK.i.po.foreach(_ := false.B)
+      codec.AUD_BCLK.i.po.foreach(_ := false.B)
+
+      AUD.DACDAT := codec.AUD_DACDAT
+      codec.AUD_ADCDAT := AUD.ADCDAT
+      ALT_IOBUF(AUD.ADCLRCK, codec.AUD_ADCLRCK)
+      ALT_IOBUF(AUD.DACLRCK, codec.AUD_DACLRCK)
+      ALT_IOBUF(AUD.BCLK, codec.AUD_BCLK)
+    }
 
     // Other clock not connected
     platform.io.otherclock := false.B.asClock()

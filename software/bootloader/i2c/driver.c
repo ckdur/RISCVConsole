@@ -44,7 +44,7 @@
         METAL_I2C_TIMEOUT_CHECK(timeout)                                       \
     }
 
-static void i2c0_init(void *gi2c,
+void i2c0_init(void *gi2c,
                       unsigned int baud_rate,
                       metal_i2c_mode_t mode) {
   if ((gi2c != NULL)) {
@@ -61,7 +61,7 @@ static void i2c0_init(void *gi2c,
 }
 
 #define METAL_SIFIVE_I2C_GET_PRESCALER(baud) ((clock_rate / (baud_rate * 5)) - 1)
-static int i2c0_set_baud_rate(void *gi2c,
+int i2c0_set_baud_rate(void *gi2c,
                               unsigned int baud_rate) {
   int ret = METAL_I2C_RET_ERR;
   unsigned long base = (unsigned long)gi2c;
@@ -92,7 +92,7 @@ static int i2c0_set_baud_rate(void *gi2c,
   return ret;
 }
 
-static int i2c0_write_addr(unsigned long base,
+int i2c0_write_addr(unsigned long base,
                            unsigned int addr,
                            unsigned char rw_flag) {
     uint32_t timeout;
@@ -130,7 +130,7 @@ static int i2c0_write_addr(unsigned long base,
     return ret;
 }
 
-static int i2c0_write(void *gi2c,
+int i2c0_write(void *gi2c,
                       unsigned int addr, unsigned int len,
                       unsigned char buf[],
                       metal_i2c_stop_bit_t stop_bit) {
@@ -191,7 +191,7 @@ static int i2c0_write(void *gi2c,
 
   return ret;
 }
-static int i2c0_read(void *gi2c,
+int i2c0_read(void *gi2c,
                      unsigned int addr, unsigned int len,
                      unsigned char buf[],
                      metal_i2c_stop_bit_t stop_bit) {
@@ -244,7 +244,7 @@ static int i2c0_read(void *gi2c,
   return ret;
 }
 
-static int i2c0_transfer(void *gi2c, unsigned int addr,
+int i2c0_transfer(void *gi2c, unsigned int addr,
                          unsigned char txbuf[], unsigned int txlen,
                          unsigned char rxbuf[], unsigned int rxlen) {
   uint8_t command;
