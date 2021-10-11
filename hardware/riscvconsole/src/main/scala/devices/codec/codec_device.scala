@@ -45,7 +45,7 @@ object CodecCtrlRegs {
 abstract class Codec(busWidthBytes: Int, c: CodecParams)(implicit p: Parameters)
   extends IORegisterRouter(
     RegisterRouterParams(
-      name = "gpio",
+      name = "codec",
       compat = Seq("console,codec0"),
       base = c.address,
       beatBytes = busWidthBytes),
@@ -155,8 +155,8 @@ case class CodecAttachParams
   def attachTo(where: Attachable)(implicit p: Parameters): TLCodec = where {
     val name = s"codec_${Codec.nextId()}"
     val cbus = where.locateTLBusWrapper(controlWhere)
-    val gpioClockDomainWrapper = LazyModule(new ClockSinkDomain(take = None))
-    val codec = gpioClockDomainWrapper { LazyModule(new TLCodec(cbus.beatBytes, device)) }
+    val codecClockDomainWrapper = LazyModule(new ClockSinkDomain(take = None))
+    val codec = codecClockDomainWrapper { LazyModule(new TLCodec(cbus.beatBytes, device)) }
     codec.suggestName(name)
 
     cbus.coupleTo(s"device_named_$name") { bus =>
@@ -167,16 +167,16 @@ case class CodecAttachParams
         blocker
       }
 
-      gpioClockDomainWrapper.clockNode := (controlXType match {
+      codecClockDomainWrapper.clockNode := (controlXType match {
         case _: SynchronousCrossing =>
           cbus.dtsClk.foreach(_.bind(codec.device))
           cbus.fixedClockNode
         case _: RationalCrossing =>
           cbus.clockNode
         case _: AsynchronousCrossing =>
-          val gpioClockGroup = ClockGroup()
-          gpioClockGroup := where.asyncClockGroupsNode
-          blockerOpt.map { _.clockNode := gpioClockGroup } .getOrElse { gpioClockGroup }
+          val codecClockGroup = ClockGroup()
+          codecClockGroup := where.asyncClockGroupsNode
+          blockerOpt.map { _.clockNode := codecClockGroup } .getOrElse { codecClockGroup }
       })
 
       (codec.controlXing(controlXType)

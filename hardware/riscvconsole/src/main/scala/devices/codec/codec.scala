@@ -46,24 +46,6 @@ class codec extends Module {
   val	dac_lrclk_rising_edge = Wire(Bool())
   val	dac_lrclk_falling_edge = Wire(Bool())
 
-  val	left_channel_read_available = Wire(UInt(8.W))
-  val	right_channel_read_available = Wire(UInt(8.W))
-
-  val left_channel_write_space = Wire(UInt(8.W))
-  val right_channel_write_space = Wire(UInt(8.W))
-
-  val audio_in_available = RegNext(
-    (left_channel_read_available(7) || left_channel_read_available(6)) &&
-      (right_channel_read_available(7) || right_channel_read_available(6)),
-    false.B)
-  io.audio_in_available := audio_in_available
-
-  val audio_out_allowed = RegNext(
-    (left_channel_write_space(7) || left_channel_write_space(6)) &&
-      (right_channel_write_space(7) || right_channel_write_space(6)),
-    false.B)
-  io.audio_out_allowed := audio_out_allowed
-
   // Internal Registers
   val	done_adc_channel_sync = RegInit(false.B)
   when(adc_lrclk_rising_edge) { done_adc_channel_sync := true.B }
@@ -96,11 +78,11 @@ class codec extends Module {
 
   Audio_In_Deserializer.io.serial_audio_in_data := io.AUD_ADCDAT
 
-  Audio_In_Deserializer.io.read_left_audio_data_en := io.read_audio_in & audio_in_available
-  Audio_In_Deserializer.io.read_right_audio_data_en := io.read_audio_in & audio_in_available
+  Audio_In_Deserializer.io.read_left_audio_data_en := io.read_audio_in// & audio_in_available
+  Audio_In_Deserializer.io.read_right_audio_data_en := io.read_audio_in// & audio_in_available
 
-  left_channel_read_available := Audio_In_Deserializer.io.left_audio_fifo_read_space
-  right_channel_read_available := Audio_In_Deserializer.io.right_audio_fifo_read_space
+  io.audio_in_available := !Audio_In_Deserializer.io.left_channel_fifo_is_empty &&
+    !Audio_In_Deserializer.io.right_channel_fifo_is_empty
 
   io.left_channel_audio_in := Audio_In_Deserializer.io.left_channel_data
   io.right_channel_audio_in := Audio_In_Deserializer.io.right_channel_data
@@ -112,13 +94,13 @@ class codec extends Module {
   Audio_Out_Serializer.io.left_right_clk_falling_edge := done_dac_channel_sync & dac_lrclk_falling_edge
 
   Audio_Out_Serializer.io.left_channel_data := io.left_channel_audio_out
-  Audio_Out_Serializer.io.left_channel_data_en := io.write_audio_out & audio_out_allowed
+  Audio_Out_Serializer.io.left_channel_data_en := io.write_audio_out// & audio_out_allowed
 
   Audio_Out_Serializer.io.right_channel_data := io.right_channel_audio_out
-  Audio_Out_Serializer.io.right_channel_data_en := io.write_audio_out & audio_out_allowed
+  Audio_Out_Serializer.io.right_channel_data_en := io.write_audio_out// & audio_out_allowed
 
-  left_channel_write_space := Audio_Out_Serializer.io.left_channel_fifo_write_space
-  right_channel_write_space := Audio_Out_Serializer.io.right_channel_fifo_write_space
+  io.audio_out_allowed := !Audio_Out_Serializer.io.left_channel_fifo_is_full &&
+    !Audio_Out_Serializer.io.right_channel_fifo_is_full
 
   io.AUD_DACDAT := Audio_Out_Serializer.io.serial_audio_out_data
 }

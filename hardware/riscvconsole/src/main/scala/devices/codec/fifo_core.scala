@@ -17,7 +17,7 @@ class fifo_core_port(val conf: fifo_core_generic) extends Bundle {
   val wrreq = Input(Bool())
   val full = Output(Bool())
   val empty = Output(Bool())
-  val count = Output(UInt(conf.countBits.W))
+  //val count = Output(UInt(conf.countBits.W))
   val rddata = Output(UInt(conf.beatBits.W))
 }
 
@@ -42,5 +42,5 @@ class fifo_core(conf: fifo_core_generic) extends Module {
   io.rddata := RegEnable(queue.io.deq.bits, queue.io.deq.fire())
 
   // The count of the elements
-  io.count := queue.io.count
+  //io.count := queue.io.count
 }
