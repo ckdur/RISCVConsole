@@ -18,11 +18,7 @@
 #define METAL_I2C_RET_ERR -1
 
 /* Driver console logging */
-#if defined(METAL_I2C_DEBUG)
 #define METAL_I2C_LOG(x) print_str(x)
-#else
-#define METAL_I2C_LOG(x)
-#endif
 
 #define METAL_SIFIVE_I2C_INSERT_STOP(stop_flag) ((stop_flag & 0x01UL) << 6)
 #define METAL_SIFIVE_I2C_INSERT_RW_BIT(addr, rw)                               \
@@ -47,6 +43,7 @@
 void i2c0_init(void *gi2c,
                       unsigned int baud_rate,
                       metal_i2c_mode_t mode) {
+  METAL_I2C_LOG("i2c0_init:\n");
   if ((gi2c != NULL)) {
     /* 1: Master 0: Slave */
     if (mode == METAL_I2C_MASTER) {
@@ -63,6 +60,7 @@ void i2c0_init(void *gi2c,
 #define METAL_SIFIVE_I2C_GET_PRESCALER(baud) ((clock_rate / (baud_rate * 5)) - 1)
 int i2c0_set_baud_rate(void *gi2c,
                               unsigned int baud_rate) {
+  METAL_I2C_LOG("i2c0_set_baud_rate:\n");
   int ret = METAL_I2C_RET_ERR;
   unsigned long base = (unsigned long)gi2c;
 
@@ -95,6 +93,7 @@ int i2c0_set_baud_rate(void *gi2c,
 int i2c0_write_addr(unsigned long base,
                            unsigned int addr,
                            unsigned char rw_flag) {
+  METAL_I2C_LOG("i2c0_write_addr:\n");
     uint32_t timeout;
     int ret = METAL_I2C_RET_OK;
     /* Reset timeout */
@@ -134,6 +133,7 @@ int i2c0_write(void *gi2c,
                       unsigned int addr, unsigned int len,
                       unsigned char buf[],
                       metal_i2c_stop_bit_t stop_bit) {
+  METAL_I2C_LOG("i2c0_write:\n");
   uint8_t command;
   uint32_t timeout;
   int ret;
@@ -195,6 +195,7 @@ int i2c0_read(void *gi2c,
                      unsigned int addr, unsigned int len,
                      unsigned char buf[],
                      metal_i2c_stop_bit_t stop_bit) {
+  METAL_I2C_LOG("i2c0_read:\n");
   int ret;
   uint8_t command;
   uint32_t timeout;

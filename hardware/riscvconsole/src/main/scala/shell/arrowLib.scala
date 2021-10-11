@@ -79,3 +79,21 @@ class pll extends BlackBox {
     val locked = Output(Bool())
   })
 }
+
+class DDR3_PORT extends Bundle {
+  val A = Output(Bits(14.W))
+  val BA = Output(Bits(3.W))
+  val CK_p = Output(Bits(1.W))
+  val CK_n = Output(Bits(1.W))
+  val CKE = Output(Bits(1.W))
+  val CS_n = Output(Bits(1.W))
+  val DM = Output(Bits(8.W))
+  val RAS_n = Output(Bool())
+  val CAS_n = Output(Bool())
+  val WE_n = Output(Bool())
+  val RESET_n = Output(Bool())
+  val DQ = Analog(32.W)
+  val DQS_p = Analog(4.W)
+  val DQS_n = Analog(4.W)
+  val ODT = Output(Bits(1.W))
+}

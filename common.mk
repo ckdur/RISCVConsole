@@ -297,4 +297,5 @@ $(ROM_CONF_FILE): $(FIRRTL_FILE)
 	touch $(ROM_CONF_FILE)
 
 $(HEX_FILE):
+	make -C $(bldr_dir) BUILD_DIR=$(build_dir) long_name=$(long_name) clean
 	make -C $(bldr_dir) BUILD_DIR=$(build_dir) long_name=$(long_name) hex

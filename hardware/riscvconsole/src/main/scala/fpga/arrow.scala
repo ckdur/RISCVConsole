@@ -45,15 +45,15 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
     }
 
     // JTAG
-    platform.io.jtag.TDI := ALT_IOBUF(HSMC_D(0))
-    platform.io.jtag.TMS := ALT_IOBUF(HSMC_D(1))
-    platform.io.jtag.TCK := ALT_IOBUF(HSMC_D(2)).asClock()
+    platform.io.jtag.TDI := ALT_IOBUF(HSMC_TX_n(11))
+    platform.io.jtag.TMS := ALT_IOBUF(HSMC_TX_p(11))
+    platform.io.jtag.TCK := ALT_IOBUF(HSMC_TX_n(10)).asClock()
     val TDO_as_base = Wire(new BasePin)
     TDO_as_base.o.oe := platform.io.jtag.TDO.driven
     TDO_as_base.o.oval := platform.io.jtag.TDO.data
     TDO_as_base.o.ie := false.B
     TDO_as_base.i.po.foreach(_ := false.B)
-    ALT_IOBUF(HSMC_D(3), TDO_as_base)
+    ALT_IOBUF(HSMC_TX_p(10), TDO_as_base)
 
     platform.io.uart_rxd := ALT_IOBUF(HSMC_RX_p(0))  // HSMC_RX_p_0 / G12 / J3 - 36
     ALT_IOBUF(HSMC_TX_p(0), platform.io.uart_txd)    // HSMC_TX_p_0 / A9 / J3 - 40

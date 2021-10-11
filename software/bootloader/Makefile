@@ -6,7 +6,7 @@ OBJDUMP=$(RISCV_PREFIX)objdump
 LINKER_SCRIPT=link.ld
 
 CFLAGS=-g -march=rv32imac -mabi=ilp32 -mcmodel=medany -I. -I./i2c -I../sdboot/kprintf -I../sdboot/include
-LDFLAGS=-march=rv32imac -mabi=ilp32 -mcmodel=medany -T $(LINKER_SCRIPT) -nostartfiles --specs=nano.specs
+LDFLAGS=-march=rv32imac -mabi=ilp32 -mcmodel=medany -T $(LINKER_SCRIPT) -nostartfiles -nostdlib --specs=nano.specs
 
 all: $(BUILD_DIR)/bootloader.hex
 

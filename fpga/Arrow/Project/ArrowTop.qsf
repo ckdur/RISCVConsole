@@ -72,73 +72,73 @@ set_location_assignment PIN_AE9 -to btn_0
 set_location_assignment PIN_AE12 -to btn_1
 set_location_assignment PIN_AD9 -to btn_2
 set_location_assignment PIN_AD11 -to btn_3
-set_location_assignment PIN_AJ14 -to DDR3_A_0
-set_location_assignment PIN_AK14 -to DDR3_A_1
-set_location_assignment PIN_AH12 -to DDR3_A_2
-set_location_assignment PIN_AJ12 -to DDR3_A_3
-set_location_assignment PIN_AG15 -to DDR3_A_4
-set_location_assignment PIN_AH15 -to DDR3_A_5
-set_location_assignment PIN_AK12 -to DDR3_A_6
-set_location_assignment PIN_AK13 -to DDR3_A_7
-set_location_assignment PIN_AH13 -to DDR3_A_8
-set_location_assignment PIN_AH14 -to DDR3_A_9
-set_location_assignment PIN_AJ9 -to DDR3_A_10
-set_location_assignment PIN_AK9 -to DDR3_A_11
-set_location_assignment PIN_AK7 -to DDR3_A_12
-set_location_assignment PIN_AK8 -to DDR3_A_13
-set_location_assignment PIN_AG12 -to DDR3_A_14
-set_location_assignment PIN_AH10 -to DDR3_BA_0
-set_location_assignment PIN_AJ11 -to DDR3_BA_1
-set_location_assignment PIN_AK11 -to DDR3_BA_2
+set_location_assignment PIN_AJ14 -to DDR3_A[0]
+set_location_assignment PIN_AK14 -to DDR3_A[1]
+set_location_assignment PIN_AH12 -to DDR3_A[2]
+set_location_assignment PIN_AJ12 -to DDR3_A[3]
+set_location_assignment PIN_AG15 -to DDR3_A[4]
+set_location_assignment PIN_AH15 -to DDR3_A[5]
+set_location_assignment PIN_AK12 -to DDR3_A[6]
+set_location_assignment PIN_AK13 -to DDR3_A[7]
+set_location_assignment PIN_AH13 -to DDR3_A[8]
+set_location_assignment PIN_AH14 -to DDR3_A[9]
+set_location_assignment PIN_AJ9 -to DDR3_A[10]
+set_location_assignment PIN_AK9 -to DDR3_A[11]
+set_location_assignment PIN_AK7 -to DDR3_A[12]
+set_location_assignment PIN_AK8 -to DDR3_A[13]
+set_location_assignment PIN_AG12 -to DDR3_A[14]
+set_location_assignment PIN_AH10 -to DDR3_BA[0]
+set_location_assignment PIN_AJ11 -to DDR3_BA[1]
+set_location_assignment PIN_AK11 -to DDR3_BA[2]
 set_location_assignment PIN_AH7 -to DDR3_CAS_n
 set_location_assignment PIN_AJ21 -to DDR3_CKE
 set_location_assignment PIN_AA15 -to DDR3_CK_n
 set_location_assignment PIN_AA14 -to DDR3_CK_p
 set_location_assignment PIN_AB15 -to DDR3_CS_n
-set_location_assignment PIN_AH17 -to DDR3_DM_0
-set_location_assignment PIN_AG23 -to DDR3_DM_1
-set_location_assignment PIN_AK23 -to DDR3_DM_2
-set_location_assignment PIN_AJ27 -to DDR3_DM_3
-set_location_assignment PIN_AF18 -to DDR3_DQ_0
-set_location_assignment PIN_AE17 -to DDR3_DQ_1
-set_location_assignment PIN_AG16 -to DDR3_DQ_2
-set_location_assignment PIN_AF16 -to DDR3_DQ_3
-set_location_assignment PIN_AH20 -to DDR3_DQ_4
-set_location_assignment PIN_AG21 -to DDR3_DQ_5
-set_location_assignment PIN_AJ16 -to DDR3_DQ_6
-set_location_assignment PIN_AH18 -to DDR3_DQ_7
-set_location_assignment PIN_AK18 -to DDR3_DQ_8
-set_location_assignment PIN_AJ17 -to DDR3_DQ_9
-set_location_assignment PIN_AG18 -to DDR3_DQ_10
-set_location_assignment PIN_AK19 -to DDR3_DQ_11
-set_location_assignment PIN_AG20 -to DDR3_DQ_12
-set_location_assignment PIN_AF19 -to DDR3_DQ_13
-set_location_assignment PIN_AJ20 -to DDR3_DQ_14
-set_location_assignment PIN_AH24 -to DDR3_DQ_15
-set_location_assignment PIN_AE19 -to DDR3_DQ_16
-set_location_assignment PIN_AE18 -to DDR3_DQ_17
-set_location_assignment PIN_AG22 -to DDR3_DQ_18
-set_location_assignment PIN_AK22 -to DDR3_DQ_19
-set_location_assignment PIN_AF21 -to DDR3_DQ_20
-set_location_assignment PIN_AF20 -to DDR3_DQ_21
-set_location_assignment PIN_AH23 -to DDR3_DQ_22
-set_location_assignment PIN_AK24 -to DDR3_DQ_23
-set_location_assignment PIN_AF24 -to DDR3_DQ_24
-set_location_assignment PIN_AF23 -to DDR3_DQ_25
-set_location_assignment PIN_AJ24 -to DDR3_DQ_26
-set_location_assignment PIN_AK26 -to DDR3_DQ_27
-set_location_assignment PIN_AE23 -to DDR3_DQ_28
-set_location_assignment PIN_AE22 -to DDR3_DQ_29
-set_location_assignment PIN_AG25 -to DDR3_DQ_30
-set_location_assignment PIN_AK27 -to DDR3_DQ_31
-set_location_assignment PIN_W16 -to DDR3_DQS_n_0
-set_location_assignment PIN_W17 -to DDR3_DQS_n_1
-set_location_assignment PIN_AA18 -to DDR3_DQS_n_2
-set_location_assignment PIN_AD19 -to DDR3_DQS_n_3
-set_location_assignment PIN_V16 -to DDR3_DQS_p_0
-set_location_assignment PIN_V17 -to DDR3_DQS_p_1
-set_location_assignment PIN_Y17 -to DDR3_DQS_p_2
-set_location_assignment PIN_AC20 -to DDR3_DQS_p_3
+set_location_assignment PIN_AH17 -to DDR3_DM[0]
+set_location_assignment PIN_AG23 -to DDR3_DM[1]
+set_location_assignment PIN_AK23 -to DDR3_DM[2]
+set_location_assignment PIN_AJ27 -to DDR3_DM[3]
+set_location_assignment PIN_AF18 -to DDR3_DQ[0]
+set_location_assignment PIN_AE17 -to DDR3_DQ[1]
+set_location_assignment PIN_AG16 -to DDR3_DQ[2]
+set_location_assignment PIN_AF16 -to DDR3_DQ[3]
+set_location_assignment PIN_AH20 -to DDR3_DQ[4]
+set_location_assignment PIN_AG21 -to DDR3_DQ[5]
+set_location_assignment PIN_AJ16 -to DDR3_DQ[6]
+set_location_assignment PIN_AH18 -to DDR3_DQ[7]
+set_location_assignment PIN_AK18 -to DDR3_DQ[8]
+set_location_assignment PIN_AJ17 -to DDR3_DQ[9]
+set_location_assignment PIN_AG18 -to DDR3_DQ[10]
+set_location_assignment PIN_AK19 -to DDR3_DQ[11]
+set_location_assignment PIN_AG20 -to DDR3_DQ[12]
+set_location_assignment PIN_AF19 -to DDR3_DQ[13]
+set_location_assignment PIN_AJ20 -to DDR3_DQ[14]
+set_location_assignment PIN_AH24 -to DDR3_DQ[15]
+set_location_assignment PIN_AE19 -to DDR3_DQ[16]
+set_location_assignment PIN_AE18 -to DDR3_DQ[17]
+set_location_assignment PIN_AG22 -to DDR3_DQ[18]
+set_location_assignment PIN_AK22 -to DDR3_DQ[19]
+set_location_assignment PIN_AF21 -to DDR3_DQ[20]
+set_location_assignment PIN_AF20 -to DDR3_DQ[21]
+set_location_assignment PIN_AH23 -to DDR3_DQ[22]
+set_location_assignment PIN_AK24 -to DDR3_DQ[23]
+set_location_assignment PIN_AF24 -to DDR3_DQ[24]
+set_location_assignment PIN_AF23 -to DDR3_DQ[25]
+set_location_assignment PIN_AJ24 -to DDR3_DQ[26]
+set_location_assignment PIN_AK26 -to DDR3_DQ[27]
+set_location_assignment PIN_AE23 -to DDR3_DQ[28]
+set_location_assignment PIN_AE22 -to DDR3_DQ[29]
+set_location_assignment PIN_AG25 -to DDR3_DQ[30]
+set_location_assignment PIN_AK27 -to DDR3_DQ[31]
+set_location_assignment PIN_W16 -to DDR3_DQS_n[0]
+set_location_assignment PIN_W17 -to DDR3_DQS_n[1]
+set_location_assignment PIN_AA18 -to DDR3_DQS_n[2]
+set_location_assignment PIN_AD19 -to DDR3_DQS_n[3]
+set_location_assignment PIN_V16 -to DDR3_DQS_p[0]
+set_location_assignment PIN_V17 -to DDR3_DQS_p[1]
+set_location_assignment PIN_Y17 -to DDR3_DQS_p[2]
+set_location_assignment PIN_AC20 -to DDR3_DQS_p[3]
 set_location_assignment PIN_AE16 -to DDR3_ODT
 set_location_assignment PIN_AH8 -to DDR3_RAS_n
 set_location_assignment PIN_AK21 -to DDR3_RESET_n
@@ -148,73 +148,73 @@ set_location_assignment PIN_AG27 -to FAN_CTRL
 set_location_assignment PIN_F25 -to HPS_CLOCK_25
 set_location_assignment PIN_D25 -to HPS_CLOCK_50
 set_location_assignment PIN_B15 -to HPS_CONV_USB_n
-set_location_assignment PIN_F26 -to HPS_DDR3_A_0
-set_location_assignment PIN_G30 -to HPS_DDR3_A_1
-set_location_assignment PIN_F28 -to HPS_DDR3_A_2
-set_location_assignment PIN_F30 -to HPS_DDR3_A_3
-set_location_assignment PIN_J25 -to HPS_DDR3_A_4
-set_location_assignment PIN_J27 -to HPS_DDR3_A_5
-set_location_assignment PIN_F29 -to HPS_DDR3_A_6
-set_location_assignment PIN_E28 -to HPS_DDR3_A_7
-set_location_assignment PIN_H27 -to HPS_DDR3_A_8
-set_location_assignment PIN_G26 -to HPS_DDR3_A_9
-set_location_assignment PIN_D29 -to HPS_DDR3_A_10
-set_location_assignment PIN_C30 -to HPS_DDR3_A_11
-set_location_assignment PIN_B30 -to HPS_DDR3_A_12
-set_location_assignment PIN_C29 -to HPS_DDR3_A_13
-set_location_assignment PIN_H25 -to HPS_DDR3_A_14
-set_location_assignment PIN_E29 -to HPS_DDR3_BA_0
-set_location_assignment PIN_J24 -to HPS_DDR3_BA_1
-set_location_assignment PIN_J23 -to HPS_DDR3_BA_2
+set_location_assignment PIN_F26 -to HPS_DDR3_A[0]
+set_location_assignment PIN_G30 -to HPS_DDR3_A[1]
+set_location_assignment PIN_F28 -to HPS_DDR3_A[2]
+set_location_assignment PIN_F30 -to HPS_DDR3_A[3]
+set_location_assignment PIN_J25 -to HPS_DDR3_A[4]
+set_location_assignment PIN_J27 -to HPS_DDR3_A[5]
+set_location_assignment PIN_F29 -to HPS_DDR3_A[6]
+set_location_assignment PIN_E28 -to HPS_DDR3_A[7]
+set_location_assignment PIN_H27 -to HPS_DDR3_A[8]
+set_location_assignment PIN_G26 -to HPS_DDR3_A[9]
+set_location_assignment PIN_D29 -to HPS_DDR3_A[10]
+set_location_assignment PIN_C30 -to HPS_DDR3_A[11]
+set_location_assignment PIN_B30 -to HPS_DDR3_A[12]
+set_location_assignment PIN_C29 -to HPS_DDR3_A[13]
+set_location_assignment PIN_H25 -to HPS_DDR3_A[14]
+set_location_assignment PIN_E29 -to HPS_DDR3_BA[0]
+set_location_assignment PIN_J24 -to HPS_DDR3_BA[1]
+set_location_assignment PIN_J23 -to HPS_DDR3_BA[2]
 set_location_assignment PIN_E27 -to HPS_DDR3_CAS_n
 set_location_assignment PIN_L29 -to HPS_DDR3_CKE
 set_location_assignment PIN_L23 -to HPS_DDR3_CK_n
 set_location_assignment PIN_M23 -to HPS_DDR3_CK_p
 set_location_assignment PIN_H24 -to HPS_DDR3_CS_n
-set_location_assignment PIN_K28 -to HPS_DDR3_DM_0
-set_location_assignment PIN_M28 -to HPS_DDR3_DM_1
-set_location_assignment PIN_R28 -to HPS_DDR3_DM_2
-set_location_assignment PIN_W30 -to HPS_DDR3_DM_3
-set_location_assignment PIN_K23 -to HPS_DDR3_DQ_0
-set_location_assignment PIN_K22 -to HPS_DDR3_DQ_1
-set_location_assignment PIN_H30 -to HPS_DDR3_DQ_2
-set_location_assignment PIN_G28 -to HPS_DDR3_DQ_3
-set_location_assignment PIN_L25 -to HPS_DDR3_DQ_4
-set_location_assignment PIN_L24 -to HPS_DDR3_DQ_5
-set_location_assignment PIN_J30 -to HPS_DDR3_DQ_6
-set_location_assignment PIN_J29 -to HPS_DDR3_DQ_7
-set_location_assignment PIN_K26 -to HPS_DDR3_DQ_8
-set_location_assignment PIN_L26 -to HPS_DDR3_DQ_9
-set_location_assignment PIN_K29 -to HPS_DDR3_DQ_10
-set_location_assignment PIN_K27 -to HPS_DDR3_DQ_11
-set_location_assignment PIN_M26 -to HPS_DDR3_DQ_12
-set_location_assignment PIN_M27 -to HPS_DDR3_DQ_13
-set_location_assignment PIN_L28 -to HPS_DDR3_DQ_14
-set_location_assignment PIN_M30 -to HPS_DDR3_DQ_15
-set_location_assignment PIN_U26 -to HPS_DDR3_DQ_16
-set_location_assignment PIN_T26 -to HPS_DDR3_DQ_17
-set_location_assignment PIN_N29 -to HPS_DDR3_DQ_18
-set_location_assignment PIN_N28 -to HPS_DDR3_DQ_19
-set_location_assignment PIN_P26 -to HPS_DDR3_DQ_20
-set_location_assignment PIN_P27 -to HPS_DDR3_DQ_21
-set_location_assignment PIN_N27 -to HPS_DDR3_DQ_22
-set_location_assignment PIN_R29 -to HPS_DDR3_DQ_23
-set_location_assignment PIN_P24 -to HPS_DDR3_DQ_24
-set_location_assignment PIN_P25 -to HPS_DDR3_DQ_25
-set_location_assignment PIN_T29 -to HPS_DDR3_DQ_26
-set_location_assignment PIN_T28 -to HPS_DDR3_DQ_27
-set_location_assignment PIN_R27 -to HPS_DDR3_DQ_28
-set_location_assignment PIN_R26 -to HPS_DDR3_DQ_29
-set_location_assignment PIN_V30 -to HPS_DDR3_DQ_30
-set_location_assignment PIN_W29 -to HPS_DDR3_DQ_31
-set_location_assignment PIN_M19 -to HPS_DDR3_DQS_n_0
-set_location_assignment PIN_N24 -to HPS_DDR3_DQS_n_1
-set_location_assignment PIN_R18 -to HPS_DDR3_DQS_n_2
-set_location_assignment PIN_R21 -to HPS_DDR3_DQS_n_3
-set_location_assignment PIN_N18 -to HPS_DDR3_DQS_p_0
-set_location_assignment PIN_N25 -to HPS_DDR3_DQS_p_1
-set_location_assignment PIN_R19 -to HPS_DDR3_DQS_p_2
-set_location_assignment PIN_R22 -to HPS_DDR3_DQS_p_3
+set_location_assignment PIN_K28 -to HPS_DDR3_DM[0]
+set_location_assignment PIN_M28 -to HPS_DDR3_DM[1]
+set_location_assignment PIN_R28 -to HPS_DDR3_DM[2]
+set_location_assignment PIN_W30 -to HPS_DDR3_DM[3]
+set_location_assignment PIN_K23 -to HPS_DDR3_DQ[0]
+set_location_assignment PIN_K22 -to HPS_DDR3_DQ[1]
+set_location_assignment PIN_H30 -to HPS_DDR3_DQ[2]
+set_location_assignment PIN_G28 -to HPS_DDR3_DQ[3]
+set_location_assignment PIN_L25 -to HPS_DDR3_DQ[4]
+set_location_assignment PIN_L24 -to HPS_DDR3_DQ[5]
+set_location_assignment PIN_J30 -to HPS_DDR3_DQ[6]
+set_location_assignment PIN_J29 -to HPS_DDR3_DQ[7]
+set_location_assignment PIN_K26 -to HPS_DDR3_DQ[8]
+set_location_assignment PIN_L26 -to HPS_DDR3_DQ[9]
+set_location_assignment PIN_K29 -to HPS_DDR3_DQ[10]
+set_location_assignment PIN_K27 -to HPS_DDR3_DQ[11]
+set_location_assignment PIN_M26 -to HPS_DDR3_DQ[12]
+set_location_assignment PIN_M27 -to HPS_DDR3_DQ[13]
+set_location_assignment PIN_L28 -to HPS_DDR3_DQ[14]
+set_location_assignment PIN_M30 -to HPS_DDR3_DQ[15]
+set_location_assignment PIN_U26 -to HPS_DDR3_DQ[16]
+set_location_assignment PIN_T26 -to HPS_DDR3_DQ[17]
+set_location_assignment PIN_N29 -to HPS_DDR3_DQ[18]
+set_location_assignment PIN_N28 -to HPS_DDR3_DQ[19]
+set_location_assignment PIN_P26 -to HPS_DDR3_DQ[20]
+set_location_assignment PIN_P27 -to HPS_DDR3_DQ[21]
+set_location_assignment PIN_N27 -to HPS_DDR3_DQ[22]
+set_location_assignment PIN_R29 -to HPS_DDR3_DQ[23]
+set_location_assignment PIN_P24 -to HPS_DDR3_DQ[24]
+set_location_assignment PIN_P25 -to HPS_DDR3_DQ[25]
+set_location_assignment PIN_T29 -to HPS_DDR3_DQ[26]
+set_location_assignment PIN_T28 -to HPS_DDR3_DQ[27]
+set_location_assignment PIN_R27 -to HPS_DDR3_DQ[28]
+set_location_assignment PIN_R26 -to HPS_DDR3_DQ[29]
+set_location_assignment PIN_V30 -to HPS_DDR3_DQ[30]
+set_location_assignment PIN_W29 -to HPS_DDR3_DQ[31]
+set_location_assignment PIN_M19 -to HPS_DDR3_DQS_n[0]
+set_location_assignment PIN_N24 -to HPS_DDR3_DQS_n[1]
+set_location_assignment PIN_R18 -to HPS_DDR3_DQS_n[2]
+set_location_assignment PIN_R21 -to HPS_DDR3_DQS_n[3]
+set_location_assignment PIN_N18 -to HPS_DDR3_DQS_p[0]
+set_location_assignment PIN_N25 -to HPS_DDR3_DQS_p[1]
+set_location_assignment PIN_R19 -to HPS_DDR3_DQS_p[2]
+set_location_assignment PIN_R22 -to HPS_DDR3_DQS_p[3]
 set_location_assignment PIN_H28 -to HPS_DDR3_ODT
 set_location_assignment PIN_D30 -to HPS_DDR3_RAS_n
 set_location_assignment PIN_P30 -to HPS_DDR3_RESET_n
@@ -475,87 +475,4 @@ set_global_assignment -name SIP_FILE pll/pll.sip
 set_global_assignment -name ENABLE_SIGNALTAP ON
 set_global_assignment -name USE_SIGNALTAP_FILE output_files/stp1.stp
 set_global_assignment -name SIGNALTAP_FILE output_files/stp1.stp
-set_global_assignment -name SLD_NODE_CREATOR_ID 110 -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_ENTITY_NAME sld_signaltap -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_clk -to "RVCPlatform:RVCPlatform|clock" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[0] -to AUD_ADCDAT -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[1] -to AUD_ADCLRCK -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[2] -to AUD_BCLK -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[3] -to AUD_DACDAT -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[4] -to AUD_DACLRCK -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[5] -to AUD_I2C_SCLK -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[6] -to AUD_I2C_SDAT -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[7] -to AUD_MUTE -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[8] -to AUD_XCK -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[9] -to "pll:pll|locked" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[10] -to "pll:pll|rst" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[0] -to AUD_ADCDAT -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[1] -to AUD_ADCLRCK -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[2] -to AUD_BCLK -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[3] -to AUD_DACDAT -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[4] -to AUD_DACLRCK -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[5] -to AUD_I2C_SCLK -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[6] -to AUD_I2C_SDAT -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[7] -to AUD_MUTE -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[8] -to AUD_XCK -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[9] -to "pll:pll|locked" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[10] -to "pll:pll|rst" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_RAM_BLOCK_TYPE=AUTO" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_DATA_BITS=11" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_BITS=11" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_STORAGE_QUALIFIER_BITS=11" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_NODE_INFO=805334528" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_POWER_UP_TRIGGER=0" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_INVERSION_MASK=000000000000000000000000000000000000000000000000000000" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_INVERSION_MASK_LENGTH=54" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_STORAGE_QUALIFIER_INVERSION_MASK_LENGTH=0" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_SEGMENT_SIZE=128" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_ATTRIBUTE_MEM_MODE=OFF" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_STATE_FLOW_USE_GENERATED=0" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_STATE_BITS=11" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_BUFFER_FULL_STOP=1" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_CURRENT_RESOURCE_WIDTH=1" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_INCREMENTAL_ROUTING=1" -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[0] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[1] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[2] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[3] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[4] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[5] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[6] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[7] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[8] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[9] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[10] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[11] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[12] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[13] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[14] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[15] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[16] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[17] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[18] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[19] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[20] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[21] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[22] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[23] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[24] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[25] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[26] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[27] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[28] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[29] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[30] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[31] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_LEVEL=1" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_SAMPLE_DEPTH=128" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_IN_ENABLED=0" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_PIPELINE=0" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_RAM_PIPELINE=0" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_COUNTER_PIPELINE=0" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_ADVANCED_TRIGGER_ENTITY=basic,1," -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_LEVEL_PIPELINE=1" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_ENABLE_ADVANCED_TRIGGER=0" -section_id auto_signaltap_0
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
-set_global_assignment -name SLD_FILE db/stp1_auto_stripped.stp

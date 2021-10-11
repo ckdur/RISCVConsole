@@ -6,20 +6,59 @@
 
 volatile uint32_t* gpio = (volatile uint32_t*)0x10001000;
 
-#define CODEC_DATA(addr, data, ref) ref[0] = ((((addr) >> 9) & 0x7F) << 1) | (((data) >> 8) & 0x1); ref[1] = (data) & 0xFF;
+#define CODEC_DATA(addr, data, ref) ref[0] = ((((addr) & 0x7F) << 1) | (((data) >> 8) & 0x1)); ref[1] = ((data) & 0xFF);
+#define CODEC_ADDR 0x1A
+
+uint8_t reverseBits(uint8_t num)
+{
+    unsigned int count = sizeof(num) * 8 - 1;
+    uint8_t reverse_num = num;
+      
+    num >>= 1; 
+    while(num)
+    {
+       reverse_num <<= 1;       
+       reverse_num |= num & 1;
+       num >>= 1;
+       count--;
+    }
+    reverse_num <<= count;
+    return reverse_num;
+}
 
 void codec_init() {
   i2c0_init((void*)I2C_CTRL_ADDR, 1000000, METAL_I2C_MASTER);
   char buf[2];
   
-  CODEC_DATA(0x06, 0, buf) 
-  i2c0_write((void*)I2C_CTRL_ADDR, 0x1A, 2, buf, METAL_I2C_STOP_ENABLE);
-  CODEC_DATA(0x07, 2 << 2 | 3 << 0, buf) 
-  i2c0_write((void*)I2C_CTRL_ADDR, 0x1A, 2, buf, METAL_I2C_STOP_ENABLE);
+  // Do a software reset
+  CODEC_DATA(0x0F, 0, buf) 
+  i2c0_write((void*)I2C_CTRL_ADDR, CODEC_ADDR, 2, buf, METAL_I2C_STOP_ENABLE);
+  // Enable all power, except OUT (R6 D4)
+  CODEC_DATA(0x06, 1 << 4, buf) 
+  i2c0_write((void*)I2C_CTRL_ADDR, CODEC_ADDR, 2, buf, METAL_I2C_STOP_ENABLE);
+  // Configuration
+  // 1. Digital Audio IF. Data word length = 24 bits (1,0 in R7 D3,D2). Format = DSP mode (11 in R7, D1,D0)
+  // 1b. Enable Master Mode in 1 also. (1 in R7, D6)
+  CODEC_DATA(0x07, 1 << 6 | 2 << 2 | 3 << 0, buf) 
+  i2c0_write((void*)I2C_CTRL_ADDR, CODEC_ADDR, 2, buf, METAL_I2C_STOP_ENABLE);
+  // 2. Left ADC volume. No BOTH, No LinMute, Vol = 0dB (010111 in R0 D5-0)
   CODEC_DATA(0x00, 0 << 8 | 0 << 7 | 0x17, buf) 
-  i2c0_write((void*)I2C_CTRL_ADDR, 0x1A, 2, buf, METAL_I2C_STOP_ENABLE);
+  i2c0_write((void*)I2C_CTRL_ADDR, CODEC_ADDR, 2, buf, METAL_I2C_STOP_ENABLE);
+  // 3. Right ADC volume. No BOTH, No LinMute, Vol = 0dB (010111 in R0 D5-0)
   CODEC_DATA(0x01, 0 << 8 | 0 << 7 | 0x17, buf)
-  i2c0_write((void*)I2C_CTRL_ADDR, 0x1A, 2, buf, METAL_I2C_STOP_ENABLE);
+  i2c0_write((void*)I2C_CTRL_ADDR, CODEC_ADDR, 2, buf, METAL_I2C_STOP_ENABLE);
+  // 4. Enable USB mode (1 in R8 D0). Sampling will be 96Khz (SR 0111 in R8 D5-2) Dividers in zero are ok.
+  CODEC_DATA(0x08, 7 << 2 | 1, buf)
+  i2c0_write((void*)I2C_CTRL_ADDR, CODEC_ADDR, 2, buf, METAL_I2C_STOP_ENABLE);
+  // Wait 34ms
+  uint64_t dest = metal_utime() + 34000;
+  while(metal_utime() <= dest);
+  // Active (R9 D0 in 1)
+  CODEC_DATA(0x09, 1, buf)
+  i2c0_write((void*)I2C_CTRL_ADDR, CODEC_ADDR, 2, buf, METAL_I2C_STOP_ENABLE);
+  // Enable all power, 0
+  CODEC_DATA(0x06, 0, buf) 
+  i2c0_write((void*)I2C_CTRL_ADDR, CODEC_ADDR, 2, buf, METAL_I2C_STOP_ENABLE);
 }
 
 int main(int argc, int argv) {
