@@ -6,6 +6,8 @@ import chipsalliance.rocketchip.config.Parameters
 import freechips.rocketchip.devices.debug._
 import freechips.rocketchip.diplomacy.LazyModule
 import freechips.rocketchip.jtag.JTAGIO
+import freechips.rocketchip.subsystem.ExtMem
+import riscvconsole.devices.altera.ddr3._
 import riscvconsole.devices.codec._
 import riscvconsole.devices.sdram.{SDRAMIf, SDRAMKey}
 import sifive.blocks.devices.gpio._
@@ -13,6 +15,7 @@ import sifive.blocks.devices.pinctrl._
 import sifive.blocks.devices.spi._
 import sifive.blocks.devices.uart._
 import sifive.blocks.devices.i2c._
+import freechips.rocketchip.util._
 
 class RVCPlatform(implicit p: Parameters) extends Module
 {
@@ -29,6 +32,11 @@ class RVCPlatform(implicit p: Parameters) extends Module
 
     // SDRAM port
     val sdram = Vec(p(SDRAMKey).size, new SDRAMIf)
+
+    // Altera DDR3 port
+    val ddr3 = p(QsysDDR3Mem).map{A => new QsysIO}
+    val ddr3refclk = p(QsysDDR3Mem).map{A => Input(Clock())}
+    val ddr3refrstn = p(QsysDDR3Mem).map{A => Input(Bool())}
 
     // Codec port
     val codec = Vec(p(PeripheryCodecKey).size, new CodecSignals(() => new BasePin()))
@@ -98,5 +106,8 @@ class RVCPlatform(implicit p: Parameters) extends Module
   }
 
   (io.sdram zip sys.sdramio).map{case (port, sys) => port <> sys}
+  (io.ddr3 zip sys.ddr3Ports).map{case (port, sys) => port <> sys}
+  (io.ddr3refclk zip sys.ddr3refclk).map{case (port, sys) => sys := port}
+  (io.ddr3refrstn zip sys.ddr3refrstn).map{case (port, sys) => sys := port}
   sys.otherclock := io.otherclock
 }

@@ -3,6 +3,7 @@ package riscvconsole.fpga
 import chisel3._
 import riscvconsole.system._
 import chipsalliance.rocketchip.config._
+import chisel3.experimental.attach
 import riscvconsole.shell.ArrowLib._
 import riscvconsole.shell.arrow._
 import sifive.blocks.devices.pinctrl._
@@ -11,7 +12,7 @@ import riscvconsole.util._
 class ArrowTop(implicit p: Parameters) extends ArrowShell
 {
   val pll = Module(new pll)
-  pll.io.refclk := clk_OSC_50_B5B
+  pll.io.refclk := sysclk
   pll.io.rst := !btn(0)
   val clock = pll.io.outclk_0
   val reset = !pll.io.locked
@@ -111,6 +112,34 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
       ALT_IOBUF(AUD.ADCLRCK, codec.AUD_ADCLRCK)
       ALT_IOBUF(AUD.DACLRCK, codec.AUD_DACLRCK)
       ALT_IOBUF(AUD.BCLK, codec.AUD_BCLK)
+    }
+
+    // The DDR3
+    platform.io.ddr3refclk.foreach(_ := sysclk) // TODO: This clock is okay?
+    platform.io.ddr3refrstn.foreach(_ := btn(0))
+    platform.io.ddr3.foreach{ ddr3 =>
+      DDR3.A := ddr3.memory_mem_a
+      DDR3.BA := ddr3.memory_mem_ba
+      DDR3.CK_p := ddr3.memory_mem_ck
+      DDR3.CK_n := ddr3.memory_mem_ck_n
+      DDR3.CKE := ddr3.memory_mem_cke
+      DDR3.CS_n := ddr3.memory_mem_cs_n
+      DDR3.DM := ddr3.memory_mem_dm
+      DDR3.RAS_n := ddr3.memory_mem_ras_n
+      DDR3.CAS_n := ddr3.memory_mem_cas_n
+      DDR3.WE_n := ddr3.memory_mem_we_n
+      attach(DDR3.DQ, ddr3.memory_mem_dq)
+      attach(DDR3.DQS_p, ddr3.memory_mem_dqs)
+      attach(DDR3.DQS_n, ddr3.memory_mem_dqs_n)
+      DDR3.ODT := ddr3.memory_mem_odt
+      DDR3.RESET_n := ddr3.memory_mem_reset_n.getOrElse(true.B)
+      ddr3.oct_rzqin := DDR3.RZQ
+
+      // If there is a DDR3 implementation, we override the leds to show the DDR3 status
+      // TODO: Do this in the system
+      led(0) := ddr3.mem_status_local_cal_fail
+      led(1) := ddr3.mem_status_local_cal_success
+      led(2) := ddr3.mem_status_local_init_done
     }
 
     // Other clock not connected

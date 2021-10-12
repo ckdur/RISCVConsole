@@ -1,9 +1,10 @@
 package riscvconsole.system
 
 import chipsalliance.rocketchip.config._
-import freechips.rocketchip.subsystem.{InSubsystem, PeripheryBusKey, SubsystemDriveAsyncClockGroupsKey, SystemBusKey}
+import freechips.rocketchip.subsystem._
 import freechips.rocketchip.devices.debug._
 import freechips.rocketchip.devices.tilelink.MaskROMLocated
+import riscvconsole.devices.altera.ddr3.QsysDDR3Mem
 import riscvconsole.devices.codec._
 import riscvconsole.devices.sdram._
 
@@ -39,6 +40,16 @@ class SetFrequency(freq: BigInt) extends Config((site, here, up) => {
 class RemoveSDRAM extends Config((site, here, up) => {
   case SDRAMKey => Nil
   //case SRAMKey => Nil
+})
+
+class WithQsysDDR3Mem extends Config((site, here, up) => {
+  case QsysDDR3Mem => Some(MemoryPortParams(MasterPortParams(0x80000000L, 0x40000000, 4, 4), 1))
+  case SRAMKey => Nil
+})
+
+class WithExtMem extends Config((site, here, up) => {
+  case ExtMem => Some(MemoryPortParams(MasterPortParams(0x80000000L, 0x40000000, 4, 4), 1))
+  case SRAMKey => Nil
 })
 
 class RemoveDebugClockGating extends Config((site, here, up) => {
@@ -79,6 +90,7 @@ class RVCHarnessConfig extends Config(new SetFrequency(100000000) ++ new RVCConf
 
 class ArrowConfig extends Config(
   new RemoveSDRAM ++
+    new WithQsysDDR3Mem ++
     new RVCPeripheralsConfig(11) ++
     new SetFrequency(50000000) ++
     new RemoveDebugClockGating ++
@@ -92,6 +104,7 @@ class ArrowConfig extends Config(
     new freechips.rocketchip.subsystem.WithDontDriveBusClocksFromSBus ++
     //new freechips.rocketchip.subsystem.WithInclusiveCache(nBanks = 1, nWays = 2, capacityKB = 16) ++       // use Sifive L2 cache
     new freechips.rocketchip.subsystem.WithNExtTopInterrupts(0) ++ // no external interrupts
-    new freechips.rocketchip.subsystem.With1TinyCore ++            // single rocket-core with scratchpad
-    new freechips.rocketchip.subsystem.WithCoherentBusTopology ++  // Hierarchical buses without L2
+    new freechips.rocketchip.subsystem.WithoutFPU() ++
+    new freechips.rocketchip.subsystem.WithNMedCores(1) ++            // single rocket-core with VM support and FPU
+    new freechips.rocketchip.subsystem.WithCoherentBusTopology ++  // Hierarchical buses with broadcast L2
     new freechips.rocketchip.system.BaseConfig)                    // "base" rocketchip system

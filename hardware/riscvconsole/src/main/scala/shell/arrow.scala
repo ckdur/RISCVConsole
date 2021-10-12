@@ -23,4 +23,10 @@ class ArrowShell extends RawModule {
   val HSMC_TX_n = IO(Vec(16, Analog(1.W)))
 
   val AUD = IO(new AUD_CODEC_PORT)
+
+  val DDR3 = IO(new DDR3_PORT)
+
+  val ckctrl_0 = Module(new clkctrl)
+  ckctrl_0.io.inclk := clk_OSC_50_B5B
+  val sysclk = ckctrl_0.io.outclk
 }
