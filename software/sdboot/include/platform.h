@@ -22,8 +22,8 @@
    #define MCAUSE_CAUSE       0x7FFFFFFFFFFFFFFFUL
 #endif
 
-#define TIMEBASE 1000000 // TODO: This should be derived from the dts
-#define F_CLK 50000000 // TODO: This should be derived from the dts
+//#define TIMEBASE 1000000 // TODO: This should be derived from the dts
+//#define F_CLK 50000000 // TODO: This should be derived from the dts
 
 /****************************************************************************
  * Platform definitions

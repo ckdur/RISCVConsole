@@ -34,6 +34,7 @@ module sdram
 //-----------------------------------------------------------------
 #(
     parameter    SDRAM_MHZ             = 50,
+    parameter    SDRAM_DATA_W          = 16,
     parameter    SDRAM_ADDR_W          = 24,
     parameter    SDRAM_COL_W           = 9,    
     parameter    SDRAM_BANK_W          = 2,
@@ -65,18 +66,18 @@ module sdram
     output          ack_o,
     
     // SDRAM Interface
-    output          sdram_clk_o,
-    output          sdram_cke_o,
-    output          sdram_cs_o,
-    output          sdram_ras_o,
-    output          sdram_cas_o,
-    output          sdram_we_o,
-    output [1:0]    sdram_dqm_o,
-    output [12:0]   sdram_addr_o,
-    output [1:0]    sdram_ba_o,
-    input  [15:0]   sdram_data_i,
-    output [15:0]   sdram_data_o,
-    output          sdram_drive_o
+    output                      sdram_clk_o,
+    output                      sdram_cke_o,
+    output                      sdram_cs_o,
+    output                      sdram_ras_o,
+    output                      sdram_cas_o,
+    output                      sdram_we_o,
+    output [SDRAM_DQM_W-1:0]    sdram_dqm_o,
+    output [SDRAM_ROW_W-1:0]    sdram_addr_o,
+    output [SDRAM_BANK_W-1:0]   sdram_ba_o,
+    input  [SDRAM_DATA_W-1:0]   sdram_data_i,
+    output [SDRAM_DATA_W-1:0]   sdram_data_o,
+    output                      sdram_drive_o
 );
 
 //-----------------------------------------------------------------
@@ -110,8 +111,6 @@ localparam STATE_REFRESH     = 4'd9;
 
 localparam AUTO_PRECHARGE    = 10;
 localparam ALL_BANKS         = 10;
-
-localparam SDRAM_DATA_W      = 16;
 
 localparam CYCLE_TIME_NS     = 1000 / SDRAM_MHZ;
 

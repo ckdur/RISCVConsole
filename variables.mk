@@ -138,6 +138,18 @@ ifeq ($(SUB_PROJECT),arrow)
 	TB                ?= TestDriver
 	TOP               ?= RVCPlatform
 endif
+# For the RISCV console (in DE2)
+ifeq ($(SUB_PROJECT),DE2)
+	SBT_PROJECT       ?= riscvconsole
+	MODEL             ?= DE2Top
+	VLOG_MODEL        ?= DE2Top
+	MODEL_PACKAGE     ?= riscvconsole.fpga
+	CONFIG            ?= DE2Config
+	CONFIG_PACKAGE    ?= riscvconsole.system
+	GENERATOR_PACKAGE ?= riscvconsole
+	TB                ?= TestDriver
+	TOP               ?= RVCPlatform
+endif
 
 #########################################################################################
 # path to rocket-chip and testchipip

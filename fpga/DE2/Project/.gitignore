@@ -1,0 +1,12 @@
+db
+incremental_db
+output_files
+*.qws
+.qsys_edit
+*.qdf
+*.txt
+*.sopcinfo
+*.csv
+clkctrl
+main
+

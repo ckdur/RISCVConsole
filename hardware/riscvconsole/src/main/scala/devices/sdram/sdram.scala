@@ -16,7 +16,8 @@ case class sdram_bb_cfg
   SDRAM_ADDR_W: Int = 24,
   SDRAM_COL_W: Int = 9,
   SDRAM_BANK_W: Int = 2,
-  SDRAM_DQM_W: Int = 2
+  SDRAM_DQM_W: Int = 2,
+  SDRAM_DQ_W: Int = 16
 ) {
   val SDRAM_MHZ = SDRAM_HZ/1000000
   val SDRAM_BANKS = 1 << SDRAM_BANK_W
@@ -29,21 +30,22 @@ case class sdram_bb_cfg
 
 trait HasSDRAMIf{
   this: Bundle =>
+  val cfg: sdram_bb_cfg
   val sdram_clk_o = Output(Bool())
   val sdram_cke_o = Output(Bool())
   val sdram_cs_o = Output(Bool())
   val sdram_ras_o = Output(Bool())
   val sdram_cas_o = Output(Bool())
   val sdram_we_o = Output(Bool())
-  val sdram_dqm_o = Output(UInt(2.W))
-  val sdram_addr_o = Output(UInt(13.W))
-  val sdram_ba_o = Output(UInt(2.W))
-  val sdram_data_o = Output(UInt(16.W))
-  val sdram_data_i = Input(UInt(16.W))
+  val sdram_dqm_o = Output(UInt(cfg.SDRAM_DQM_W.W))
+  val sdram_addr_o = Output(UInt(cfg.SDRAM_ROW_W.W))
+  val sdram_ba_o = Output(UInt(cfg.SDRAM_BANK_W.W))
+  val sdram_data_o = Output(UInt(cfg.SDRAM_DQ_W.W))
+  val sdram_data_i = Input(UInt(cfg.SDRAM_DQ_W.W))
   val sdram_drive_o = Output(Bool())
 }
 
-class SDRAMIf extends Bundle with HasSDRAMIf
+class SDRAMIf(val cfg: sdram_bb_cfg = sdram_bb_cfg()) extends Bundle with HasSDRAMIf
 
 trait HasWishboneIf{
   this: Bundle =>
@@ -61,6 +63,7 @@ trait HasWishboneIf{
 class sdram(val cfg: sdram_bb_cfg) extends BlackBox (
   Map(
     "SDRAM_MHZ" -> IntParam(cfg.SDRAM_MHZ),
+    "SDRAM_DATA_W" -> IntParam(cfg.SDRAM_DQ_W),
     "SDRAM_ADDR_W" -> IntParam(cfg.SDRAM_ADDR_W),
     "SDRAM_COL_W" -> IntParam(cfg.SDRAM_COL_W),
     "SDRAM_BANK_W" -> IntParam(cfg.SDRAM_BANK_W),
@@ -73,7 +76,7 @@ class sdram(val cfg: sdram_bb_cfg) extends BlackBox (
     "SDRAM_READ_LATENCY" -> IntParam(cfg.SDRAM_READ_LATENCY)
   )
 ) with HasBlackBoxResource {
-  val io = IO(new Bundle with HasSDRAMIf with HasWishboneIf {
+  val io = IO(new SDRAMIf(cfg) with HasWishboneIf {
     val clk_i = Input(Clock())
     val rst_i = Input(Bool())
   })
@@ -85,9 +88,12 @@ class sdram(val cfg: sdram_bb_cfg) extends BlackBox (
 case class SDRAMConfig // Periphery Config
 (
   address: BigInt,
-  size: BigInt = 0x2000000L, // 32Mb (256Mbits)
   sdcfg: sdram_bb_cfg = sdram_bb_cfg()
-)
+) {
+  val size: BigInt = (1 << sdcfg.SDRAM_ADDR_W) * sdcfg.SDRAM_DQ_W / 8
+  //0x2000000L, // 32Mb (256Mbits)
+  //0x4000000L, // 64Mb (512Mbits)
+}
 
 class SDRAM(cfg: SDRAMConfig, blockBytes: Int, beatBytes: Int)(implicit p: Parameters) extends LazyModule with HasClockDomainCrossing{
 

@@ -837,11 +837,6 @@ set_global_assignment -name VERILOG_MACRO "SYNTHESIS=1"
 
 
 
-set_global_assignment -name ENABLE_SIGNALTAP ON
-set_global_assignment -name USE_SIGNALTAP_FILE output_files/stp1.stp
-
-
-
 set_global_assignment -name VERILOG_FILE "../generated-src/riscvconsole.fpga.ArrowTop.ArrowConfig/riscvconsole.fpga.ArrowTop.ArrowConfig.rom.v"
 set_global_assignment -name VERILOG_FILE "../generated-src/riscvconsole.fpga.ArrowTop.ArrowConfig/EICG_wrapper.v"
 set_global_assignment -name VERILOG_FILE "../generated-src/riscvconsole.fpga.ArrowTop.ArrowConfig/plusarg_reader.v"
