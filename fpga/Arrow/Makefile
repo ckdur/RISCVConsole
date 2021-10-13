@@ -17,6 +17,7 @@ include $(base_dir)/variables.mk
 #########################################################################################
 #bldr_dir=$(soft_dir)/bootloader
 #HEX_FILE=$(build_dir)/bootloader.hex
+SDBOOT_TARGET_JUMP=0x80000000UL
 
 #########################################################################################
 # setup misc. sim files

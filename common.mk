@@ -288,6 +288,7 @@ bldr_dir?=$(soft_dir)/sdboot
 HEX_FILE?=$(build_dir)/sdboot.hex
 ROM_FILE ?= $(build_dir)/$(long_name).rom.v
 ROM_CONF_FILE ?= $(build_dir)/$(long_name).rom.conf
+SDBOOT_TARGET_JUMP?=0x81F00000UL
 ROM_SCRIPT = $(base_dir)/hardware/vlsi_rom_gen_fpga
 #ROM_SCRIPT = $(base_dir)/hardware/vlsi_rom_gen
 $(ROM_FILE): $(ROM_CONF_FILE) $(HEX_FILE)
@@ -297,5 +298,5 @@ $(ROM_CONF_FILE): $(FIRRTL_FILE)
 	touch $(ROM_CONF_FILE)
 
 $(HEX_FILE):
-	make -C $(bldr_dir) BUILD_DIR=$(build_dir) long_name=$(long_name) clean
-	make -C $(bldr_dir) BUILD_DIR=$(build_dir) long_name=$(long_name) hex
+	make -C $(bldr_dir) BUILD_DIR=$(build_dir) SDBOOT_TARGET_JUMP=$(SDBOOT_TARGET_JUMP) long_name=$(long_name) clean
+	make -C $(bldr_dir) BUILD_DIR=$(build_dir) SDBOOT_TARGET_JUMP=$(SDBOOT_TARGET_JUMP) long_name=$(long_name) hex
