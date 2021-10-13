@@ -15,8 +15,8 @@ include $(base_dir)/variables.mk
 #########################################################################################
 # BOOTROM
 #########################################################################################
-bldr_dir=$(soft_dir)/bootloader
-HEX_FILE=$(build_dir)/bootloader.hex
+#bldr_dir=$(soft_dir)/bootloader
+#HEX_FILE=$(build_dir)/bootloader.hex
 
 #########################################################################################
 # setup misc. sim files

@@ -17,10 +17,10 @@ class ArrowShell extends RawModule {
   //val HSMC_GXB_TX_p = IO(Vec(8, Analog(1.W)))
   //val HSMC_GXB_RX_n = IO(Vec(8, Analog(1.W)))
   //val HSMC_GXB_TX_n = IO(Vec(8, Analog(1.W)))
-  val HSMC_RX_p = IO(Vec(16, Analog(1.W)))
-  val HSMC_TX_p = IO(Vec(16, Analog(1.W)))
-  val HSMC_RX_n = IO(Vec(16, Analog(1.W)))
-  val HSMC_TX_n = IO(Vec(16, Analog(1.W)))
+  val HSMC_RX_p = IO(Vec(17, Analog(1.W)))
+  val HSMC_TX_p = IO(Vec(17, Analog(1.W)))
+  val HSMC_RX_n = IO(Vec(17, Analog(1.W)))
+  val HSMC_TX_n = IO(Vec(17, Analog(1.W)))
 
   val AUD = IO(new AUD_CODEC_PORT)
 

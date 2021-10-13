@@ -452,6 +452,119 @@ set_location_assignment PIN_AJ1 -to VGA_R_7
 set_location_assignment PIN_AG2 -to VGA_SYNC_n
 set_location_assignment PIN_AC12 -to VGA_VS
 
+
+set_instance_assignment -name IO_STANDARD "2.5 V" -to AUD_ADCDAT
+set_instance_assignment -name IO_STANDARD "2.5 V" -to AUD_ADCLRCK
+set_instance_assignment -name IO_STANDARD "2.5 V" -to AUD_BCLK
+set_instance_assignment -name IO_STANDARD "2.5 V" -to AUD_DACDAT
+set_instance_assignment -name IO_STANDARD "2.5 V" -to AUD_DACLRCK
+set_instance_assignment -name IO_STANDARD "2.5 V" -to AUD_I2C_SCLK
+set_instance_assignment -name IO_STANDARD "2.5 V" -to AUD_I2C_SDAT
+set_instance_assignment -name IO_STANDARD "2.5 V" -to AUD_MUTE
+set_instance_assignment -name IO_STANDARD "2.5 V" -to AUD_XCK
+
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_CLKIN_n_1
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_CLKIN_n_2
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_CLKIN_p_1
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_CLKIN_p_2
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_CLKOUT_n_1
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_CLKOUT_n_2
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_CLKOUT_p_1
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_CLKOUT_p_2
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_CLK_IN0
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_CLK_OUT0
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_D_0
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_D_1
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_D_2
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_D_3
+set_instance_assignment -name IO_STANDARD "1.5-V PCML" -to HSMC_GXB_RX_p_0
+set_instance_assignment -name IO_STANDARD "1.5-V PCML" -to HSMC_GXB_RX_p_1
+set_instance_assignment -name IO_STANDARD "1.5-V PCML" -to HSMC_GXB_RX_p_2
+set_instance_assignment -name IO_STANDARD "1.5-V PCML" -to HSMC_GXB_RX_p_3
+set_instance_assignment -name IO_STANDARD "1.5-V PCML" -to HSMC_GXB_RX_p_4
+set_instance_assignment -name IO_STANDARD "1.5-V PCML" -to HSMC_GXB_RX_p_5
+set_instance_assignment -name IO_STANDARD "1.5-V PCML" -to HSMC_GXB_RX_p_6
+set_instance_assignment -name IO_STANDARD "1.5-V PCML" -to HSMC_GXB_RX_p_7
+set_instance_assignment -name IO_STANDARD "1.5-V PCML" -to HSMC_GXB_TX_p_0
+set_instance_assignment -name IO_STANDARD "1.5-V PCML" -to HSMC_GXB_TX_p_1
+set_instance_assignment -name IO_STANDARD "1.5-V PCML" -to HSMC_GXB_TX_p_2
+set_instance_assignment -name IO_STANDARD "1.5-V PCML" -to HSMC_GXB_TX_p_3
+set_instance_assignment -name IO_STANDARD "1.5-V PCML" -to HSMC_GXB_TX_p_4
+set_instance_assignment -name IO_STANDARD "1.5-V PCML" -to HSMC_GXB_TX_p_5
+set_instance_assignment -name IO_STANDARD "1.5-V PCML" -to HSMC_GXB_TX_p_6
+set_instance_assignment -name IO_STANDARD "1.5-V PCML" -to HSMC_GXB_TX_p_7
+set_instance_assignment -name IO_STANDARD HCSL -to HSMC_REF_CLK_p
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_n_0
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_n_1
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_n_2
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_n_3
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_n_4
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_n_5
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_n_6
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_n_7
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_n_8
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_n_9
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_n_10
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_n_11
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_n_12
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_n_13
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_n_14
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_n_15
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_n_16
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_p_0
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_p_1
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_p_2
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_p_3
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_p_4
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_p_5
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_p_6
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_p_7
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_p_8
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_p_9
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_p_10
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_p_11
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_p_12
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_p_13
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_p_14
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_p_15
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_RX_p_16
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_SCL
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_SDA
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_n_0
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_n_1
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_n_2
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_n_3
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_n_4
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_n_5
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_n_6
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_n_7
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_n_8
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_n_9
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_n_10
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_n_11
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_n_12
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_n_13
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_n_14
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_n_15
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_n_16
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_p_0
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_p_1
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_p_2
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_p_3
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_p_4
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_p_5
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_p_6
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_p_7
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_p_8
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_p_9
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_p_10
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_p_11
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_p_12
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_p_13
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_p_14
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_p_15
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HSMC_TX_p_16
+
 #============================================================
 # DDR3
 #============================================================
@@ -739,4 +852,7 @@ set_global_assignment -name VERILOG_FILE "../generated-src/riscvconsole.fpga.Arr
 set_global_assignment -name QSYS_FILE main.qsys
 set_global_assignment -name QSYS_FILE clkctrl.qsys
 set_global_assignment -name QIP_FILE pll/pll.qip
+
+
+
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

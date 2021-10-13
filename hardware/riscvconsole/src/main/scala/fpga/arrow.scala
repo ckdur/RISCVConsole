@@ -56,7 +56,7 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
     TDO_as_base.i.po.foreach(_ := false.B)
     ALT_IOBUF(HSMC_TX_p(10), TDO_as_base)
 
-    platform.io.uart_rxd := ALT_IOBUF(HSMC_RX_p(0))  // HSMC_RX_p_0 / G12 / J3 - 36
+    platform.io.uart_rxd := ALT_IOBUF(HSMC_TX_n(0))  // HSMC_RX_p_0 / G12 / J3 - 36
     ALT_IOBUF(HSMC_TX_p(0), platform.io.uart_txd)    // HSMC_TX_p_0 / A9 / J3 - 40
 
     platform.io.jtag_RSTn := sw(0)       //reset for the jtag
@@ -68,11 +68,11 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
 
     platform.io.spi.foreach { spi =>
       ALT_IOBUF(HSMC_TX_p(1), spi.sck)
-      ALT_IOBUF(HSMC_TX_p(2), spi.cs(0))
-      ALT_IOBUF(HSMC_TX_p(3), spi.dq(0))
-      ALT_IOBUF(HSMC_TX_p(4), spi.dq(1))
-      ALT_IOBUF(HSMC_TX_p(5), spi.dq(2))
-      ALT_IOBUF(HSMC_TX_p(6), spi.dq(3))
+      ALT_IOBUF(HSMC_TX_n(1), spi.cs(0))
+      ALT_IOBUF(HSMC_TX_p(2), spi.dq(0))
+      ALT_IOBUF(HSMC_TX_n(2), spi.dq(1))
+      ALT_IOBUF(HSMC_TX_p(3), spi.dq(2))
+      ALT_IOBUF(HSMC_TX_n(3), spi.dq(3))
     }
 
     // SPI flash
@@ -81,12 +81,12 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
     platform.io.spiflash.foreach(_.dq.foreach(_.i.po.foreach(_ := false.B)))
 
     platform.io.spiflash.foreach { spi =>
-      ALT_IOBUF(HSMC_TX_p(7), spi.sck)
-      ALT_IOBUF(HSMC_TX_p(8), spi.cs(0))
-      ALT_IOBUF(HSMC_TX_p(9), spi.dq(0))
-      ALT_IOBUF(HSMC_TX_p(10), spi.dq(1))
-      ALT_IOBUF(HSMC_TX_p(11), spi.dq(2))
-      ALT_IOBUF(HSMC_TX_p(12), spi.dq(3))
+      ALT_IOBUF(HSMC_RX_p(0), spi.sck)
+      ALT_IOBUF(HSMC_RX_n(0), spi.cs(0))
+      ALT_IOBUF(HSMC_RX_p(1), spi.dq(0))
+      ALT_IOBUF(HSMC_RX_n(1), spi.dq(1))
+      ALT_IOBUF(HSMC_RX_p(2), spi.dq(2))
+      ALT_IOBUF(HSMC_RX_n(2), spi.dq(3))
     }
 
     // I2C in AudioCodec
