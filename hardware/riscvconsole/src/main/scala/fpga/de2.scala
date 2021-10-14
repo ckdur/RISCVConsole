@@ -56,10 +56,10 @@ class DE2Top(implicit p: Parameters) extends DE2Shell
     TDO_as_base.o.oval := platform.io.jtag.TDO.data
     TDO_as_base.o.ie := false.B
     TDO_as_base.i.po.foreach(_ := false.B)
-    ALT_IOBUF(GPIO(8), TDO_as_base)
+    ALT_IOBUF(GPIO(6), TDO_as_base)
 
-    platform.io.uart_rxd := ALT_IOBUF(UART_RXD)
-    ALT_IOBUF(UART_TXD, platform.io.uart_txd)
+    platform.io.uart_rxd := ALT_IOBUF(GPIO(8))
+    ALT_IOBUF(GPIO(10), platform.io.uart_txd)
 
     platform.io.jtag_RSTn := SW(0)       //reset for the jtag
 

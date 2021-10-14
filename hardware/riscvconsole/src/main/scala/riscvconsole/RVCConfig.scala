@@ -118,8 +118,10 @@ class DE2Config extends Config(
     sdcfg = sdram_bb_cfg(
       SDRAM_HZ = 50000000L,
       SDRAM_DQM_W = 2, // TODO: Should be 4, but sdram.v still does not support
-      SDRAM_DQ_W = 16)) // TODO: Should be 32, but sdram.v still does not support
+      SDRAM_DQ_W = 16, // TODO: Should be 32, but sdram.v still does not support
+      SDRAM_READ_LATENCY = 2))
   ) ++
+    new WithSRAM(SRAMConfig(address = 0x82200000L, size = 0x4000)) ++ // TODO: If managed to get 64MB, disable this
     new RVCPeripheralsConfig(10) ++
     new SetFrequency(50000000) ++
     new RemoveDebugClockGating ++
