@@ -9,7 +9,7 @@ The intention is probably run some programs to do graphics via HDMI.
 Clone using:
 
 ```shell
-git clone -b dev https://github.com/ckdur/RISCVConsole.git
+git clone -b dev https://github.com/uec-hanken/RISCVConsole.git
 cd RISCVConsole/
 ./update.sh
 ```
