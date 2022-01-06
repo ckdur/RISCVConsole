@@ -142,16 +142,23 @@ architecture fft_engine_beh of fft_engine is
     return integer is
     variable k_uns : unsigned(LOG2_FFT_LEN-1 downto 0);
     variable k_int : integer;
+    variable b : unsigned(LOG2_FFT_LEN-1 downto 0);
+    variable mask : unsigned(LOG2_FFT_LEN-1 downto 0);
   begin
     k_uns := to_unsigned(step, LOG2_FFT_LEN);
     if stage > 0 then
-      k_uns(LOG2_FFT_LEN-1 downto LOG2_FFT_LEN-stage) :=
-        k_uns(LOG2_FFT_LEN-2 downto LOG2_FFT_LEN-stage-1);
+      b := shift_left(to_unsigned(1, LOG2_FFT_LEN), LOG2_FFT_LEN-stage) - 1;
+      k_uns := (shift_left(k_uns, 1) and not b) or (k_uns and b);
+      --k_uns(LOG2_FFT_LEN-1 downto LOG2_FFT_LEN-stage) :=
+      --  k_uns(LOG2_FFT_LEN-2 downto LOG2_FFT_LEN-stage-1);
     end if;
+		mask := shift_left(to_unsigned(1, LOG2_FFT_LEN), LOG2_FFT_LEN-stage-1);
     if nin = 0 then
-      k_uns(LOG2_FFT_LEN-stage-1) := '0';
+      k_uns := k_uns and not mask;
+      --k_uns(LOG2_FFT_LEN-stage-1) := '0';
     else
-      k_uns(LOG2_FFT_LEN-stage-1) := '1';
+      k_uns := k_uns or mask;
+      --k_uns(LOG2_FFT_LEN-stage-1) := '1';
     end if;
     k_int := to_integer(k_uns);
     return k_int;

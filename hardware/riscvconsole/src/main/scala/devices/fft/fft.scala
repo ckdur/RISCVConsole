@@ -1,6 +1,7 @@
 package riscvconsole.devices.fft
 
 import chisel3._
+import chisel3.experimental.IntParam
 import chisel3.util._
 import freechips.rocketchip.config._
 import freechips.rocketchip.diplomacy._
@@ -15,13 +16,7 @@ import freechips.rocketchip.diplomaticobjectmodel._
 import freechips.rocketchip.diplomaticobjectmodel.model._
 import freechips.rocketchip.diplomaticobjectmodel.logicaltree._
 
-object FFT_param {
-  val LOG2_FFT_LEN = 10
-}
-
-import FFT_param._
-
-case class FFTParams(address: BigInt)
+case class FFTParams(address: BigInt, LOG2_FFT_LEN: Int = 8)
 
 case class OMFFT
 (
@@ -39,13 +34,15 @@ object FFTCtrlRegs {
   val status      = 0x14
 }
 
-class fft_wrapper extends BlackBox with HasBlackBoxResource {
+class fft_wrapper(val c: FFTParams) extends BlackBox(
+  Map("LOG2_FFT_LEN" -> IntParam(c.LOG2_FFT_LEN))
+) with HasBlackBoxResource {
   val io = IO(new Bundle {
     val din = Input(UInt(32.W))
-    val addr_in = Input(UInt(LOG2_FFT_LEN.W))
+    val addr_in = Input(UInt(c.LOG2_FFT_LEN.W))
     val wr_in = Input(Bool())
     val dout = Output(UInt(32.W))
-    val addr_out = Input(UInt(LOG2_FFT_LEN.W))
+    val addr_out = Input(UInt(c.LOG2_FFT_LEN.W))
     val ready = Output(Bool())
     val busy = Output(Bool())
     val start = Input(Bool())
@@ -73,12 +70,12 @@ abstract class FFT(busWidthBytes: Int, c: FFTParams)(implicit p: Parameters)
 
   def nInterrupts = 1
   lazy val module = new LazyModuleImp(this) {
-    val fft = Module(new fft_wrapper)
+    val fft = Module(new fft_wrapper(c))
 
     // Registers
     val din = Reg(UInt(32.W))
-    val addr_in = Reg(UInt(LOG2_FFT_LEN.W))
-    val addr_out = Reg(UInt(LOG2_FFT_LEN.W))
+    val addr_in = Reg(UInt(c.LOG2_FFT_LEN.W))
+    val addr_out = Reg(UInt(c.LOG2_FFT_LEN.W))
     val wr_in = WireInit(false.B)
     val start = WireInit(false.B)
     val syn_rst = WireInit(false.B)

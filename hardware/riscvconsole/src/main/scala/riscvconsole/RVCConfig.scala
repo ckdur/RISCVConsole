@@ -25,7 +25,7 @@ class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
   case SDRAMKey => Seq()
   case SRAMKey => Seq()
   case PeripheryCodecKey => Seq(CodecParams(0x10004000))
-  case PeripheryFFTKey => Seq(FFTParams(0x10005000))
+  case PeripheryFFTKey => Seq(FFTParams(0x10005000, 13))
   //case freechips.rocketchip.subsystem.PeripheryMaskROMKey => Seq()
   case SubsystemDriveAsyncClockGroupsKey => None
 })
