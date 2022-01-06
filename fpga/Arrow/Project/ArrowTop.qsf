@@ -837,6 +837,17 @@ set_global_assignment -name VERILOG_MACRO "SYNTHESIS=1"
 
 
 
+
+
+
+
+set_global_assignment -name VHDL_FILE "../generated-src/riscvconsole.fpga.ArrowTop.ArrowConfig/icpxram.vhd"
+set_global_assignment -name VHDL_FILE "../generated-src/riscvconsole.fpga.ArrowTop.ArrowConfig/icpx_pkg.vhd"
+set_global_assignment -name VHDL_FILE "../generated-src/riscvconsole.fpga.ArrowTop.ArrowConfig/fft_wrapper.vhd"
+set_global_assignment -name VHDL_FILE "../generated-src/riscvconsole.fpga.ArrowTop.ArrowConfig/fft_len.vhd"
+set_global_assignment -name VHDL_FILE "../generated-src/riscvconsole.fpga.ArrowTop.ArrowConfig/fft_engine.vhd"
+set_global_assignment -name VHDL_FILE "../generated-src/riscvconsole.fpga.ArrowTop.ArrowConfig/dpram_inf.vhd"
+set_global_assignment -name VHDL_FILE "../generated-src/riscvconsole.fpga.ArrowTop.ArrowConfig/butterfly.vhd"
 set_global_assignment -name VERILOG_FILE "../generated-src/riscvconsole.fpga.ArrowTop.ArrowConfig/riscvconsole.fpga.ArrowTop.ArrowConfig.rom.v"
 set_global_assignment -name VERILOG_FILE "../generated-src/riscvconsole.fpga.ArrowTop.ArrowConfig/EICG_wrapper.v"
 set_global_assignment -name VERILOG_FILE "../generated-src/riscvconsole.fpga.ArrowTop.ArrowConfig/plusarg_reader.v"
@@ -847,7 +858,4 @@ set_global_assignment -name VERILOG_FILE "../generated-src/riscvconsole.fpga.Arr
 set_global_assignment -name QSYS_FILE main.qsys
 set_global_assignment -name QSYS_FILE clkctrl.qsys
 set_global_assignment -name QIP_FILE pll/pll.qip
-
-
-
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top

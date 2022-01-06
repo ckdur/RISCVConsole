@@ -7,6 +7,7 @@ import freechips.rocketchip.devices.tilelink.MaskROMLocated
 import riscvconsole.devices.altera.ddr3.QsysDDR3Mem
 import riscvconsole.devices.codec._
 import riscvconsole.devices.sdram._
+import riscvconsole.devices.fft._
 
 class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
   case sifive.blocks.devices.uart.PeripheryUARTKey => Seq(
@@ -24,6 +25,7 @@ class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
   case SDRAMKey => Seq()
   case SRAMKey => Seq()
   case PeripheryCodecKey => Seq(CodecParams(0x10004000))
+  case PeripheryFFTKey => Seq(FFTParams(0x10005000))
   //case freechips.rocketchip.subsystem.PeripheryMaskROMKey => Seq()
   case SubsystemDriveAsyncClockGroupsKey => None
 })

@@ -1,0 +1,8 @@
+This source code is a copy from opencores.org
+
+https://opencores.org/projects/versatile_fft
+
+According to the BSD clause, we credit the original author.
+
+Copyright (c) 2014 Wojciech Zabolotny  wzab01<at>gmail.com
+
