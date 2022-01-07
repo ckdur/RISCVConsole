@@ -16,7 +16,7 @@ import freechips.rocketchip.diplomaticobjectmodel._
 import freechips.rocketchip.diplomaticobjectmodel.model._
 import freechips.rocketchip.diplomaticobjectmodel.logicaltree._
 
-case class FFTParams(address: BigInt, LOG2_FFT_LEN: Int = 8)
+case class FFTParams(address: BigInt, LOG2_FFT_LEN: Int = 8, dmaAddress: Option[BigInt] = None)
 
 case class OMFFT
 (
@@ -68,9 +68,35 @@ abstract class FFT(busWidthBytes: Int, c: FFTParams)(implicit p: Parameters)
       beatBytes = busWidthBytes))
     with HasInterruptSources {
 
+  // Create the DMA
+  val dmanode: Option[TLManagerNode] = c.dmaAddress.map{ addr =>
+    //val device = new MemoryDevice
+    val device = new SimpleDevice("fftdma", Seq("console,fftdma0")) {
+      override def describe(resources: ResourceBindings): Description = {
+        val Description(name, mapping) = super.describe(resources)
+        Description(name, mapping ++ extraResources(resources))
+      }
+    }
+    val tlcfg = TLSlaveParameters.v1(
+      address             = AddressSet.misaligned(addr, Math.max(1L << (c.LOG2_FFT_LEN + 1), 0x1000L)),
+      resources           = device.reg,
+      regionType          = RegionType.GET_EFFECTS, // no cacheable
+      executable          = false,
+      supportsGet         = TransferSizes(1, 4),
+      supportsPutFull     = TransferSizes(1, 4),
+      supportsPutPartial  = TransferSizes(1, 4),
+      fifoId              = Some(0))
+    val tlportcfg = TLSlavePortParameters.v1(
+      managers = Seq(tlcfg),
+      beatBytes = 4)
+    TLManagerNode(Seq(tlportcfg))
+  }
+
   def nInterrupts = 1
   lazy val module = new LazyModuleImp(this) {
     val fft = Module(new fft_wrapper(c))
+
+    val (tl_in, tl_edge) = dmanode.map(A=>A.in(0)).unzip
 
     // Registers
     val din = Reg(UInt(32.W))
@@ -89,6 +115,40 @@ abstract class FFT(busWidthBytes: Int, c: FFTParams)(implicit p: Parameters)
     fft.io.syn_rst_n := !syn_rst
     fft.io.rst_n := !reset.asBool()
     fft.io.clk := clock
+
+    (tl_in zip tl_edge).foreach{ case(tl, edge) =>
+      val d_full = RegInit(false.B)
+      val d_hasData = Reg(Bool())
+      val d_size = Reg(UInt()) // Saved size
+      val d_source = Reg(UInt()) // Saved source
+      val hasData = edge.hasData(tl.a.bits)
+      when (tl.d.fire()) { d_full := false.B }
+      when (tl.a.fire()) {
+        d_full := true.B
+        d_hasData := hasData
+        d_size   := tl.a.bits.size
+        d_source := tl.a.bits.source
+      }
+      val d_data = fft.io.dout holdUnless RegNext(tl.a.fire())
+
+      tl.a.ready := !d_full
+      tl.d.valid := d_full
+
+      tl.d.bits := edge.AccessAck(d_source, d_size, d_data)
+      tl.d.bits.opcode := Mux(d_hasData, TLMessages.AccessAck, TLMessages.AccessAckData)
+
+      when(tl.a.fire()) {
+        fft.io.addr_in := tl.a.bits.address(c.LOG2_FFT_LEN-1, 0)
+        fft.io.addr_out := tl.a.bits.address(c.LOG2_FFT_LEN-1, 0)
+        fft.io.din := tl.a.bits.data
+        fft.io.wr_in := hasData
+      }
+      d_full.suggestName("d_full")
+      d_hasData.suggestName("d_hasData")
+      d_data.suggestName("d_data")
+      d_size.suggestName("d_size")
+      d_source.suggestName("d_source")
+    }
 
     // Interrupts
     interrupts(0) := fft.io.ready
@@ -146,6 +206,7 @@ case class FFTAttachParams
 (
   device: FFTParams,
   controlWhere: TLBusWrapperLocation = PBUS,
+  memWhere: TLBusWrapperLocation = MBUS,
   blockerAddr: Option[BigInt] = None,
   controlXType: ClockCrossingType = NoCrossing,
   intXType: ClockCrossingType = NoCrossing)
@@ -153,6 +214,7 @@ case class FFTAttachParams
   def attachTo(where: Attachable)(implicit p: Parameters): TLFFT = where {
     val name = s"fft_${FFT.nextId()}"
     val cbus = where.locateTLBusWrapper(controlWhere)
+    val mbus = where.locateTLBusWrapper(memWhere)
     val fftClockDomainWrapper = LazyModule(new ClockSinkDomain(take = None))
     val fft = fftClockDomainWrapper { LazyModule(new TLFFT(cbus.beatBytes, device)) }
     fft.suggestName(name)
@@ -180,6 +242,15 @@ case class FFTAttachParams
       (fft.controlXing(controlXType)
         := TLFragmenter(cbus)
         := blockerOpt.map { _.node := bus } .getOrElse { bus })
+    }
+
+    fft.dmanode.foreach{ dmanode =>
+      mbus.coupleTo(s"device_named_${name}_dma") { bus =>
+        (dmanode
+          := TLFragmenter(4, cbus.blockBytes)
+          := TLWidthWidget(cbus.beatBytes)
+          := bus)
+      }
     }
 
     (intXType match {
