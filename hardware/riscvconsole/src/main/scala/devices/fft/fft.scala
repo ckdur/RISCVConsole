@@ -96,8 +96,6 @@ abstract class FFT(busWidthBytes: Int, c: FFTParams)(implicit p: Parameters)
   lazy val module = new LazyModuleImp(this) {
     val fft = Module(new fft_wrapper(c))
 
-    val (tl_in, tl_edge) = dmanode.map(A=>A.in(0)).unzip
-
     // Registers
     val din = Reg(UInt(32.W))
     val addr_in = Reg(UInt(c.LOG2_FFT_LEN.W))
@@ -116,6 +114,7 @@ abstract class FFT(busWidthBytes: Int, c: FFTParams)(implicit p: Parameters)
     fft.io.rst_n := !reset.asBool()
     fft.io.clk := clock
 
+    val (tl_in, tl_edge) = dmanode.map(A=>A.in(0)).unzip
     (tl_in zip tl_edge).foreach{ case(tl, edge) =>
       val d_full = RegInit(false.B)
       val d_hasData = Reg(Bool())

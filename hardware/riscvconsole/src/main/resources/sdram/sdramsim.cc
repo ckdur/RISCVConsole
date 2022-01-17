@@ -4,9 +4,9 @@
 
 #include "sdramsim.h"
 
-short	SDRAMSIM::operator()(int clk, int cke, int cs_n, int ras_n, int cas_n, int we_n,
-		int bs, unsigned addr, int driv, short data, short dqm) {
-	short	result = 0;
+int	SDRAMSIM::operator()(int clk, int cke, int cs_n, int ras_n, int cas_n, int we_n,
+		int bs, unsigned addr, int driv, int data, int dqm) {
+	int	result = 0;
 
 	if (driv) // If the bus is going out, reads don't make sense ... but
 		result = data; // read what we output anyway
@@ -259,7 +259,7 @@ extern "C" int sdram_tick(int clk, int cke, int cs_n, int ras_n, int cas_n, int 
 		sdram = new SDRAMSIM();
 	}
 	*datao = (int)(*sdram)(clk, cke, cs_n, ras_n, cas_n, we_n,
-		bs, (unsigned) addr, driv, (short)data, (short)dqm);
+		bs, (unsigned) addr, driv, (int)data, (int)dqm);
 	return 0;
 }
 

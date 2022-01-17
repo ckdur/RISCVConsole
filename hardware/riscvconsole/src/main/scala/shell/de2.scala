@@ -12,10 +12,10 @@ class DE2SDRAM extends Bundle {
   val RAS_N = Output(Bool())
   val CAS_N = Output(Bool())
   val WE_N = Output(Bool())
-  val DQM = Output(UInt(2.W)) // TODO: Should be 4
+  val DQM = Output(UInt(4.W))
   val ADDR = Output(UInt(13.W))
   val BA = Output(UInt(2.W))
-  val DQ = Vec(16, Analog(1.W)) // TODO: Should be 32
+  val DQ = Vec(32, Analog(1.W))
   def from_SDRAMIf(io: SDRAMIf) = {
     CLK := io.sdram_clk_o
     CKE := io.sdram_cke_o

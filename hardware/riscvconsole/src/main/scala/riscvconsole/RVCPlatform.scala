@@ -31,7 +31,7 @@ class RVCPlatform(implicit p: Parameters) extends Module
     val jtag_RSTn = Input(Bool())
 
     // SDRAM port
-    val sdram = Vec(p(SDRAMKey).size, new SDRAMIf)
+    val sdram = MixedVec(p(SDRAMKey).map{ A => new SDRAMIf(A.sdcfg)})
 
     // Altera DDR3 port
     val ddr3 = p(QsysDDR3Mem).map{A => new QsysIO}

@@ -116,7 +116,7 @@ class SDRAM(cfg: SDRAMConfig, blockBytes: Int, beatBytes: Int)(implicit p: Param
   val node = TLBuffer()
 
   // Create the IO node, and stop trying to get something from elsewhere
-  val ioNode = BundleBridgeSource(() => (new SDRAMIf).cloneType)
+  val ioNode = BundleBridgeSource(() => (new SDRAMIf(cfg.sdcfg)).cloneType)
   val port = InModuleBody { ioNode.bundle }
 
   // Connections of the node
