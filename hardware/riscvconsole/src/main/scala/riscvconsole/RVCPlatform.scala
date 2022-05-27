@@ -55,7 +55,7 @@ class RVCPlatform(implicit p: Parameters) extends Module
 
   val greset = WireInit(false.B)
   val sys = withReset(greset){ Module(LazyModule(new RVCSystem).module) }
-  greset := reset.toBool() || sys.debug.get.ndreset // Put the ndreset from debug here
+  greset := reset.asBool || sys.debug.get.ndreset // Put the ndreset from debug here
 
   sys.resetctrl.foreach { rstctrl => rstctrl.hartIsInReset.foreach(_ := greset)}
 
@@ -79,7 +79,7 @@ class RVCPlatform(implicit p: Parameters) extends Module
     b.sck.default()
     b.cs.foreach(_.default())
     b.dq.foreach(_.default())
-    SPIPinsFromPort(b, a, sys.clock, sys.reset.toBool(), 3)
+    SPIPinsFromPort(b, a, sys.clock, sys.reset.asBool, 3)
   }
 
   val spiflash = sys.qspi
@@ -87,14 +87,14 @@ class RVCPlatform(implicit p: Parameters) extends Module
     b.sck.default()
     b.cs.foreach(_.default())
     b.dq.foreach(_.default())
-    SPIPinsFromPort(b, a, sys.clock, sys.reset.toBool(), 3)
+    SPIPinsFromPort(b, a, sys.clock, sys.reset.asBool, 3)
   }
 
   val i2c = sys.i2c
   (i2c zip io.i2c).foreach { case (a, b) =>
     b.scl.default()
     b.sda.default()
-    I2CPinsFromPort(b, a, sys.clock, sys.reset.toBool(), 3)
+    I2CPinsFromPort(b, a, sys.clock, sys.reset.asBool, 3)
   }
 
   val codec = sys.codec
@@ -102,7 +102,7 @@ class RVCPlatform(implicit p: Parameters) extends Module
     b.AUD_BCLK.default()
     b.AUD_ADCLRCK.default()
     b.AUD_DACLRCK.default()
-    CodecPinsFromPort(b, a, sys.clock, sys.reset.toBool(), 3)
+    CodecPinsFromPort(b, a, sys.clock, sys.reset.asBool, 3)
   }
 
   (io.sdram zip sys.sdramio).map{case (port, sys) => port <> sys}

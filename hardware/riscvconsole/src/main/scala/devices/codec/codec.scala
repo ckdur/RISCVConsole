@@ -68,7 +68,7 @@ class codec extends Module {
   dac_lrclk_rising_edge := DAC_Left_Right_Clock_Edges.io.rising_edge
   dac_lrclk_falling_edge := DAC_Left_Right_Clock_Edges.io.falling_edge
 
-  val Audio_In_Deserializer = withReset(reset.toBool() || io.clear_audio_in_memory) { Module(new audio_in_deserializer) }
+  val Audio_In_Deserializer = withReset(reset.asBool || io.clear_audio_in_memory) { Module(new audio_in_deserializer) }
   Audio_In_Deserializer.io.bit_clk_rising_edge := bclk_rising_edge
   Audio_In_Deserializer.io.bit_clk_falling_edge := bclk_falling_edge
   Audio_In_Deserializer.io.left_right_clk_rising_edge := adc_lrclk_rising_edge
@@ -87,7 +87,7 @@ class codec extends Module {
   io.left_channel_audio_in := Audio_In_Deserializer.io.left_channel_data
   io.right_channel_audio_in := Audio_In_Deserializer.io.right_channel_data
 
-  val Audio_Out_Serializer = withReset(reset.toBool() || io.clear_audio_out_memory) { Module(new audio_out_serializer) }
+  val Audio_Out_Serializer = withReset(reset.asBool || io.clear_audio_out_memory) { Module(new audio_out_serializer) }
   Audio_Out_Serializer.io.bit_clk_rising_edge := bclk_rising_edge
   Audio_Out_Serializer.io.bit_clk_falling_edge := bclk_falling_edge
   Audio_Out_Serializer.io.left_right_clk_rising_edge := done_dac_channel_sync & dac_lrclk_rising_edge
