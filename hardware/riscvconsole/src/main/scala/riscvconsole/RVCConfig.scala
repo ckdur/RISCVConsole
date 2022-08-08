@@ -68,8 +68,6 @@ class RemoveDebugClockGating extends Config((site, here, up) => {
 
 class ArrowConfig extends Config(
   new WithQsysDDR3Mem ++
-    new WithCODEC ++
-    new WithDefaultFFT ++
     new RVCPeripheralsConfig(11) ++
     new SetFrequency(50000000) ++
     new RemoveDebugClockGating ++
@@ -97,8 +95,6 @@ class DE2Config extends Config(
       SDRAM_DQ_W = 32,
       SDRAM_READ_LATENCY = 2))
   ) ++
-    new WithCODEC ++
-    new WithDefaultFFT ++
     new RVCPeripheralsConfig(10) ++
     new SetFrequency(50000000) ++
     new RemoveDebugClockGating ++
