@@ -118,7 +118,7 @@
  <module
    name="avalon_crossclk"
    kind="altera_avalon_mm_clock_crossing_bridge"
-   version="18.1"
+   version="20.1"
    enabled="1">
   <parameter name="ADDRESS_UNITS" value="SYMBOLS" />
   <parameter name="ADDRESS_WIDTH" value="30" />
@@ -135,7 +135,7 @@
  <module
    name="axi_to_avalon"
    kind="altera_axi_bridge"
-   version="18.1"
+   version="20.1"
    enabled="1">
   <parameter name="ADDR_WIDTH" value="30" />
   <parameter name="AXI_VERSION" value="AXI4" />
@@ -204,7 +204,7 @@
  <module
    name="ddr3_ctrl"
    kind="altera_mem_if_ddr3_emif"
-   version="18.1"
+   version="20.1"
    enabled="1">
   <parameter name="ABSTRACT_REAL_COMPARE_TEST" value="false" />
   <parameter name="ABS_RAM_MEM_INIT_FILENAME" value="meminit" />
@@ -524,13 +524,13 @@
   <parameter name="WEIGHT_PORT" value="0,0,0,0,0,0" />
   <parameter name="WRBUFFER_ADDR_WIDTH" value="6" />
  </module>
- <module name="ddr_clk" kind="clock_source" version="18.1" enabled="1">
+ <module name="ddr_clk" kind="clock_source" version="20.1" enabled="1">
   <parameter name="clockFrequency" value="50000000" />
   <parameter name="clockFrequencyKnown" value="true" />
   <parameter name="inputClockFrequency" value="0" />
   <parameter name="resetSynchronousEdges" value="NONE" />
  </module>
- <module name="sys_clk" kind="clock_source" version="18.1" enabled="1">
+ <module name="sys_clk" kind="clock_source" version="20.1" enabled="1">
   <parameter name="clockFrequency" value="50000000" />
   <parameter name="clockFrequencyKnown" value="true" />
   <parameter name="inputClockFrequency" value="0" />
@@ -538,7 +538,7 @@
  </module>
  <connection
    kind="avalon"
-   version="18.1"
+   version="20.1"
    start="avalon_crossclk.m0"
    end="ddr3_ctrl.avl">
   <parameter name="arbitrationPriority" value="1" />
@@ -547,7 +547,7 @@
  </connection>
  <connection
    kind="avalon"
-   version="18.1"
+   version="20.1"
    start="axi_to_avalon.m0"
    end="avalon_crossclk.s0">
   <parameter name="arbitrationPriority" value="1" />
@@ -556,47 +556,47 @@
  </connection>
  <connection
    kind="clock"
-   version="18.1"
+   version="20.1"
    start="ddr3_ctrl.afi_clk"
    end="avalon_crossclk.m0_clk" />
  <connection
    kind="clock"
-   version="18.1"
+   version="20.1"
    start="sys_clk.clk"
    end="axi_to_avalon.clk" />
  <connection
    kind="clock"
-   version="18.1"
+   version="20.1"
    start="ddr_clk.clk"
    end="ddr3_ctrl.pll_ref_clk" />
  <connection
    kind="clock"
-   version="18.1"
+   version="20.1"
    start="sys_clk.clk"
    end="avalon_crossclk.s0_clk" />
  <connection
    kind="reset"
-   version="18.1"
+   version="20.1"
    start="sys_clk.clk_reset"
    end="axi_to_avalon.clk_reset" />
  <connection
    kind="reset"
-   version="18.1"
+   version="20.1"
    start="ddr_clk.clk_reset"
    end="ddr3_ctrl.global_reset" />
  <connection
    kind="reset"
-   version="18.1"
+   version="20.1"
    start="sys_clk.clk_reset"
    end="avalon_crossclk.m0_reset" />
  <connection
    kind="reset"
-   version="18.1"
+   version="20.1"
    start="sys_clk.clk_reset"
    end="avalon_crossclk.s0_reset" />
  <connection
    kind="reset"
-   version="18.1"
+   version="20.1"
    start="ddr_clk.clk_reset"
    end="ddr3_ctrl.soft_reset" />
  <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
