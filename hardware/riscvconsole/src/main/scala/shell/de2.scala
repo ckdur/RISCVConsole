@@ -3,7 +3,7 @@ package riscvconsole.shell.de2
 import chisel3._
 import chisel3.experimental.{Analog, attach}
 import riscvconsole.devices.sdram.SDRAMIf
-import riscvconsole.shell.ArrowLib._
+import riscvconsole.shell.alteraLib._
 
 class DE2SDRAM extends Bundle {
   val CLK = Output(Bool())

@@ -4,6 +4,8 @@
 !*.shell.quartus.tcl
 !*.qsys.main.tcl
 !*.qsys
-!constrants.sdc
+!*.sdc
 !pll/
 !pll/*
+!pll/pll/*
+!pll/pll_sim/*

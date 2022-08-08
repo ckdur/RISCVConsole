@@ -4,7 +4,7 @@ import chisel3._
 import riscvconsole.system._
 import chipsalliance.rocketchip.config._
 import chisel3.experimental.attach
-import riscvconsole.shell.ArrowLib._
+import riscvconsole.shell.alteraLib._
 import riscvconsole.shell.arrow._
 import sifive.blocks.devices.pinctrl._
 import riscvconsole.util._
@@ -102,6 +102,7 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
     AUD.XCK := pll.io.outclk_1.asBool() // 5MHz
     platform.io.gpio(10).i.ival := false.B
     AUD.MUTE := platform.io.gpio(10).o.oval
+    AUD.DACDAT := 0.U
     platform.io.codec.foreach { codec =>
       codec.AUD_ADCLRCK.i.po.foreach(_ := false.B)
       codec.AUD_DACLRCK.i.po.foreach(_ := false.B)

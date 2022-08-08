@@ -5,7 +5,7 @@ import riscvconsole.system._
 import chipsalliance.rocketchip.config._
 import chisel3.experimental.attach
 import riscvconsole.shell.de2._
-import riscvconsole.shell.ArrowLib.{ALT_IOBUF}
+import riscvconsole.shell.alteraLib.{ALT_IOBUF}
 import sifive.blocks.devices.pinctrl._
 import riscvconsole.util._
 
@@ -103,7 +103,8 @@ class DE2Top(implicit p: Parameters) extends DE2Shell
     }
 
     // Codec in AudioCodec
-    AUD.XCK := pll.io.c1.asBool() // 5MHz
+    AUD.XCK := pll.io.c1.asBool // 5MHz
+    AUD.DACDAT := 0.U
     platform.io.codec.foreach { codec =>
       codec.AUD_ADCLRCK.i.po.foreach(_ := false.B)
       codec.AUD_DACLRCK.i.po.foreach(_ := false.B)
