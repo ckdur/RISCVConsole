@@ -48,5 +48,24 @@ default: $(sim_vsrcs) $(top_and_harness_files) $(ROM_FILE)
 
 .PHONY: clean
 clean:
-	rm -rf $(gen_dir)
+	rm -rf $(build_dir)
+
+#########################################################################################
+# Common rules for the Quartus
+#########################################################################################
+VSRCS := $(sim_vsrcs) $(top_and_harness_files) $(ROM_FILE)
+TOP_F := $(sim_top_blackboxes) $(sim_harness_blackboxes)
+
+add_file := $(build_dir)/pll.quartus.tcl
+$(build_dir)/pll.quartus.tcl: pll/pll.quartus.tcl
+	cp $< $@
+	cp -r pll $(build_dir)/pll
+
+BUILD_DIR=$(build_dir)
+FPGA_DIR=$(base_dir)/hardware/fpga-shells/altera
+export FPGA_BOARD=DE2
+TCL_SHELL=$(sim_dir)/DE2.shell.quartus.tcl
+TCL_QSYS_MAIN=$(sim_dir)/main.qsys
+SDC_FILE=$(sim_dir)/constraints.sdc
+include $(base_dir)/fpga/altera.mk
 

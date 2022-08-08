@@ -1,52 +1,3 @@
-# -------------------------------------------------------------------------- #
-#
-# Copyright (C) 2018  Intel Corporation. All rights reserved.
-# Your use of Intel Corporation's design tools, logic functions 
-# and other software and tools, and its AMPP partner logic 
-# functions, and any output files from any of the foregoing 
-# (including device programming or simulation files), and any 
-# associated documentation or information are expressly subject 
-# to the terms and conditions of the Intel Program License 
-# Subscription Agreement, the Intel Quartus Prime License Agreement,
-# the Intel FPGA IP License Agreement, or other applicable license
-# agreement, including, without limitation, that your use is for
-# the sole purpose of programming logic devices manufactured by
-# Intel and sold by Intel or its authorized distributors.  Please
-# refer to the applicable agreement for further details.
-#
-# -------------------------------------------------------------------------- #
-#
-# Quartus Prime
-# Version 18.1.0 Build 625 09/12/2018 SJ Standard Edition
-# Date created = 00:54:54  June 19, 2019
-#
-# -------------------------------------------------------------------------- #
-#
-# Notes:
-#
-# 1) The default values for assignments are stored in the file:
-#		DE2_115_assignment_defaults.qdf
-#    If this file doesn't exist, see file:
-#		assignment_defaults.qdf
-#
-# 2) Altera recommends that you do not modify this file. This
-#    file is updated automatically by the Quartus Prime software
-#    and any changes you make may be lost or overwritten.
-#
-# -------------------------------------------------------------------------- #
-
-
-set_global_assignment -name FAMILY "Cyclone IV E"
-set_global_assignment -name DEVICE EP4CE115F29C7
-set_global_assignment -name TOP_LEVEL_ENTITY DE2Top
-set_global_assignment -name ORIGINAL_QUARTUS_VERSION 18.1.0
-set_global_assignment -name PROJECT_CREATION_TIME_DATE "00:54:54  JUNE 19, 2019"
-set_global_assignment -name LAST_QUARTUS_VERSION "18.1.0 Standard Edition"
-set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
-set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
-set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
-set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 1
-set_global_assignment -name NOMINAL_CORE_SUPPLY_VOLTAGE 1.2V
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to CLOCK_50
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to CLOCK2_50
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to CLOCK3_50
@@ -506,8 +457,75 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to EX_IO_3
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to EX_IO_4
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to EX_IO_5
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to EX_IO_6
-set_global_assignment -name LL_ROOT_REGION ON -section_id "Root Region"
-set_global_assignment -name LL_MEMBER_STATE LOCKED -section_id "Root Region"
+set_instance_assignment -name IO_STANDARD "2.5 V" -to ENET0_TX_DATA_2
+set_instance_assignment -name IO_STANDARD "2.5 V" -to ENET0_INT_N
+set_instance_assignment -name IO_STANDARD "2.5 V" -to LEDR_2
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_8
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_9
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_10
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_11
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_8
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_9
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_10
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_11
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_8
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_9
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_10
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_11
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_7
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_8
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_9
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_10
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_11
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_CLKIN_P2
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_CLKIN_N2
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_0
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_1
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_2
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_3
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_4
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_5
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_6
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_7
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_0
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_1
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_2
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_3
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_4
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_5
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_6
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_7
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_0
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_1
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_2
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_3
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_4
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_5
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_6
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_7
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_0
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_1
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_2
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_3
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_4
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_5
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_6
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_CLKIN_P1
+set_instance_assignment -name IO_STANDARD LVDS -to HSMC_CLKIN_N1
+set_instance_assignment -name IO_STANDARD "3.0-V LVTTL" -to HSMC_CLKIN0
+set_location_assignment PIN_F14 -to EX_IO_4
+set_location_assignment PIN_J13 -to UART_CTS
+set_location_assignment PIN_G12 -to UART_RXD
+set_location_assignment PIN_G9 -to UART_TXD
+set_location_assignment PIN_A10 -to VGA_B_1
+set_location_assignment PIN_H12 -to VGA_G_3
+
+set_instance_assignment -name IO_MAXIMUM_TOGGLE_RATE "0 MHz" -to HEX2
+set_instance_assignment -name IO_MAXIMUM_TOGGLE_RATE "0 MHz" -to HEX0
+set_instance_assignment -name IO_MAXIMUM_TOGGLE_RATE "0 MHz" -to HEX1
+set_instance_assignment -name IO_MAXIMUM_TOGGLE_RATE "0 MHz" -to KEY
+set_instance_assignment -name IO_MAXIMUM_TOGGLE_RATE "0 MHz" -to SW
+
 set_location_assignment PIN_A17 -to ENET0_GTX_CLK
 set_location_assignment PIN_A21 -to ENET0_INT_N
 set_location_assignment PIN_C20 -to ENET0_MDC
@@ -982,67 +1000,6 @@ set_location_assignment PIN_E4 -to TD_VS
 set_location_assignment PIN_E5 -to TD_HS
 set_location_assignment PIN_B7 -to AUD_I2C_SCLK
 set_location_assignment PIN_A8 -to AUD_I2C_SDAT
-set_instance_assignment -name IO_STANDARD "2.5 V" -to ENET0_TX_DATA_2
-set_instance_assignment -name IO_STANDARD "2.5 V" -to ENET0_INT_N
-set_instance_assignment -name IO_STANDARD "2.5 V" -to LEDR_2
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_8
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_9
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_10
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_11
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_8
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_9
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_10
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_11
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_8
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_9
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_10
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_11
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_7
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_8
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_9
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_10
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_11
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_CLKIN_P2
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_CLKIN_N2
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_0
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_1
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_2
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_3
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_4
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_5
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_6
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_P_7
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_0
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_1
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_2
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_3
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_4
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_5
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_6
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_TX_D_N_7
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_0
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_1
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_2
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_3
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_4
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_5
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_6
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_P_7
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_0
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_1
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_2
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_3
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_4
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_5
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_RX_D_N_6
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_CLKIN_P1
-set_instance_assignment -name IO_STANDARD LVDS -to HSMC_CLKIN_N1
-set_instance_assignment -name IO_STANDARD "3.0-V LVTTL" -to HSMC_CLKIN0
-set_instance_assignment -name IO_MAXIMUM_TOGGLE_RATE "0 MHz" -to HEX2
-set_instance_assignment -name IO_MAXIMUM_TOGGLE_RATE "0 MHz" -to HEX0
-set_instance_assignment -name IO_MAXIMUM_TOGGLE_RATE "0 MHz" -to HEX1
-set_instance_assignment -name IO_MAXIMUM_TOGGLE_RATE "0 MHz" -to KEY
-set_instance_assignment -name IO_MAXIMUM_TOGGLE_RATE "0 MHz" -to SW
 set_location_assignment PIN_AF27 -to HSMC_D_3
 set_location_assignment PIN_AB28 -to SW_0
 set_location_assignment PIN_AD15 -to GPIO_8
@@ -1082,296 +1039,4 @@ set_location_assignment PIN_G4 -to OTG_DATA_15
 set_location_assignment PIN_C14 -to ENET0_LINK100
 set_location_assignment PIN_D13 -to ENET1_LINK100
 set_location_assignment PIN_A14 -to ENETCLK_25
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to ENET0_LINK100
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to ENET1_LINK100
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to ENETCLK_25
-set_instance_assignment -name IO_MAXIMUM_TOGGLE_RATE "0 MHz" -to HEX3_1
-set_instance_assignment -name IO_MAXIMUM_TOGGLE_RATE "0 MHz" -to HEX3_0
-set_location_assignment PIN_F14 -to EX_IO_4
-set_location_assignment PIN_J13 -to UART_CTS
-set_location_assignment PIN_G12 -to UART_RXD
-set_location_assignment PIN_G9 -to UART_TXD
-set_location_assignment PIN_A10 -to VGA_B_1
-set_location_assignment PIN_H12 -to VGA_G_3
-set_global_assignment -name POWER_PRESET_COOLING_SOLUTION "23 MM HEAT SINK WITH 200 LFPM AIRFLOW"
-set_global_assignment -name POWER_BOARD_THERMAL_MODEL "NONE (CONSERVATIVE)"
-set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
-set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
-set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
-set_global_assignment -name VERILOG_MACRO "SYNTHESIS=1"
 
-
-
-
-set_global_assignment -name ENABLE_SIGNALTAP ON
-set_global_assignment -name USE_SIGNALTAP_FILE stp1.stp
-set_global_assignment -name SLD_NODE_CREATOR_ID 110 -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_ENTITY_NAME sld_signaltap -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_clk -to "pll:pll|c0" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[0] -to "RVCPlatform:RVCPlatform|io_jtag_RSTn" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[1] -to "RVCPlatform:RVCPlatform|io_jtag_TCK" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[2] -to "RVCPlatform:RVCPlatform|io_jtag_TDI" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[3] -to "RVCPlatform:RVCPlatform|io_jtag_TDO_data" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[4] -to "RVCPlatform:RVCPlatform|io_jtag_TDO_driven" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[5] -to "RVCPlatform:RVCPlatform|io_jtag_TMS" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[6] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[0]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[7] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[10]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[8] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[11]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[9] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[12]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[10] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[1]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[11] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[2]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[12] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[3]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[13] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[4]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[14] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[5]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[15] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[6]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[16] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[7]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[17] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[8]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[18] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[9]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[19] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_ba_o[0]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[20] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_ba_o[1]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[21] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_cas_o" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[22] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_cke_o" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[23] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_clk_o" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[24] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_cs_o" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[25] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[0]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[26] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[10]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[27] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[11]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[28] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[12]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[29] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[13]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[30] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[14]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[31] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[15]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[32] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[16]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[33] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[17]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[34] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[18]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[35] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[19]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[36] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[1]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[37] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[20]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[38] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[21]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[39] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[22]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[40] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[23]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[41] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[24]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[42] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[25]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[43] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[26]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[44] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[27]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[45] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[28]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[46] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[29]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[47] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[2]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[48] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[30]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[49] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[31]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[50] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[3]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[51] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[4]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[52] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[5]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[53] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[6]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[54] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[7]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[55] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[8]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[56] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[9]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[57] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[0]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[58] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[10]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[59] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[11]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[60] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[12]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[61] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[13]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[62] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[14]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[63] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[15]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[64] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[16]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[65] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[17]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[66] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[18]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[67] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[19]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[68] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[1]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[69] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[20]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[70] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[21]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[71] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[22]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[72] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[23]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[73] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[24]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[74] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[25]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[75] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[26]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[76] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[27]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[77] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[28]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[78] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[29]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[79] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[2]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[80] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[30]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[81] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[31]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[82] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[3]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[83] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[4]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[84] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[5]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[85] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[6]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[86] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[7]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[87] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[8]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[88] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[9]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[89] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_dqm_o[0]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[90] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_dqm_o[1]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[91] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_dqm_o[2]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[92] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_dqm_o[3]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[93] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_drive_o" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[94] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_ras_o" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_trigger_in[95] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_we_o" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[0] -to "RVCPlatform:RVCPlatform|io_jtag_RSTn" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[1] -to "RVCPlatform:RVCPlatform|io_jtag_TCK" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[2] -to "RVCPlatform:RVCPlatform|io_jtag_TDI" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[3] -to "RVCPlatform:RVCPlatform|io_jtag_TDO_data" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[4] -to "RVCPlatform:RVCPlatform|io_jtag_TDO_driven" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[5] -to "RVCPlatform:RVCPlatform|io_jtag_TMS" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[6] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[0]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[7] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[10]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[8] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[11]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[9] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[12]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[10] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[1]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[11] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[2]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[12] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[3]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[13] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[4]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[14] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[5]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[15] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[6]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[16] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[7]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[17] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[8]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[18] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_addr_o[9]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[19] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_ba_o[0]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[20] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_ba_o[1]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[21] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_cas_o" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[22] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_cke_o" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[23] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_clk_o" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[24] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_cs_o" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[25] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[0]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[26] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[10]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[27] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[11]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[28] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[12]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[29] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[13]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[30] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[14]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[31] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[15]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[32] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[16]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[33] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[17]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[34] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[18]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[35] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[19]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[36] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[1]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[37] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[20]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[38] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[21]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[39] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[22]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[40] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[23]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[41] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[24]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[42] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[25]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[43] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[26]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[44] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[27]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[45] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[28]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[46] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[29]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[47] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[2]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[48] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[30]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[49] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[31]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[50] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[3]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[51] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[4]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[52] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[5]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[53] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[6]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[54] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[7]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[55] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[8]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[56] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_i[9]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[57] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[0]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[58] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[10]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[59] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[11]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[60] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[12]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[61] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[13]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[62] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[14]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[63] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[15]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[64] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[16]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[65] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[17]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[66] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[18]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[67] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[19]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[68] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[1]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[69] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[20]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[70] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[21]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[71] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[22]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[72] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[23]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[73] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[24]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[74] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[25]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[75] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[26]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[76] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[27]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[77] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[28]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[78] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[29]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[79] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[2]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[80] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[30]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[81] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[31]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[82] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[3]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[83] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[4]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[84] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[5]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[85] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[6]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[86] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[7]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[87] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[8]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[88] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_data_o[9]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[89] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_dqm_o[0]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[90] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_dqm_o[1]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[91] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_dqm_o[2]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[92] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_dqm_o[3]" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[93] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_drive_o" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[94] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_ras_o" -section_id auto_signaltap_0
-set_instance_assignment -name CONNECT_TO_SLD_NODE_ENTITY_PORT acq_data_in[95] -to "RVCPlatform:RVCPlatform|io_sdram_0_sdram_we_o" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_RAM_BLOCK_TYPE=AUTO" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_DATA_BITS=96" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_BITS=96" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_STORAGE_QUALIFIER_BITS=96" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_NODE_INFO=805334528" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_POWER_UP_TRIGGER=0" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_INVERSION_MASK=000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_INVERSION_MASK_LENGTH=309" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_STORAGE_QUALIFIER_INVERSION_MASK_LENGTH=0" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_SEGMENT_SIZE=128" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_ATTRIBUTE_MEM_MODE=OFF" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_STATE_FLOW_USE_GENERATED=0" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_STATE_BITS=11" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_BUFFER_FULL_STOP=1" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_CURRENT_RESOURCE_WIDTH=1" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_INCREMENTAL_ROUTING=1" -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[0] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[1] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[2] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[3] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[4] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[5] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[6] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[7] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[8] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[9] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[10] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[11] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[12] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[13] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[14] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[15] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[16] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[17] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[18] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[19] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[20] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[21] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[22] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[23] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[24] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[25] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[26] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[27] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[28] -to auto_signaltap_0|gnd -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[29] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[30] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_instance_assignment -name POST_FIT_CONNECT_TO_SLD_NODE_ENTITY_PORT crc[31] -to auto_signaltap_0|vcc -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_LEVEL=1" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_SAMPLE_DEPTH=128" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_IN_ENABLED=0" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_PIPELINE=0" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_RAM_PIPELINE=0" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_COUNTER_PIPELINE=0" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_ADVANCED_TRIGGER_ENTITY=basic,1," -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_TRIGGER_LEVEL_PIPELINE=1" -section_id auto_signaltap_0
-set_global_assignment -name SLD_NODE_PARAMETER_ASSIGNMENT "SLD_ENABLE_ADVANCED_TRIGGER=0" -section_id auto_signaltap_0
-set_global_assignment -name VHDL_FILE "../generated-src/riscvconsole.fpga.DE2Top.DE2Config/icpxram.vhd"
-set_global_assignment -name VHDL_FILE "../generated-src/riscvconsole.fpga.DE2Top.DE2Config/icpx_pkg.vhd"
-set_global_assignment -name VHDL_FILE "../generated-src/riscvconsole.fpga.DE2Top.DE2Config/fft_wrapper.vhd"
-set_global_assignment -name VHDL_FILE "../generated-src/riscvconsole.fpga.DE2Top.DE2Config/fft_len.vhd"
-set_global_assignment -name VHDL_FILE "../generated-src/riscvconsole.fpga.DE2Top.DE2Config/fft_engine.vhd"
-set_global_assignment -name VHDL_FILE "../generated-src/riscvconsole.fpga.DE2Top.DE2Config/dpram_inf.vhd"
-set_global_assignment -name VHDL_FILE "../generated-src/riscvconsole.fpga.DE2Top.DE2Config/butterfly.vhd"
-set_global_assignment -name VERILOG_FILE "../generated-src/riscvconsole.fpga.DE2Top.DE2Config/sdram.v"
-set_global_assignment -name VERILOG_FILE "../generated-src/riscvconsole.fpga.DE2Top.DE2Config/riscvconsole.fpga.DE2Top.DE2Config.rom.v"
-set_global_assignment -name VERILOG_FILE "../generated-src/riscvconsole.fpga.DE2Top.DE2Config/EICG_wrapper.v"
-set_global_assignment -name VERILOG_FILE "../generated-src/riscvconsole.fpga.DE2Top.DE2Config/plusarg_reader.v"
-set_global_assignment -name VERILOG_FILE "../generated-src/riscvconsole.fpga.DE2Top.DE2Config/riscvconsole.fpga.DE2Top.DE2Config.harness.mems.v"
-set_global_assignment -name VERILOG_FILE "../generated-src/riscvconsole.fpga.DE2Top.DE2Config/riscvconsole.fpga.DE2Top.DE2Config.harness.v"
-set_global_assignment -name VERILOG_FILE "../generated-src/riscvconsole.fpga.DE2Top.DE2Config/riscvconsole.fpga.DE2Top.DE2Config.top.mems.v"
-set_global_assignment -name VERILOG_FILE "../generated-src/riscvconsole.fpga.DE2Top.DE2Config/riscvconsole.fpga.DE2Top.DE2Config.top.v"
-set_global_assignment -name QIP_FILE pll/pll.qip
-set_global_assignment -name SLD_FILE db/stp1_auto_stripped.stp
-set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
