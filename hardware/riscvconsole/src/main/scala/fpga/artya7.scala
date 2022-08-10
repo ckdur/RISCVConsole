@@ -5,6 +5,8 @@ import riscvconsole.system._
 import chipsalliance.rocketchip.config._
 import chisel3.experimental.attach
 import freechips.rocketchip.diplomacy.LazyModule
+import freechips.rocketchip.subsystem.PeripheryBusKey
+import freechips.rocketchip.util.ResetCatchAndSync
 import riscvconsole.devices.codec.{CodecIO, CodecSignals}
 import riscvconsole.shell.artya7._
 import sifive.fpgashells.ip.xilinx._
@@ -19,7 +21,7 @@ import sifive.fpgashells.clocks._
 class ArtyA7Top(implicit p: Parameters) extends ArtyA7Shell
 {
   // PLL instance
-  val freq = 50.0
+  val freq = p(PeripheryBusKey).dtsFrequency.getOrElse(BigInt(50000000)).toDouble / 1000000.0 // NOTE: Getting this from PeripheryBusKey
   val c = new PLLParameters(
     name = "pll",
     input = PLLInClockParameters(freqMHz = 100.0, feedback = true),
@@ -34,7 +36,7 @@ class ArtyA7Top(implicit p: Parameters) extends ArtyA7Shell
   pll.io.reset := !ck_rst
 
   val clock = pll.io.clk_out1.get
-  val reset = !pll.io.locked
+  val reset = WireInit(!pll.io.locked)
 
   withClockAndReset(clock, reset)
   {
@@ -123,6 +125,16 @@ class ArtyA7Top(implicit p: Parameters) extends ArtyA7Shell
       codec.AUD_ADCLRCK.in := false.B
       codec.AUD_DACLRCK.in := false.B
       codec.AUD_BCLK.in := false.B
+    }
+
+    platform.artyA7MIGPorts.foreach{ case mig =>
+      ddr <> mig
+      // MIG connections, like resets and stuff
+      mig.sys_clk_i := pll.io.clk_out2.get.asBool
+      mig.clk_ref_i := pll.io.clk_out3.get.asBool
+      mig.aresetn := pll.io.locked
+      mig.sys_rst := ResetCatchAndSync(pll.io.clk_out2.get, !pll.io.locked)
+      reset := ResetCatchAndSync(pll.io.clk_out1.get, mig.ui_clk_sync_rst)
     }
 
     // Other clock not connected

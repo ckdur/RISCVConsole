@@ -150,6 +150,18 @@ ifeq ($(SUB_PROJECT),DE2)
 	TB                ?= TestDriver
 	TOP               ?= RVCSystem
 endif
+# For the RISCV console (in ArtyA7)
+ifeq ($(SUB_PROJECT),ArtyA7)
+	SBT_PROJECT       ?= riscvconsole
+	MODEL             ?= ArtyA7Top
+	VLOG_MODEL        ?= ArtyA7Top
+	MODEL_PACKAGE     ?= riscvconsole.fpga
+	CONFIG            ?= ArtyA7Config
+	CONFIG_PACKAGE    ?= riscvconsole.system
+	GENERATOR_PACKAGE ?= riscvconsole
+	TB                ?= TestDriver
+	TOP               ?= RVCSystem
+endif
 
 #########################################################################################
 # path to rocket-chip and testchipip
