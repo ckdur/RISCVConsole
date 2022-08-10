@@ -275,7 +275,7 @@ lazy val sifive_cache = (project in file("hardware/chipyard/generators/sifive-ca
     Test / testGrouping := isolateAllTests( (Test / definedTests).value ),
     Test / testOptions += Tests.Argument("-oF")
   )*/
-lazy val fpga_shells = (project in file("./hardware/chipyard/fpga/fpga-shells"))
+lazy val fpga_shells = (project in file("./hardware/fpga-shells"))
   .dependsOn(rocketchip, sifive_blocks)
   .settings(libraryDependencies ++= rocketLibDeps.value)
   .settings(
@@ -288,7 +288,7 @@ lazy val fpga_platforms = (project in file("./hardware/chipyard/fpga"))
   .settings(commonSettings)
 
 lazy val riscvconsole = (project in file("hardware/riscvconsole"))
-  .dependsOn(rocketchip, sifive_blocks, tapeout, chipyard).
+  .dependsOn(rocketchip, sifive_blocks, tapeout, chipyard, fpga_shells).
   settings(libraryDependencies ++= rocketLibDeps.value).
   settings(commonSettings)
 

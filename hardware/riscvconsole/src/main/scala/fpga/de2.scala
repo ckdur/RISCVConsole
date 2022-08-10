@@ -4,10 +4,16 @@ import chisel3._
 import riscvconsole.system._
 import chipsalliance.rocketchip.config._
 import chisel3.experimental.attach
+import freechips.rocketchip.diplomacy.LazyModule
+import riscvconsole.devices.codec.{CodecIO, CodecPinsFromPort, CodecSignals}
 import riscvconsole.shell.de2._
-import riscvconsole.shell.alteraLib.{ALT_IOBUF}
+import riscvconsole.shell.alteraLib.ALT_IOBUF
 import sifive.blocks.devices.pinctrl._
 import riscvconsole.util._
+import sifive.blocks.devices.gpio.GPIOPortIO
+import sifive.blocks.devices.i2c.{I2CPins, I2CPinsFromPort, I2CPort}
+import sifive.blocks.devices.spi.{SPIPins, SPIPinsFromPort, SPIPortIO}
+import sifive.blocks.devices.uart.UARTPortIO
 
 class DE2Top(implicit p: Parameters) extends DE2Shell
 {
@@ -19,58 +25,66 @@ class DE2Top(implicit p: Parameters) extends DE2Shell
 
   withClockAndReset(clock, reset)
   {
-    val platform = Module(new RVCPlatform) //RVC:RISCV console(Full View)
+    val greset = WireInit(false.B)
+    val platform = withReset(greset){ Module(LazyModule(new RVCSystem).module) }
+    greset := reset.asBool || platform.ndreset.getOrElse(false.B) // Put the ndreset from debug here
 
     // default all gpio
-    platform.io.gpio.foreach(_.i.po.foreach(_ := false.B))
+    platform.gpio.foreach { case gpio: GPIOPortIO =>
+      gpio.pins.foreach(_.i.po.foreach(_ := false.B))
 
-    //connect the led
-    LEDR.foreach(_ := false.B)
-    LEDG.foreach(_ := false.B)
-    (LEDR.slice(0, 4) zip platform.io.gpio.slice(0, 4)).foreach
-    {
-      case (l, pin) =>
-        l := pin.o.oval & pin.o.oe // ":="  <- connect
-        pin.i.ival := false.B
-    }
+      //connect the led
+      LEDR.foreach(_ := false.B)
+      LEDG.foreach(_ := false.B)
+      (LEDR.slice(0, 4) zip gpio.pins.slice(0, 4)).foreach
+      {
+        case (l, pin) =>
+          l := pin.o.oval & pin.o.oe // ":="  <- connect
+          pin.i.ival := false.B
+      }
 
-    //button into the gpio
-    (KEY.slice(1, 4) zip platform.io.gpio.slice(4, 7)).foreach
-    {
-      case (b, pin) =>
-        pin.i.ival := b
-    }
-    //switch into the gpio
-    (SW.slice(1, 4) zip platform.io.gpio.slice(7, 10)).foreach
-    {
-      case (s, pin) =>
-        pin.i.ival := s
+      //button into the gpio
+      (KEY.slice(1, 4) zip gpio.pins.slice(4, 7)).foreach
+      {
+        case (b, pin) =>
+          pin.i.ival := b
+      }
+      //switch into the gpio
+      (SW.slice(1, 4) zip gpio.pins.slice(7, 10)).foreach
+      {
+        case (s, pin) =>
+          pin.i.ival := s
+      }
     }
 
     // JTAG
-    platform.io.jtag.TDI := ALT_IOBUF(GPIO(0))
-    platform.io.jtag.TMS := ALT_IOBUF(GPIO(2))
-    platform.io.jtag.TCK := ALT_IOBUF(GPIO(4)).asClock()
-    val TDO_as_base = Wire(new BasePin)
-    TDO_as_base.o.oe := platform.io.jtag.TDO.driven
-    TDO_as_base.o.oval := platform.io.jtag.TDO.data
-    TDO_as_base.o.ie := false.B
-    TDO_as_base.i.po.foreach(_ := false.B)
-    ALT_IOBUF(GPIO(6), TDO_as_base)
+    platform.jtag.foreach { case jtag =>
+      jtag.TDI := ALT_IOBUF(GPIO(0))
+      jtag.TMS := ALT_IOBUF(GPIO(2))
+      jtag.TCK := ALT_IOBUF(GPIO(4)).asClock()
+      val TDO_as_base = Wire(new BasePin)
+      TDO_as_base.o.oe := jtag.TDO.driven
+      TDO_as_base.o.oval := jtag.TDO.data
+      TDO_as_base.o.ie := false.B
+      TDO_as_base.i.po.foreach(_ := false.B)
+      ALT_IOBUF(GPIO(6), TDO_as_base)
+      jtag.TRSTn.foreach(_ := SW(0))
+    }
 
-    //platform.io.uart_rxd := ALT_IOBUF(GPIO(8))
-    //ALT_IOBUF(GPIO(10), platform.io.uart_txd)
-    platform.io.uart_rxd := ALT_IOBUF(UART_RXD)
-    ALT_IOBUF(UART_TXD, platform.io.uart_txd)
-
-    platform.io.jtag_RSTn := SW(0)       //reset for the jtag
+    platform.uart.foreach { case uart: UARTPortIO =>
+      uart.rxd := ALT_IOBUF(UART_RXD)
+      ALT_IOBUF(UART_TXD, uart.txd)
+    }
 
     // SPI (for SD)
-    platform.io.spi.foreach(_.sck.i.po.foreach(_ := false.B))
-    platform.io.spi.foreach(_.cs.foreach(_.i.po.foreach(_ := false.B)))
-    platform.io.spi.foreach(_.dq.foreach(_.i.po.foreach(_ := false.B)))
+    // SPI (for SD)
+    platform.spi.foreach{ case spic: SPIPortIO =>
+      val spi = Wire(new SPIPins(() => new BasePin(), spic.c))
+      spi.sck.i.po.foreach(_ := false.B)
+      spi.cs.foreach(_.i.po.foreach(_ := false.B))
+      spi.dq.foreach(_.i.po.foreach(_ := false.B))
+      SPIPinsFromPort(spi, spic, clock, reset.asBool, 3)
 
-    platform.io.spi.foreach { spi =>
       ALT_IOBUF(SD_CLK, spi.sck)
       ALT_IOBUF(SD_DAT(3), spi.cs(0))
       ALT_IOBUF(SD_CMD, spi.dq(0))
@@ -80,11 +94,13 @@ class DE2Top(implicit p: Parameters) extends DE2Shell
     }
 
     // SPI flash
-    platform.io.spiflash.foreach(_.sck.i.po.foreach(_ := false.B))
-    platform.io.spiflash.foreach(_.cs.foreach(_.i.po.foreach(_ := false.B)))
-    platform.io.spiflash.foreach(_.dq.foreach(_.i.po.foreach(_ := false.B)))
+    platform.qspi.foreach{ case spic: SPIPortIO =>
+      val spi = Wire(new SPIPins(() => new BasePin(), spic.c))
+      spi.sck.i.po.foreach(_ := false.B)
+      spi.cs.foreach(_.i.po.foreach(_ := false.B))
+      spi.dq.foreach(_.i.po.foreach(_ := false.B))
+      SPIPinsFromPort(spi, spic, clock, reset.asBool, 3)
 
-    platform.io.spiflash.foreach { spi =>
       ALT_IOBUF(GPIO(1), spi.sck)
       ALT_IOBUF(GPIO(3), spi.cs(0))
       ALT_IOBUF(GPIO(5), spi.dq(0))
@@ -94,10 +110,12 @@ class DE2Top(implicit p: Parameters) extends DE2Shell
     }
 
     // I2C in AudioCodec
-    platform.io.i2c.foreach(_.scl.i.po.foreach(_ := false.B))
-    platform.io.i2c.foreach(_.sda.i.po.foreach(_ := false.B))
+    platform.i2c.foreach{ case i2cc: I2CPort =>
+      val i2c = Wire(new I2CPins(() => new BasePin()))
+      i2c.scl.i.po.foreach(_ := false.B)
+      i2c.sda.i.po.foreach(_ := false.B)
+      I2CPinsFromPort(i2c, i2cc, clock, reset.asBool, 3)
 
-    platform.io.i2c.foreach{ i2c =>
       ALT_IOBUF(AUD.I2C_SCLK, i2c.scl)
       ALT_IOBUF(AUD.I2C_SDAT, i2c.sda)
     }
@@ -105,10 +123,12 @@ class DE2Top(implicit p: Parameters) extends DE2Shell
     // Codec in AudioCodec
     AUD.XCK := pll.io.c1.asBool // 5MHz
     AUD.DACDAT := 0.U
-    platform.io.codec.foreach { codec =>
+    platform.codec.foreach { case codecc: CodecIO =>
+      val codec = Wire(new CodecSignals(() => new BasePin()))
       codec.AUD_ADCLRCK.i.po.foreach(_ := false.B)
       codec.AUD_DACLRCK.i.po.foreach(_ := false.B)
       codec.AUD_BCLK.i.po.foreach(_ := false.B)
+      CodecPinsFromPort(codec, codecc, clock, reset.asBool, 3)
 
       AUD.DACDAT := codec.AUD_DACDAT
       codec.AUD_ADCDAT := AUD.ADCDAT
@@ -118,9 +138,9 @@ class DE2Top(implicit p: Parameters) extends DE2Shell
     }
 
     // The DRAM
-    platform.io.sdram.foreach(DRAM.from_SDRAMIf)
+    platform.sdramio.foreach(DRAM.from_SDRAMIf)
 
     // Other clock not connected
-    platform.io.otherclock := pll.io.c0
+    platform.otherclock := pll.io.c0
   }
 }

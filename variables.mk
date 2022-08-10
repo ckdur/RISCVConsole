@@ -105,8 +105,8 @@ endif
 # For the RISCV console (TODO: SImulation)
 ifeq ($(SUB_PROJECT),riscvconsole)
 	SBT_PROJECT       ?= riscvconsole
-	MODEL             ?= RVCPlatform
-	VLOG_MODEL        ?= RVCPlatform
+	MODEL             ?= RVCSystem
+	VLOG_MODEL        ?= RVCSystem
 	MODEL_PACKAGE     ?= riscvconsole.system
 	CONFIG            ?= RVCConfig
 	CONFIG_PACKAGE    ?= riscvconsole.system
@@ -124,7 +124,7 @@ ifeq ($(SUB_PROJECT),ulx3s)
 	CONFIG_PACKAGE    ?= riscvconsole.system
 	GENERATOR_PACKAGE ?= riscvconsole
 	TB                ?= TestDriver
-	TOP               ?= RVCPlatform
+	TOP               ?= RVCSystem
 endif
 # For the RISCV console (in Arrow)
 ifeq ($(SUB_PROJECT),arrow)
@@ -136,7 +136,7 @@ ifeq ($(SUB_PROJECT),arrow)
 	CONFIG_PACKAGE    ?= riscvconsole.system
 	GENERATOR_PACKAGE ?= riscvconsole
 	TB                ?= TestDriver
-	TOP               ?= RVCPlatform
+	TOP               ?= RVCSystem
 endif
 # For the RISCV console (in DE2)
 ifeq ($(SUB_PROJECT),DE2)
@@ -148,7 +148,7 @@ ifeq ($(SUB_PROJECT),DE2)
 	CONFIG_PACKAGE    ?= riscvconsole.system
 	GENERATOR_PACKAGE ?= riscvconsole
 	TB                ?= TestDriver
-	TOP               ?= RVCPlatform
+	TOP               ?= RVCSystem
 endif
 
 #########################################################################################
