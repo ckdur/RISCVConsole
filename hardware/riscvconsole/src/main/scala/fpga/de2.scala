@@ -138,6 +138,7 @@ class DE2Top(implicit p: Parameters) extends DE2Shell
     }
 
     // The DRAM
+    DRAM.default
     platform.sdramio.foreach(DRAM.from_SDRAMIf)
 
     // Other clock not connected

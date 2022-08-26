@@ -35,6 +35,17 @@ class DE2SDRAM extends Bundle {
         b.io.o
     }).asUInt()
   }
+  def default = {
+    CLK := false.B
+    CKE := false.B
+    CS_N := false.B
+    RAS_N := false.B
+    CAS_N := false.B
+    WE_N := false.B
+    DQM := 0.U
+    ADDR := 0.U
+    BA := 0.U
+  }
 }
 
 class AUD_CODEC_DE2_PORT extends Bundle {
