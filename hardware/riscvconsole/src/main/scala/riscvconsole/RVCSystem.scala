@@ -15,6 +15,7 @@ import freechips.rocketchip.tilelink.{TLFragmenter, TLRAM}
 import riscvconsole.devices.altera.ddr3._
 import riscvconsole.devices.codec._
 import riscvconsole.devices.fft._
+import riscvconsole.devices.gcd._
 import riscvconsole.devices.sdram._
 import riscvconsole.devices.xilinx.artya7ddr._
 import testchipip._
@@ -36,6 +37,8 @@ class RVCSystem(implicit p: Parameters) extends RVCSubsystem
   with HasArtyA7MIG
   with HasPeripheryCodec
   with HasPeripheryFFT
+  with HasPeripheryGCD
+  with HasPeripheryGCDBB
   with CanHaveMasterAXI4MemPort
   with CanHavePeripheryTLSerial
 {
@@ -92,6 +95,7 @@ class RVCSystemModuleImp[+L <: RVCSystem](_outer: L) extends RVCSubsystemModuleI
   with HasArtyA7MIGModuleImp
   with HasPeripheryCodecModuleImp
   with HasPeripheryFFTModuleImp
+  with HasPeripheryGCDModuleImp
   with HasRTCModuleImp
 {
   val spi  = outer.spiNodes.zipWithIndex.map  { case(n,i) => n.makeIO()(ValName(s"spi_$i")).asInstanceOf[SPIPortIO] }

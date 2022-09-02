@@ -143,5 +143,10 @@ class DE2Top(implicit p: Parameters) extends DE2Shell
 
     // Other clock not connected
     platform.otherclock := pll.io.c0
+
+    // Test GCD peripheral
+    platform.gcd.foreach{ case gcd =>
+      ALT_IOBUF(GPIO(13), gcd.ready)
+    }
   }
 }

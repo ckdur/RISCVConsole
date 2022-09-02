@@ -139,5 +139,10 @@ class ArtyA7Top(implicit p: Parameters) extends ArtyA7Shell
 
     // Other clock not connected
     platform.otherclock := false.B.asClock
+
+    // Test GCD peripheral
+    platform.gcd.foreach{ case gcd =>
+      IOBUF(ck_io(2), gcd.ready)
+    }
   }
 }
