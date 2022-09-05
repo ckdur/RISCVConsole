@@ -18,6 +18,7 @@ import riscvconsole.devices.fft._
 import riscvconsole.devices.gcd._
 import riscvconsole.devices.sdram._
 import riscvconsole.devices.xilinx.artya7ddr._
+import riscvconsole.devices.xilinx.nexys4ddr._
 import testchipip._
 
 case class SRAMConfig
@@ -35,6 +36,7 @@ class RVCSystem(implicit p: Parameters) extends RVCSubsystem
   with HasSDRAM
   with HasQsysDDR3
   with HasArtyA7MIG
+  with HasNexys4DDRMIG
   with HasPeripheryCodec
   with HasPeripheryFFT
   with HasPeripheryGCD
@@ -93,6 +95,7 @@ class RVCSystemModuleImp[+L <: RVCSystem](_outer: L) extends RVCSubsystemModuleI
   with HasSDRAMModuleImp
   with HasQsysDDR3ModuleImp
   with HasArtyA7MIGModuleImp
+  with HasNexys4DDRMIGModuleImp
   with HasPeripheryCodecModuleImp
   with HasPeripheryFFTModuleImp
   with HasPeripheryGCDModuleImp

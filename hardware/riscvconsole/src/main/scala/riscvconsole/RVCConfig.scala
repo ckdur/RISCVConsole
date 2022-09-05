@@ -9,6 +9,7 @@ import riscvconsole.devices.codec._
 import riscvconsole.devices.sdram._
 import riscvconsole.devices.fft._
 import riscvconsole.devices.xilinx.artya7ddr.ArtyA7MIGMem
+import riscvconsole.devices.xilinx.nexys4ddr.Nexys4DDRMIGMem
 
 class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
   case sifive.blocks.devices.uart.PeripheryUARTKey => Seq(
@@ -62,6 +63,11 @@ class WithQsysDDR3Mem extends Config((site, here, up) => {
 
 class WithArtyA7MIGMem extends Config((site, here, up) => {
   case ArtyA7MIGMem => Some(MemoryPortParams(MasterPortParams(0x80000000L, 0x10000000, 8, 4), 1))
+  case SRAMKey => Nil
+})
+
+class WithNexys4DDRMIGMem extends Config((site, here, up) => {
+  case Nexys4DDRMIGMem => Some(MemoryPortParams(MasterPortParams(0x80000000L, 0x08000000, 8, 4), 1))
   case SRAMKey => Nil
 })
 
@@ -125,6 +131,26 @@ class DE2Config extends Config(
 
 class ArtyA7Config extends Config(
   new WithArtyA7MIGMem ++
+    new RVCPeripheralsConfig(8) ++
+    new SetFrequency(50000000) ++
+    new RemoveDebugClockGating ++
+    new freechips.rocketchip.subsystem.WithRV32 ++
+    new freechips.rocketchip.subsystem.WithTimebase(1000000) ++
+    new freechips.rocketchip.subsystem.WithNBreakpoints(1) ++
+    new freechips.rocketchip.subsystem.WithJtagDTM ++
+    new freechips.rocketchip.subsystem.WithNoMemPort ++              // no top-level memory port at 0x80000000
+    new freechips.rocketchip.subsystem.WithNoMMIOPort ++           // no top-level MMIO master port (overrides default set in rocketchip)
+    new freechips.rocketchip.subsystem.WithNoSlavePort ++          // no top-level MMIO slave port (overrides default set in rocketchip)
+    new freechips.rocketchip.subsystem.WithDontDriveBusClocksFromSBus ++
+    //new freechips.rocketchip.subsystem.WithInclusiveCache(nBanks = 1, nWays = 2, capacityKB = 16) ++       // use Sifive L2 cache
+    new freechips.rocketchip.subsystem.WithNExtTopInterrupts(0) ++ // no external interrupts
+    new freechips.rocketchip.subsystem.WithoutFPU() ++
+    new freechips.rocketchip.subsystem.WithNMedCores(1) ++            // single rocket-core with VM support and FPU
+    new freechips.rocketchip.subsystem.WithCoherentBusTopology ++  // Hierarchical buses with broadcast L2
+    new freechips.rocketchip.system.BaseConfig)                    // "base" rocketchip system
+
+class Nexys4DDRConfig extends Config(
+  new WithNexys4DDRMIGMem ++
     new RVCPeripheralsConfig(8) ++
     new SetFrequency(50000000) ++
     new RemoveDebugClockGating ++

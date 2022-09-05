@@ -162,6 +162,18 @@ ifeq ($(SUB_PROJECT),ArtyA7)
 	TB                ?= TestDriver
 	TOP               ?= RVCSystem
 endif
+# For the RISCV console (in Nexys4DDR)
+ifeq ($(SUB_PROJECT),Nexys4DDR)
+	SBT_PROJECT       ?= riscvconsole
+	MODEL             ?= Nexys4DDRTop
+	VLOG_MODEL        ?= Nexys4DDRTop
+	MODEL_PACKAGE     ?= riscvconsole.fpga
+	CONFIG            ?= Nexys4DDRConfig
+	CONFIG_PACKAGE    ?= riscvconsole.system
+	GENERATOR_PACKAGE ?= riscvconsole
+	TB                ?= TestDriver
+	TOP               ?= RVCSystem
+endif
 
 #########################################################################################
 # path to rocket-chip and testchipip
