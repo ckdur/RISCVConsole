@@ -1,0 +1,11 @@
+*
+!.gitignore
+!Makefile
+!*.shell.quartus.tcl
+!*.qsys.main.tcl
+!*.qsys
+!*.sdc
+!pll/
+!pll/*
+!pll/pll/*
+!pll/pll_sim/*

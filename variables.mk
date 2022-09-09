@@ -105,8 +105,8 @@ endif
 # For the RISCV console (TODO: SImulation)
 ifeq ($(SUB_PROJECT),riscvconsole)
 	SBT_PROJECT       ?= riscvconsole
-	MODEL             ?= RVCPlatform
-	VLOG_MODEL        ?= RVCPlatform
+	MODEL             ?= RVCSystem
+	VLOG_MODEL        ?= RVCSystem
 	MODEL_PACKAGE     ?= riscvconsole.system
 	CONFIG            ?= RVCConfig
 	CONFIG_PACKAGE    ?= riscvconsole.system
@@ -124,7 +124,7 @@ ifeq ($(SUB_PROJECT),ulx3s)
 	CONFIG_PACKAGE    ?= riscvconsole.system
 	GENERATOR_PACKAGE ?= riscvconsole
 	TB                ?= TestDriver
-	TOP               ?= RVCPlatform
+	TOP               ?= RVCSystem
 endif
 # For the RISCV console (in Arrow)
 ifeq ($(SUB_PROJECT),arrow)
@@ -136,7 +136,7 @@ ifeq ($(SUB_PROJECT),arrow)
 	CONFIG_PACKAGE    ?= riscvconsole.system
 	GENERATOR_PACKAGE ?= riscvconsole
 	TB                ?= TestDriver
-	TOP               ?= RVCPlatform
+	TOP               ?= RVCSystem
 endif
 # For the RISCV console (in DE2)
 ifeq ($(SUB_PROJECT),DE2)
@@ -148,7 +148,31 @@ ifeq ($(SUB_PROJECT),DE2)
 	CONFIG_PACKAGE    ?= riscvconsole.system
 	GENERATOR_PACKAGE ?= riscvconsole
 	TB                ?= TestDriver
-	TOP               ?= RVCPlatform
+	TOP               ?= RVCSystem
+endif
+# For the RISCV console (in ArtyA7)
+ifeq ($(SUB_PROJECT),ArtyA7)
+	SBT_PROJECT       ?= riscvconsole
+	MODEL             ?= ArtyA7Top
+	VLOG_MODEL        ?= ArtyA7Top
+	MODEL_PACKAGE     ?= riscvconsole.fpga
+	CONFIG            ?= ArtyA7Config
+	CONFIG_PACKAGE    ?= riscvconsole.system
+	GENERATOR_PACKAGE ?= riscvconsole
+	TB                ?= TestDriver
+	TOP               ?= RVCSystem
+endif
+# For the RISCV console (in Nexys4DDR)
+ifeq ($(SUB_PROJECT),Nexys4DDR)
+	SBT_PROJECT       ?= riscvconsole
+	MODEL             ?= Nexys4DDRTop
+	VLOG_MODEL        ?= Nexys4DDRTop
+	MODEL_PACKAGE     ?= riscvconsole.fpga
+	CONFIG            ?= Nexys4DDRConfig
+	CONFIG_PACKAGE    ?= riscvconsole.system
+	GENERATOR_PACKAGE ?= riscvconsole
+	TB                ?= TestDriver
+	TOP               ?= RVCSystem
 endif
 
 #########################################################################################
@@ -212,6 +236,7 @@ SBT_OPTS_FILE := $(base_dir)/.sbtopts
 ifneq (,$(wildcard $(SBT_OPTS_FILE)))
 override SBT_OPTS += $(subst $$PWD,$(base_dir),$(shell cat $(SBT_OPTS_FILE)))
 endif
+override SBT_OPTS += -DfirrtlVersion=1.4.1
 
 SCALA_BUILDTOOL_DEPS = $(SBT_SOURCES)
 
