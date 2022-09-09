@@ -15,18 +15,21 @@ import "DPI-C" function int sdram_tick
  output int datao
 );
 
-module sdramsim(
+module sdramsim #(
+  parameter    SDRAM_DATA_W          = 16,
+  parameter    SDRAM_DQM_W           = 2
+) (
   input          sdram_clk_o,
   input          sdram_cke_o,
   input          sdram_cs_o,
   input          sdram_ras_o,
   input          sdram_cas_o,
   input          sdram_we_o,
-  input  [1:0]   sdram_dqm_o,
+  input  [SDRAM_DQM_W-1:0]   sdram_dqm_o,
   input  [12:0]  sdram_addr_o,
   input  [1:0]   sdram_ba_o,
-  output [15:0]  sdram_data_i,
-  input  [15:0]  sdram_data_o,
+  output [SDRAM_DATA_W-1:0]  sdram_data_i,
+  input  [SDRAM_DATA_W-1:0]  sdram_data_o,
   input          sdram_drive_o,
   input          reset
 );
@@ -54,9 +57,9 @@ module sdramsim(
   assign __bs = {30'd0, sdram_ba_o};
   assign __addr = {19'd0, sdram_addr_o};
   assign __driv = {31'd0, sdram_drive_o};
-  assign __data = {16'd0, sdram_data_o};
-  assign __dqm = {30'd0, sdram_dqm_o};
-  assign sdram_data_i = __datao[15:0];
+  assign __data = sdram_data_o;
+  assign __dqm = sdram_dqm_o;
+  assign sdram_data_i = __datao;
   
   always @(posedge sdram_clk_o)
     if(!reset)

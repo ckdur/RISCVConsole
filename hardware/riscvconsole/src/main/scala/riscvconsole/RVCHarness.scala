@@ -8,8 +8,11 @@ import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.devices.debug._
+import freechips.rocketchip.util.PlusArg
+import riscvconsole.devices.codec.CodecIO
 import riscvconsole.devices.sdram._
 import sifive.blocks.devices.gpio.{GPIOPortIO, IOFPortIO}
+import sifive.blocks.devices.i2c.I2CPort
 import sifive.blocks.devices.uart._
 import testchipip._
 
@@ -33,9 +36,28 @@ class RVCHarness()(implicit p: Parameters) extends Module {
   }
 
   // Debug tie off (This also handles the reset system)
-  val debug_success = WireInit(false.B)
-  Debug.connectDebug(dut.debug, dut.resetctrl, dut.psd, clock, reset.asBool(), debug_success)
-  when (debug_success) { io.success := true.B }
+  dut.jtag.foreach { jtag =>
+    val debug_success = WireInit(false.B)
+    val simjtag = Module(new SimJTAG(tickDelay=3))
+    jtag.TRSTn.foreach(_ := !reset.asBool) // NOTE: Normal reset
+    jtag.TMS := simjtag.io.jtag.TMS
+    jtag.TDI := simjtag.io.jtag.TDI
+    jtag.TCK := simjtag.io.jtag.TCK
+    simjtag.io.jtag.TDO.data := jtag.TDO.data
+    simjtag.io.jtag.TDO.driven := jtag.TDO.driven
+
+    simjtag.io.clock := clock
+    simjtag.io.reset := reset
+    simjtag.io.enable := PlusArg("jtag_rbb_enable", 0, "Enable SimJTAG for JTAG Connections. Simulation will pause until connection is made.")
+    simjtag.io.init_done := !reset.asBool
+    when (simjtag.io.exit === 1.U) { io.success := true.B }
+    when (simjtag.io.exit >= 2.U) {
+      printf("*** FAILED *** (exit code = %d)\n", simjtag.io.exit >> 1.U)
+      assert(false.B)
+    }
+    // Equivalent of simjtag.connect
+  }
+
 
   // Serial interface (if existent) will be connected here
   io.success := false.B
@@ -51,15 +73,15 @@ class RVCHarness()(implicit p: Parameters) extends Module {
   UARTAdapter.connect(uart = dut.uart.map(_.asInstanceOf[UARTPortIO]), baudrate = BigInt(115200))
 
   // GPIO tie down
-  dut.gpio.foreach{case gpio:GPIOPortIO =>
+  dut.gpio.foreach{ case gpio:GPIOPortIO =>
     gpio.pins.foreach{ case pin =>
       pin.i.ival := false.B
       pin.i.po.foreach(_ := false.B)
     }
   }
-  dut.iof.foreach { case iof: IOFPortIO =>
-    iof.iof_0.foreach(_.default())
-    iof.iof_1.foreach(_.default())
+  dut.iof.foreach { case iof: Option[IOFPortIO] =>
+    iof.foreach(_.iof_0.foreach(_.default()))
+    iof.foreach(_.iof_1.foreach(_.default()))
   }
 
   // SPI
@@ -68,4 +90,18 @@ class RVCHarness()(implicit p: Parameters) extends Module {
   // SDRAM
   dut.sdramio.foreach(sdramsim(_, reset.asBool()))
   dut.otherclock := clock
+
+  // I2C
+  dut.i2c.foreach{ case i2c:I2CPort =>
+    i2c.sda.in := false.B
+    i2c.scl.in := false.B
+  }
+
+  // CODEC
+  dut.codec.foreach{ case codec:CodecIO =>
+    codec.AUD_DACLRCK.in := false.B
+    codec.AUD_ADCLRCK.in := false.B
+    codec.AUD_BCLK.in := false.B
+    codec.AUD_ADCDAT := false.B
+  }
 }

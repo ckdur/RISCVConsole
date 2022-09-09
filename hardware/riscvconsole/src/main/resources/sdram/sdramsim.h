@@ -13,8 +13,8 @@
 
 class	SDRAMSIM {
 	int	m_pwrup;
-	short	*m_mem;
-	short	m_last_value, m_qmem[4];
+	int	*m_mem;
+	int	m_last_value, m_qmem[4];
 	int	m_bank_status[NBANKS];
 	int	m_bank_row[NBANKS];
 	int	m_bank_open_time[NBANKS];
@@ -26,7 +26,7 @@ class	SDRAMSIM {
 	unsigned	m_fail;
 public:
 	SDRAMSIM(void) {
-		m_mem = new short[SDRAMSZB/2]; // 256 MB, or 128 Mshorts
+		m_mem = new int[SDRAMSZB/2]; // 256 MB (or 512MB), or 128 Mints
 
 		m_nrefresh = 1<<13;
 		m_refresh_time = new unsigned[m_nrefresh];
@@ -52,14 +52,14 @@ public:
 		delete m_mem;
 	}
 
-	short operator()(int clk, int cke,
+	int operator()(int clk, int cke,
 			int cs_n, int ras_n, int cas_n, int we_n, int bs, 
 				unsigned addr,
-			int driv, short data, short dqm);
+			int driv, int data, int dqm);
 	int	pwrup(void) const { return m_pwrup; }
 
 	void	load(unsigned addr, const char *data, size_t len) {
-		short		*dp;
+		int		*dp;
 		const char	*sp = data;
 		unsigned	base;
 
@@ -69,7 +69,7 @@ public:
 		assert(addr + len < SDRAMSZB);
 		dp = &m_mem[(base>>1)];
 		for(unsigned k=0; k<len/2; k++) {
-			short	v;
+			int	v;
 			v = (sp[0]<<8)|(sp[1]&0x0ff);
 			sp+=2;
 			*dp++ = v;

@@ -80,6 +80,15 @@ module sdram
     output                      sdram_drive_o
 );
 
+function integer log2;
+  input integer addr;
+  begin
+    addr = addr - 1;
+    for (log2=0; addr>0; log2=log2+1)
+      addr = addr >> 1;
+  end
+endfunction
+
 //-----------------------------------------------------------------
 // Defines / Local params
 //-----------------------------------------------------------------
@@ -118,6 +127,10 @@ localparam CYCLE_TIME_NS     = 1000 / SDRAM_MHZ;
 localparam SDRAM_TRCD_CYCLES = (20 + (CYCLE_TIME_NS-1)) / CYCLE_TIME_NS;
 localparam SDRAM_TRP_CYCLES  = (20 + (CYCLE_TIME_NS-1)) / CYCLE_TIME_NS;
 localparam SDRAM_TRFC_CYCLES = (60 + (CYCLE_TIME_NS-1)) / CYCLE_TIME_NS;
+
+// SDRAM number of mems
+localparam SDRAM_MEMS = SDRAM_DQM_W >> 1;
+localparam SDRAM_MEMS_B = log2(SDRAM_MEMS);
 
 //-----------------------------------------------------------------
 // Registers / Wires
@@ -160,6 +173,9 @@ reg  [STATE_W-1:0]     delay_state_q;
 wire [SDRAM_ROW_W-1:0]  addr_col_w  = {{(SDRAM_ROW_W-SDRAM_COL_W){1'b0}}, addr_i[SDRAM_COL_W:2], 1'b0};
 wire [SDRAM_ROW_W-1:0]  addr_row_w  = addr_i[SDRAM_ADDR_W:SDRAM_COL_W+2+1];
 wire [SDRAM_BANK_W-1:0] addr_bank_w = addr_i[SDRAM_COL_W+2:SDRAM_COL_W+2-1];
+wire [SDRAM_MEMS_B+1:0] addr_mem_w = {addr_i[SDRAM_ADDR_W+SDRAM_MEMS_B+1:SDRAM_ADDR_W+1], 1'b0};
+wire [SDRAM_MEMS_B:0]   sel_mem_w = addr_i[SDRAM_ADDR_W+SDRAM_MEMS_B+1:SDRAM_ADDR_W+1];
+reg [SDRAM_MEMS_B:0]    sel_mem_q;
 
 //-----------------------------------------------------------------
 // SDRAM State Machine
@@ -447,12 +463,33 @@ if (rst_i)
 else
     sample_data0_q <= sdram_data_in_w;
 
-reg [SDRAM_DATA_W-1:0] sample_data_q;
+// We do a multiplexer here
+wire [16-1:0] sample_data0_q_arr [0:SDRAM_MEMS-1];
+genvar i;
+generate
+  for(i = 0; i < SDRAM_MEMS; i=i+1) begin : SDRAM_MEMS_ARR
+    assign sample_data0_q_arr[i] = sample_data0_q[(i+1)*16-1:i*16];
+  end
+endgenerate
+
+reg [16-1:0] sample_data_q;
 always @ (posedge rst_i or posedge clk_i)
 if (rst_i)
-    sample_data_q <= {SDRAM_DATA_W{1'b0}};
+    sample_data_q <= 16'd0;
 else
-    sample_data_q <= sample_data0_q;
+    sample_data_q <= sample_data0_q_arr[sel_mem_q]; // sample_data0_q
+
+
+// Replication for writes
+wire [SDRAM_DATA_W-1:0] data_i_write0_rep;
+wire [SDRAM_DATA_W-1:0] data_i_write1_rep;
+generate
+  for(i = 0; i < SDRAM_MEMS; i=i+1) begin : SDRAM_MEMS_WR_REP
+    assign data_i_write0_rep[(i+1)*16-1:i*16] = data_i[15:0];
+    assign data_i_write1_rep[(i+1)*16-1:i*16] = data_i[31:16];
+  end
+endgenerate
+
 
 //-----------------------------------------------------------------
 // Command Output
@@ -463,13 +500,14 @@ always @ (posedge rst_i or posedge clk_i)
 if (rst_i)
 begin
     command_q       <= CMD_NOP;
-    data_q          <= 16'b0;
+    data_q          <= {SDRAM_DATA_W{1'b0}};
     addr_q          <= {SDRAM_ROW_W{1'b0}};
     bank_q          <= {SDRAM_BANK_W{1'b0}};
     cke_q           <= 1'b0; 
     dqm_q           <= {SDRAM_DQM_W{1'b0}};
     data_rd_en_q    <= 1'b1;
     dqm_buffer_q    <= {SDRAM_DQM_W{1'b0}};
+    sel_mem_q       <= {(SDRAM_MEMS_B+1){1'b0}};
 
     for (idx=0;idx<SDRAM_BANKS;idx=idx+1)
         active_row_q[idx] <= {SDRAM_ROW_W{1'b0}};
@@ -587,6 +625,9 @@ begin
 
         // Read mask (all bytes in burst)
         dqm_q       <= {SDRAM_DQM_W{1'b0}};
+        
+        // The current selector
+        sel_mem_q   <= sel_mem_w;
     end
     //-----------------------------------------
     // STATE_WRITE0
@@ -596,14 +637,14 @@ begin
         command_q       <= CMD_WRITE;
         addr_q          <= addr_col_w;
         bank_q          <= addr_bank_w;
-        data_q          <= data_i[15:0];
+        data_q          <= data_i_write0_rep;
 
         // Disable auto precharge (auto close of row)
         addr_q[AUTO_PRECHARGE]  <= 1'b0;
 
         // Write mask
-        dqm_q           <= ~sel_i[1:0];
-        dqm_buffer_q    <= ~sel_i[3:2];
+        dqm_q           <= ~({{(SDRAM_DQM_W-2){1'b0}}, sel_i[1:0]} << addr_mem_w);
+        dqm_buffer_q    <= ~({{(SDRAM_DQM_W-2){1'b0}}, sel_i[3:2]} << addr_mem_w);
 
         data_rd_en_q    <= 1'b0;
     end
@@ -645,14 +686,14 @@ else
 // in WRITE0. Also buffer lower 16-bits of read data.
 always @ (posedge rst_i or posedge clk_i)
 if (rst_i)
-    data_buffer_q <= 16'b0;
+    data_buffer_q <= {SDRAM_DATA_W{1'b0}};
 else if (state_q == STATE_WRITE0)
-    data_buffer_q <= data_i[31:16];
+    data_buffer_q <= data_i_write1_rep;
 else if (rd_q[SDRAM_READ_LATENCY+1])
     data_buffer_q <= sample_data_q;
 
 // Read data output
-assign data_o = {sample_data_q, data_buffer_q};
+assign data_o = {sample_data_q, data_buffer_q[15:0]};
 
 //-----------------------------------------------------------------
 // Wishbone ACK
@@ -680,7 +721,6 @@ assign stall_o = ~(state_q == STATE_READ || state_q == STATE_WRITE0);
 //-----------------------------------------------------------------
 // SDRAM I/O
 //-----------------------------------------------------------------
-genvar i;
 
 assign sdram_clk_o     = ~clk_i;
 assign sdram_drive_o   = !data_rd_en_q;

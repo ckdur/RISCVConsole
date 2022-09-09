@@ -3,7 +3,7 @@ package riscvconsole.shell.de2
 import chisel3._
 import chisel3.experimental.{Analog, attach}
 import riscvconsole.devices.sdram.SDRAMIf
-import riscvconsole.shell.ArrowLib._
+import riscvconsole.shell.alteraLib._
 
 class DE2SDRAM extends Bundle {
   val CLK = Output(Bool())
@@ -12,10 +12,10 @@ class DE2SDRAM extends Bundle {
   val RAS_N = Output(Bool())
   val CAS_N = Output(Bool())
   val WE_N = Output(Bool())
-  val DQM = Output(UInt(2.W)) // TODO: Should be 4
+  val DQM = Output(UInt(4.W))
   val ADDR = Output(UInt(13.W))
   val BA = Output(UInt(2.W))
-  val DQ = Vec(16, Analog(1.W)) // TODO: Should be 32
+  val DQ = Vec(32, Analog(1.W))
   def from_SDRAMIf(io: SDRAMIf) = {
     CLK := io.sdram_clk_o
     CKE := io.sdram_cke_o
@@ -34,6 +34,17 @@ class DE2SDRAM extends Bundle {
         attach(b.io.io, an)
         b.io.o
     }).asUInt()
+  }
+  def default = {
+    CLK := false.B
+    CKE := false.B
+    CS_N := false.B
+    RAS_N := false.B
+    CAS_N := false.B
+    WE_N := false.B
+    DQM := 0.U
+    ADDR := 0.U
+    BA := 0.U
   }
 }
 

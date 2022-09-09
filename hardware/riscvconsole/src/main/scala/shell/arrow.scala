@@ -2,8 +2,29 @@ package riscvconsole.shell.arrow
 
 import chisel3._
 import chisel3.experimental.Analog
-import riscvconsole.shell.ArrowLib._
+import riscvconsole.shell.alteraLib._
 
+class AUD_CODEC_PORT extends Bundle {
+  val XCK = Output(Bool())
+  val BCLK = Analog(1.W)
+  val DACDAT = Output(Bool())
+  val DACLRCK = Analog(1.W)
+  val ADCDAT = Input(Bool())
+  val ADCLRCK = Analog(1.W)
+  val MUTE = Output(Bool())
+  val I2C_SCLK = Analog(1.W)
+  val I2C_SDAT = Analog(1.W)
+}
+
+class pll extends BlackBox {
+  val io = IO(new Bundle {
+    val refclk = Input(Clock())
+    val rst = Input(Bool())
+    val outclk_0 = Output(Clock())
+    val outclk_1 = Output(Clock())
+    val locked = Output(Bool())
+  })
+}
 
 class ArrowShell extends RawModule {
   val clk_OSC_50_B5B = IO(Input(Clock()))

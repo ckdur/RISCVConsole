@@ -14,7 +14,10 @@ import freechips.rocketchip.prci._
 import freechips.rocketchip.tilelink.{TLFragmenter, TLRAM}
 import riscvconsole.devices.altera.ddr3._
 import riscvconsole.devices.codec._
+import riscvconsole.devices.fft._
 import riscvconsole.devices.sdram._
+import riscvconsole.devices.xilinx.artya7ddr._
+import riscvconsole.devices.xilinx.nexys4ddr._
 import testchipip._
 
 case class SRAMConfig
@@ -30,8 +33,11 @@ class RVCSystem(implicit p: Parameters) extends RVCSubsystem
   with HasPeripherySPIFlash
   with HasPeripheryI2C
   with HasSDRAM
-  with HasPeripheryCodec
   with HasQsysDDR3
+  with HasArtyA7MIG
+  with HasNexys4DDRMIG
+  with HasPeripheryCodec
+  with HasPeripheryFFT
   with CanHaveMasterAXI4MemPort
   with CanHavePeripheryTLSerial
 {
@@ -85,7 +91,10 @@ class RVCSystemModuleImp[+L <: RVCSystem](_outer: L) extends RVCSubsystemModuleI
   with HasPeripheryI2CModuleImp
   with HasSDRAMModuleImp
   with HasQsysDDR3ModuleImp
+  with HasArtyA7MIGModuleImp
+  with HasNexys4DDRMIGModuleImp
   with HasPeripheryCodecModuleImp
+  with HasPeripheryFFTModuleImp
   with HasRTCModuleImp
 {
   val spi  = outer.spiNodes.zipWithIndex.map  { case(n,i) => n.makeIO()(ValName(s"spi_$i")).asInstanceOf[SPIPortIO] }

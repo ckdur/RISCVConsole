@@ -17,7 +17,8 @@ case class sdram_bb_cfg
   SDRAM_COL_W: Int = 9,
   SDRAM_BANK_W: Int = 2,
   SDRAM_DQM_W: Int = 2,
-  SDRAM_DQ_W: Int = 16
+  SDRAM_DQ_W: Int = 16,
+  SDRAM_READ_LATENCY: Int  = 3
 ) {
   val SDRAM_MHZ = SDRAM_HZ/1000000
   val SDRAM_BANKS = 1 << SDRAM_BANK_W
@@ -25,7 +26,6 @@ case class sdram_bb_cfg
   val SDRAM_REFRESH_CNT = 1 << SDRAM_ROW_W
   val SDRAM_START_DELAY = 100000 / (1000 / SDRAM_MHZ) // 100 uS
   val SDRAM_REFRESH_CYCLES = (64000*SDRAM_MHZ) / SDRAM_REFRESH_CNT-1
-  val SDRAM_READ_LATENCY = 3
 }
 
 trait HasSDRAMIf{
@@ -116,7 +116,7 @@ class SDRAM(cfg: SDRAMConfig, blockBytes: Int, beatBytes: Int)(implicit p: Param
   val node = TLBuffer()
 
   // Create the IO node, and stop trying to get something from elsewhere
-  val ioNode = BundleBridgeSource(() => (new SDRAMIf).cloneType)
+  val ioNode = BundleBridgeSource(() => (new SDRAMIf(cfg.sdcfg)).cloneType)
   val port = InModuleBody { ioNode.bundle }
 
   // Connections of the node
