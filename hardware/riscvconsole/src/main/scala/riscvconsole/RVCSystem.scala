@@ -12,6 +12,7 @@ import freechips.rocketchip.devices.tilelink._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.prci._
 import freechips.rocketchip.tilelink.{TLFragmenter, TLRAM}
+import freechips.rocketchip.util._
 import riscvconsole.devices.altera.ddr3._
 import riscvconsole.devices.codec._
 import riscvconsole.devices.fft._
@@ -43,6 +44,7 @@ class RVCSystem(implicit p: Parameters) extends RVCSubsystem
   with HasPeripheryGCDBB
   with CanHaveMasterAXI4MemPort
   with CanHavePeripheryTLSerial
+  with HasPeripheryBootAddrReg
 {
   val spiDevs = p(PeripherySPIKey).map { ps =>
     SPIAttachParams(ps).attachTo(this)
@@ -65,7 +67,9 @@ class RVCSystem(implicit p: Parameters) extends RVCSubsystem
     Resource(chosen, "bootargs").bind(ResourceString(""))
   }
 
+  val bootROM  = p(BootROMLocated(location)).map { BootROM.attach(_, this, CBUS) }
   val maskROMs = p(MaskROMLocated(location)).map { MaskROM.attach(_, this, CBUS) }
+  val noBootROM = bootROM.isEmpty
 
   val srams = p(SRAMKey).zipWithIndex.map { case(sramcfg, i) =>
     val sram = LazyModule(new TLRAM(AddressSet.misaligned(sramcfg.address, sramcfg.size).head, cacheable = true))
@@ -74,8 +78,8 @@ class RVCSystem(implicit p: Parameters) extends RVCSubsystem
     sram
   }
 
-  val maskROMResetVectorSourceNode = BundleBridgeSource[UInt]()
-  tileResetVectorNexusNode := maskROMResetVectorSourceNode
+  val maskROMResetVectorSourceNode = noBootROM.option(BundleBridgeSource[UInt]())
+  maskROMResetVectorSourceNode.foreach(tileResetVectorNexusNode := _)
 
   // Create the ClockGroupSource (only 1...)
   val clockGroup = ClockGroupSourceNode(List.fill(1) { ClockGroupSourceParameters() })
@@ -103,7 +107,7 @@ class RVCSystemModuleImp[+L <: RVCSystem](_outer: L) extends RVCSubsystemModuleI
 {
   val spi  = outer.spiNodes.zipWithIndex.map  { case(n,i) => n.makeIO()(ValName(s"spi_$i")).asInstanceOf[SPIPortIO] }
   val possible_addresses = outer.p(MaskROMLocated(outer.location)).map(_.address) ++ p(PeripherySPIFlashKey).map(_.fAddress)
-  outer.maskROMResetVectorSourceNode.bundle := possible_addresses(0).U
+  outer.maskROMResetVectorSourceNode.foreach(_.bundle := possible_addresses(0).U)
 
   println(s"Connecting clocks...")
   val extclocks = outer.clockGroup.out.flatMap(_._1.member.elements)

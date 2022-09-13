@@ -20,7 +20,7 @@ module RealGCDBB (
         x <= y;
         y <= x;
       end else begin
-        y = y - x;
+        y <= y - x;
       end
     end else if(i_in_valid && !p) begin
       x <= i_a;

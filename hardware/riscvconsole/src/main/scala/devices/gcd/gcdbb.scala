@@ -2,7 +2,7 @@ package riscvconsole.devices.gcd
 
 import chipsalliance.rocketchip.config.{Field, Parameters}
 import chisel3._
-import chisel3.util.{DeqIO, HasBlackBoxResource, Valid}
+import chisel3.util.{DeqIO, HasBlackBoxResource, RegEnable, Valid}
 import freechips.rocketchip.devices.tilelink._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.diplomaticobjectmodel.DiplomaticObjectModelAddressing
@@ -59,7 +59,7 @@ abstract class GCDBB(busWidthBytes: Int, c: GCDParams)(implicit p: Parameters)
 
     in_ready := mod.io.o_in_ready
     out_valid := mod.io.o_out_valid
-    data_c := mod.io.o_c
+    data_c := RegEnable(mod.io.o_c, out_valid)
 
     val mapping = Seq(
       GCDCtrlRegs.trigger -> Seq(

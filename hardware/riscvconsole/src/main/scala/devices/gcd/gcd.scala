@@ -2,7 +2,7 @@ package riscvconsole.devices.gcd
 
 import chipsalliance.rocketchip.config.{Field, Parameters}
 import chisel3._
-import chisel3.util.{DeqIO, Valid}
+import chisel3.util._
 import freechips.rocketchip.devices.tilelink._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.diplomaticobjectmodel.DiplomaticObjectModelAddressing
@@ -106,7 +106,7 @@ abstract class GCD(busWidthBytes: Int, c: GCDParams)(implicit p: Parameters)
 
     in_ready := mod.io.in.ready
     out_valid := mod.io.out.valid
-    data_c := mod.io.out.bits
+    data_c := RegEnable(mod.io.out.bits, out_valid)
 
     // External ports
     port.ready := mod.io.out.valid

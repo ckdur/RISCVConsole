@@ -3,13 +3,15 @@ package riscvconsole.system
 import chipsalliance.rocketchip.config._
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.devices.debug._
-import freechips.rocketchip.devices.tilelink.MaskROMLocated
+import freechips.rocketchip.devices.tilelink.{BootROMLocated, BootROMParams, MaskROMLocated}
+import freechips.rocketchip.tile.XLen
 import riscvconsole.devices.altera.ddr3.QsysDDR3Mem
 import riscvconsole.devices.codec._
 import riscvconsole.devices.sdram._
 import riscvconsole.devices.fft._
 import riscvconsole.devices.xilinx.artya7ddr.ArtyA7MIGMem
 import riscvconsole.devices.xilinx.nexys4ddr.Nexys4DDRMIGMem
+import testchipip.{SerialTLKey, SerialTLParams}
 
 class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
   case sifive.blocks.devices.uart.PeripheryUARTKey => Seq(
@@ -28,10 +30,28 @@ class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
   //  sifive.blocks.devices.spi.SPIFlashParams(0x10003000, 0x20000000L))
   case MaskROMLocated(InSubsystem) => Seq(
     freechips.rocketchip.devices.tilelink.MaskROMParams(0x20000000L, "MyBootROM", 4096))
+  case BootROMLocated(InSubsystem) => None
   case SDRAMKey => Seq()
   case SRAMKey => Seq()
   //case freechips.rocketchip.subsystem.PeripheryMaskROMKey => Seq()
   case SubsystemDriveAsyncClockGroupsKey => None
+})
+
+class ReplaceMaskROM extends Config((site, here, up) => {
+  case MaskROMLocated(InSubsystem) => Nil
+  case BootROMLocated(InSubsystem) => Some(BootROMParams(contentFileName = s"./hardware/chipyard/generators/testchipip/bootrom/bootrom.rv${site(XLen)}.img"))
+})
+
+class WithTLSerial extends Config((site, here, up) => {
+  case SerialTLKey => Some(SerialTLParams(
+    memParams = MasterPortParams(
+      base = BigInt("64000000", 16),
+      size = BigInt("00001000", 16),
+      beatBytes = site(MemoryBusKey).beatBytes,
+      idBits = 4
+    ),
+    width = 4
+  ))
 })
 
 class SetFrequency(freq: BigInt) extends Config((site, here, up) => {
@@ -169,4 +189,24 @@ class Nexys4DDRConfig extends Config(
     new freechips.rocketchip.subsystem.WithCoherentBusTopology ++  // Hierarchical buses with broadcast L2
     new freechips.rocketchip.system.BaseConfig)                    // "base" rocketchip system
 
-class RVCHarnessConfig extends Config(new SetFrequency(100000000) ++ new DE2Config)
+class RVCHarnessConfig extends Config(
+  new SetFrequency(100000000) ++
+    new ReplaceMaskROM ++
+    new WithTLSerial ++
+    new WithExtMem ++
+    new RVCPeripheralsConfig(10) ++
+    new RemoveDebugClockGating ++
+    new freechips.rocketchip.subsystem.WithRV32 ++
+    new freechips.rocketchip.subsystem.WithTimebase(1000000) ++
+    new freechips.rocketchip.subsystem.WithNBreakpoints(1) ++
+    new freechips.rocketchip.subsystem.WithJtagDTM ++
+    new freechips.rocketchip.subsystem.WithNoMemPort ++              // no top-level memory port at 0x80000000
+    new freechips.rocketchip.subsystem.WithNoMMIOPort ++           // no top-level MMIO master port (overrides default set in rocketchip)
+    new freechips.rocketchip.subsystem.WithNoSlavePort ++          // no top-level MMIO slave port (overrides default set in rocketchip)
+    new freechips.rocketchip.subsystem.WithDontDriveBusClocksFromSBus ++
+    //new freechips.rocketchip.subsystem.WithInclusiveCache(nBanks = 1, nWays = 2, capacityKB = 16) ++       // use Sifive L2 cache
+    new freechips.rocketchip.subsystem.WithNExtTopInterrupts(0) ++ // no external interrupts
+    new freechips.rocketchip.subsystem.WithoutFPU() ++
+    new freechips.rocketchip.subsystem.WithNMedCores(1) ++            // single rocket-core with VM support and FPU
+    new freechips.rocketchip.subsystem.WithCoherentBusTopology ++  // Hierarchical buses with broadcast L2
+    new freechips.rocketchip.system.BaseConfig)
