@@ -9,11 +9,9 @@ The intention is probably run some programs to do graphics via HDMI.
 Clone using:
 
 ```shell
-git clone https://github.com/ckdur/RISCVConsole.git
-cd RISCVConsole
-git submodule update --init
-cd hardware/chipyard
-./scripts/init-submodules-no-riscv-tools.sh
+git clone -b dev https://github.com/uec-hanken/RISCVConsole.git
+cd RISCVConsole/
+./update.sh
 ```
 
 To create the .bit file, please run:
