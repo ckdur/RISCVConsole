@@ -4,7 +4,7 @@ import chisel3._
 import chisel3.experimental.{Analog, IntParam, StringParam, attach}
 import chisel3.util._
 import freechips.rocketchip.amba.axi4._
-import freechips.rocketchip.config._
+import org.chipsalliance.cde.config._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.tilelink._
@@ -139,7 +139,8 @@ class QsysPlatform(c : Seq[AddressSet],
   val node: TLInwardNode =
     island := yank.node := deint.node := indexer.node := toaxi4.node := buffer.node
 
-  lazy val module = new LazyModuleImp(this) {
+  lazy val module = new Impl
+  class Impl extends LazyModuleImp(this) {
     val io = IO(new Bundle {
       val port = new QsysIO(ddrc)
       val ckrst = new Bundle with QsysClocksReset
@@ -175,7 +176,7 @@ class QsysPlatform(c : Seq[AddressSet],
     blackbox.io.ddr_clk_clk       := io.ckrst.ddr_clk_clk
     blackbox.io.sys_clk_clk       := clock
     blackbox.io.ddr_reset_reset_n := io.ckrst.ddr_reset_reset_n
-    blackbox.io.sys_reset_reset_n := !reset.asBool()
+    blackbox.io.sys_reset_reset_n := !reset.asBool
     blackbox.io.oct_rzqin         := io.port.oct_rzqin
     io.port.mem_status_local_init_done   := blackbox.io.mem_status_local_init_done
     io.port.mem_status_local_cal_success := blackbox.io.mem_status_local_cal_success

@@ -3,7 +3,14 @@
 # - to use the help text, your Makefile should have a 'help' target that just
 #   prints all the HELP_LINES
 #########################################################################################
-HELP_COMPILATION_VARIABLES =
+HELP_COMPILATION_VARIABLES = \
+"   JAVA_HEAP_SIZE    = if overridden, set the default java heap size (default is 8G)" \
+"   JAVA_TOOL_OPTIONS = if overridden, set underlying java tool options (default sets misc. sizes and tmp dir)" \
+"   SBT_OPTS          = set additional sbt command line options (these take the form -Dsbt.<option>=<setting>) " \
+"                       See https://www.scala-sbt.org/1.x/docs/Command-Line-Reference.html\#Command+Line+Options" \
+"   SBT               = if overridden, used to invoke sbt (default is to invoke sbt by sbt-launch.jar)" \
+"   FIRRTL_LOGLEVEL   = if overridden, set firrtl log level (default is error)"
+
 HELP_PROJECT_VARIABLES = \
 "   SUB_PROJECT            = use the specific subproject default variables [$(SUB_PROJECT)]" \
 "   SBT_PROJECT            = the SBT project that you should find the classes/packages in [$(SBT_PROJECT)]" \
@@ -18,7 +25,11 @@ HELP_PROJECT_VARIABLES = \
 
 HELP_SIMULATION_VARIABLES = \
 "   BINARY                 = riscv elf binary that the simulator will run when using the run-binary* targets" \
-"   VERBOSE_FLAGS          = flags used when doing verbose simulation [$(VERBOSE_FLAGS)]"
+"   BINARIES               = list of riscv elf binary that the simulator will run when using the run-binaries* targets" \
+"   LOADMEM                = riscv elf binary that should be loaded directly into simulated DRAM. LOADMEM=1 will load the BINARY elf" \
+"   LOADARCH               = path to a architectural checkpoint directory that should end in .loadarch/, for restoring from a checkpoint" \
+"   VERBOSE_FLAGS          = flags used when doing verbose simulation [$(VERBOSE_FLAGS)]" \
+"   TIMEOUT_CYCLES         = number of clock cycles before simulator times out, defaults to 10000000"
 
 # include default simulation rules
 HELP_COMMANDS = \
@@ -193,22 +204,59 @@ ifeq ($(GENERATOR_PACKAGE),hwacha)
 	long_name=$(MODEL_PACKAGE).$(CONFIG)
 endif
 
+# classpaths
+CLASSPATH_CACHE ?= $(base_dir)/.classpath_cache
+CHIPYARD_CLASSPATH ?= $(CLASSPATH_CACHE)/chipyard.jar
+TAPEOUT_CLASSPATH ?= $(CLASSPATH_CACHE)/tapeout.jar
+# if *_CLASSPATH is a true java classpath, it can be colon-delimited list of paths (on *nix)
+CHIPYARD_CLASSPATH_TARGETS ?= $(subst :, ,$(CHIPYARD_CLASSPATH))
+TAPEOUT_CLASSPATH_TARGETS ?= $(subst :, ,$(TAPEOUT_CLASSPATH))
+
+# chisel generated outputs
 FIRRTL_FILE ?= $(build_dir)/$(long_name).fir
 ANNO_FILE   ?= $(build_dir)/$(long_name).anno.json
+EXTRA_ANNO_FILE ?= $(build_dir)/$(long_name).extra.anno.json
+CHISEL_LOG_FILE ?= $(build_dir)/$(long_name).chisel.log
 
-TOP_FILE       ?= $(build_dir)/$(long_name).top.v
-TOP_FIR        ?= $(build_dir)/$(long_name).top.fir
-TOP_ANNO       ?= $(build_dir)/$(long_name).top.anno.json
-TOP_SMEMS_FILE ?= $(build_dir)/$(long_name).top.mems.v
+# chisel anno modification output
+MFC_EXTRA_ANNO_FILE ?= $(build_dir)/$(long_name).extrafirtool.anno.json
+FINAL_ANNO_FILE ?= $(build_dir)/$(long_name).appended.anno.json
+
+# scala firrtl compiler (sfc) outputs
+SFC_FIRRTL_BASENAME ?= $(build_dir)/$(long_name).sfc
+SFC_FIRRTL_FILE ?= $(SFC_FIRRTL_BASENAME).fir
+SFC_EXTRA_ANNO_FILE ?= $(build_dir)/$(long_name).extrasfc.anno.json
+SFC_ANNO_FILE ?= $(build_dir)/$(long_name).sfc.anno.json
+
+# firtool compiler outputs
+MFC_TOP_HRCHY_JSON ?= $(build_dir)/top_module_hierarchy.json
+MFC_MODEL_HRCHY_JSON ?= $(build_dir)/model_module_hierarchy.json
+MFC_MODEL_HRCHY_JSON_UNIQUIFIED ?= $(build_dir)/model_module_hierarchy.uniquified.json
+MFC_SMEMS_CONF ?= $(build_dir)/$(long_name).mems.conf
+# hardcoded firtool outputs
+MFC_FILELIST = $(GEN_COLLATERAL_DIR)/filelist.f
+MFC_BB_MODS_FILELIST = $(GEN_COLLATERAL_DIR)/firrtl_black_box_resource_files.f
+MFC_TOP_SMEMS_JSON = $(GEN_COLLATERAL_DIR)/metadata/seq_mems.json
+MFC_MODEL_SMEMS_JSON = $(GEN_COLLATERAL_DIR)/metadata/tb_seq_mems.json
+
+# macrocompiler smems in/output
+SFC_SMEMS_CONF ?= $(build_dir)/$(long_name).sfc.mems.conf
 TOP_SMEMS_CONF ?= $(build_dir)/$(long_name).top.mems.conf
+TOP_SMEMS_FILE ?= $(GEN_COLLATERAL_DIR)/$(long_name).top.mems.v
 TOP_SMEMS_FIR  ?= $(build_dir)/$(long_name).top.mems.fir
+MODEL_SMEMS_CONF ?= $(build_dir)/$(long_name).model.mems.conf
+MODEL_SMEMS_FILE ?= $(GEN_COLLATERAL_DIR)/$(long_name).model.mems.v
+MODEL_SMEMS_FIR  ?= $(build_dir)/$(long_name).model.mems.fir
 
-HARNESS_FILE       ?= $(build_dir)/$(long_name).harness.v
-HARNESS_FIR        ?= $(build_dir)/$(long_name).harness.fir
-HARNESS_ANNO       ?= $(build_dir)/$(long_name).harness.anno.json
-HARNESS_SMEMS_FILE ?= $(build_dir)/$(long_name).harness.mems.v
-HARNESS_SMEMS_CONF ?= $(build_dir)/$(long_name).harness.mems.conf
-HARNESS_SMEMS_FIR  ?= $(build_dir)/$(long_name).harness.mems.fir
+# top module files to include
+TOP_MODS_FILELIST ?= $(build_dir)/$(long_name).top.f
+# model module files to include (not including top modules)
+MODEL_MODS_FILELIST ?= $(build_dir)/$(long_name).model.f
+# list of all blackbox files (may be included in the top/model.f files)
+# this has the build_dir appended
+BB_MODS_FILELIST ?= $(build_dir)/$(long_name).bb.f
+# all module files to include (top, model, bb included)
+ALL_MODS_FILELIST ?= $(build_dir)/$(long_name).all.f
 
 BOOTROM_FILES   ?= bootrom.rv64.img bootrom.rv32.img
 BOOTROM_TARGETS ?= $(addprefix $(build_dir)/, $(BOOTROM_FILES))
@@ -216,44 +264,47 @@ BOOTROM_TARGETS ?= $(addprefix $(build_dir)/, $(BOOTROM_FILES))
 # files that contain lists of files needed for VCS or Verilator simulation
 SIM_FILE_REQS =
 sim_files              ?= $(build_dir)/sim_files.f
-sim_top_blackboxes     ?= $(build_dir)/firrtl_black_box_resource_files.top.f
-sim_harness_blackboxes ?= $(build_dir)/firrtl_black_box_resource_files.harness.f
 # single file that contains all files needed for VCS or Verilator simulation (unique and without .h's)
 sim_common_files       ?= $(build_dir)/sim_files.common.f
-top_and_harness_files  ?= $(build_dir)/top_and_harness.common.f
+
+SFC_LEVEL ?= $(build_dir)/.sfc_level
+EXTRA_FIRRTL_OPTIONS ?= $(build_dir)/.extra_firrtl_options
+MFC_LOWERING_OPTIONS ?= $(build_dir)/.mfc_lowering_options
 
 #########################################################################################
 # java arguments used in sbt
 #########################################################################################
 JAVA_HEAP_SIZE ?= 8G
-JAVA_ARGS ?= -Xmx$(JAVA_HEAP_SIZE) -Xss8M -XX:MaxPermSize=256M
+JAVA_TMP_DIR ?= $(base_dir)/.java_tmp
+export JAVA_TOOL_OPTIONS ?= -Xmx$(JAVA_HEAP_SIZE) -Xss8M -Djava.io.tmpdir=$(JAVA_TMP_DIR)
 
 #########################################################################################
 # default sbt launch command
 #########################################################################################
-# by default build chisel3/firrtl and other subprojects from source
-SBT_OPTS_FILE := $(base_dir)/.sbtopts
-ifneq (,$(wildcard $(SBT_OPTS_FILE)))
-override SBT_OPTS += $(subst $$PWD,$(base_dir),$(shell cat $(SBT_OPTS_FILE)))
-endif
-override SBT_OPTS += -DfirrtlVersion=1.4.1
-
 SCALA_BUILDTOOL_DEPS = $(SBT_SOURCES)
 
-SBT_THIN_CLIENT_TIMESTAMP = $(base_dir)/project/target/active.json
+# passes $(JAVA_TOOL_OPTIONS) from env to java
+export SBT_OPTS ?= -Dsbt.ivy.home=$(base_dir)/.ivy2 -Dsbt.global.base=$(base_dir)/.sbt -Dsbt.boot.directory=$(base_dir)/.sbt/boot/ -Dsbt.color=always -Dsbt.supershell=false -Dsbt.server.forcestart=true
+SBT ?= java -jar $(base_dir)/hardware/chipyard/scripts/sbt-launch.jar $(SBT_OPTS)
 
-ifdef ENABLE_SBT_THIN_CLIENT
-override SCALA_BUILDTOOL_DEPS += $(SBT_THIN_CLIENT_TIMESTAMP)
-# enabling speeds up sbt loading
-# use with sbt script or sbtn to bypass error code issues
-SBT_CLIENT_FLAG = --client
-endif
+# (1) - classpath of the fat jar
+# (2) - main class
+# (3) - main class arguments
+define run_jar_scala_main
+	cd $(base_dir) && java -cp $(1) $(2) $(3)
+endef
 
-SBT ?= java $(JAVA_OPTS) -jar $(ROCKETCHIP_DIR)/sbt-launch.jar $(SBT_OPTS) $(SBT_CLIENT_FLAG)
-SBT_NON_THIN ?= $(subst $(SBT_CLIENT_FLAG),,$(SBT))
-
+# (1) - sbt project
+# (2) - main class
+# (3) - main class arguments
 define run_scala_main
 	cd $(base_dir) && $(SBT) ";project $(1); runMain $(2) $(3)"
+endef
+
+# (1) - sbt project to assemble
+# (2) - classpath file(s) to create
+define run_sbt_assembly
+	cd $(base_dir) && $(SBT) ";project $(1); set assembly / assemblyOutputPath := file(\"$(2)\"); assembly" && touch $(2)
 endef
 
 FIRRTL_LOGLEVEL ?= error
@@ -269,40 +320,39 @@ output_dir=$(sim_dir)/output/$(long_name)
 PERMISSIVE_ON=+permissive
 PERMISSIVE_OFF=+permissive-off
 BINARY ?=
-LOADMEM ?=
-LOADMEM_ADDR ?= 81000000
-override SIM_FLAGS += +dramsim +dramsim_ini_dir=$(TESTCHIP_DIR)/src/main/resources/dramsim2_ini +max-cycles=$(timeout_cycles)
-ifneq ($(LOADMEM),)
-override SIM_FLAGS += +loadmem=$(LOADMEM) +loadmem_addr=$(LOADMEM_ADDR)
-endif
+BINARIES ?=
+override SIM_FLAGS += +dramsim +dramsim_ini_dir=$(TESTCHIP_DIR)/src/main/resources/dramsim2_ini +max-cycles=$(TIMEOUT_CYCLES)
 VERBOSE_FLAGS ?= +verbose
-sim_out_name = $(output_dir)/$(subst $() $(),_,$(notdir $(basename $(BINARY))))
-binary_hex= $(sim_out_name).loadmem_hex
+# get_out_name is a function, 1st argument is the binary
+get_out_name = $(subst $() $(),_,$(notdir $(basename $(1))))
+LOADMEM ?=
+LOADARCH ?=
+
+ifneq ($(LOADARCH),)
+override BINARY = $(addsuffix /mem.elf,$(LOADARCH))
+override BINARIES = $(addsuffix /mem.elf,$(LOADARCH))
+override get_out_name = $(shell basename $(dir $(1)))
+override LOADMEM = 1
+endif
 
 #########################################################################################
 # build output directory for compilation
 #########################################################################################
-gen_dir=$(sim_dir)/generated-src
-build_dir=$(gen_dir)/$(long_name)
+# output for all project builds
+generated_src_name ?=generated-src
+gen_dir             =$(sim_dir)/$(generated_src_name)
+# per-project output directory
+build_dir           =$(gen_dir)/$(long_name)
+# final generated collateral per-project
+GEN_COLLATERAL_DIR ?=$(build_dir)/gen-collateral
 
 #########################################################################################
-# vsrcs needed to run projects
+# simulation variables
 #########################################################################################
-rocketchip_vsrc_dir = $(ROCKETCHIP_DIR)/src/main/resources/vsrc
+TIMEOUT_CYCLES = 10000000
 
-#########################################################################################
-# sources needed to run simulators
-#########################################################################################
-sim_vsrcs = \
-	$(TOP_FILE) \
-	$(HARNESS_FILE) \
-	$(TOP_SMEMS_FILE) \
-	$(HARNESS_SMEMS_FILE)
-
-#########################################################################################
-# assembly/benchmark variables
-#########################################################################################
-timeout_cycles = 10000000
-bmark_timeout_cycles = 100000000
-
-soft_dir=$(base_dir)/software
+# legacy timeout_cycles handling
+timeout_cycles ?=
+ifneq ($(timeout_cycles),)
+TIMEOUT_CYCLES=$(timeout_cycles)
+endif

@@ -1,14 +1,17 @@
 package riscvconsole.devices.sdram
 
 import chisel3._
-import chisel3.experimental.{Analog, IntParam, StringParam, attach}
-import chisel3.util.{HasBlackBoxResource, RegEnable}
-import freechips.rocketchip.config._
+import chisel3.experimental.IntParam
+import chisel3.util._
+import org.chipsalliance.cde.config.{Field, Parameters}
 import freechips.rocketchip.diplomacy._
-import freechips.rocketchip.prci.{ClockGroup, ClockSinkDomain}
-import freechips.rocketchip.subsystem.{Attachable, BaseSubsystem, MBUS, SBUS}
+import freechips.rocketchip.interrupts._
+import freechips.rocketchip.prci._
+import freechips.rocketchip.regmapper._
+import freechips.rocketchip.subsystem._
 import freechips.rocketchip.tilelink._
-import freechips.rocketchip.util.HeterogeneousBag
+import freechips.rocketchip.devices.tilelink._
+import freechips.rocketchip.util._
 
 case class sdram_bb_cfg
 (
@@ -129,7 +132,7 @@ class SDRAM(cfg: SDRAMConfig, blockBytes: Int, beatBytes: Int)(implicit p: Param
 
     // Clock and Reset
     sdramimp.io.clk_i := clock
-    sdramimp.io.rst_i := reset.asBool()
+    sdramimp.io.rst_i := reset.asBool
 
     // SDRAM side
     port.sdram_clk_o := sdramimp.io.sdram_clk_o
@@ -220,22 +223,22 @@ case class SDRAMAttachParams
 
   def attachTo(where: Attachable)(implicit p: Parameters): SDRAM = where {
     val name = s"sdram_${SDRAMObject.nextId()}"
-    val mbus = where.locateTLBusWrapper(MBUS)
+    val tlbus = where.locateTLBusWrapper(MBUS)
     val sdramClockDomainWrapper = LazyModule(new ClockSinkDomain(take = None))
-    val sdram = sdramClockDomainWrapper { LazyModule(new SDRAM(device, mbus.blockBytes, mbus.beatBytes)) }
+    val sdram = sdramClockDomainWrapper { LazyModule(new SDRAM(device, tlbus.blockBytes, tlbus.beatBytes)) }
     sdram.suggestName(name)
 
-    mbus.coupleTo(s"mem_${name}") { bus =>
-      sdramClockDomainWrapper.clockNode := (controlXType match {
+    tlbus.coupleTo(s"mem_${name}") { bus =>
+      (controlXType match {
         case _: SynchronousCrossing =>
-          mbus.dtsClk.map(_.bind(sdram.device))
-          mbus.fixedClockNode
+          tlbus.dtsClk.map(_.bind(sdram.device))
+          sdramClockDomainWrapper.clockNode := tlbus.fixedClockNode
         case _: RationalCrossing =>
-          mbus.clockNode
+          sdramClockDomainWrapper.clockNode := tlbus.clockNode
         case _: AsynchronousCrossing =>
           val sdramClockGroup = ClockGroup()
-          sdramClockGroup := where.asyncClockGroupsNode
-          sdramClockGroup
+          sdramClockGroup := where.allClockGroupsNode
+          sdramClockDomainWrapper.clockNode := sdramClockGroup
       })
 
       sdram.controlXing(controlXType) := bus

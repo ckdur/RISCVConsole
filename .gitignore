@@ -20,4 +20,6 @@ env-riscv-tools.sh
 env-esp-tools.sh
 generated-src
 .bsp
+.ivy2
+.sbt
 

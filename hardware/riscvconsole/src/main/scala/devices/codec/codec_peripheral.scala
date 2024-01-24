@@ -2,7 +2,7 @@ package riscvconsole.devices.codec
 
 import chisel3._
 
-import freechips.rocketchip.config.Field
+import org.chipsalliance.cde.config._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.subsystem.BaseSubsystem
 

@@ -3,7 +3,7 @@ package riscvconsole.devices.xilinx.artya7ddr
 import chisel3._
 import chisel3.experimental.IO
 import chisel3.util._
-import freechips.rocketchip.config.Field
+import org.chipsalliance.cde.config._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.amba.axi4._
@@ -19,7 +19,7 @@ trait HasArtyA7MIG { this: BaseSubsystem =>
   private val device = new MemoryDevice
   private val idBits = memPortParamsOpt.map(_.master.idBits).getOrElse(1)
 
-  val artyA7MIGDev = memPortParamsOpt.zipWithIndex.map{ case (MemoryPortParams(memPortParams, _), i) =>
+  val artyA7MIGDev = memPortParamsOpt.zipWithIndex.map{ case (MemoryPortParams(memPortParams, _, _), i) =>
     require(memPortParams.beatBytes == 8, s"ArtyA7MIG does not support beatBytes${memPortParams.beatBytes} different to 4")
 
     val ddr = LazyModule(

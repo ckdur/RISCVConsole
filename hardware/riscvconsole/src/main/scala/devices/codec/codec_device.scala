@@ -1,7 +1,7 @@
 package riscvconsole.devices.codec
 
 import chisel3._
-import freechips.rocketchip.config.{Field, Parameters}
+import org.chipsalliance.cde.config._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.interrupts._
 import freechips.rocketchip.prci._
@@ -10,9 +10,6 @@ import freechips.rocketchip.subsystem._
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.devices.tilelink._
 import freechips.rocketchip.util._
-import freechips.rocketchip.diplomaticobjectmodel.DiplomaticObjectModelAddressing
-import freechips.rocketchip.diplomaticobjectmodel.model.{OMComponent, OMDevice, OMInterrupt, OMMemoryRegion, OMRegister}
-import freechips.rocketchip.diplomaticobjectmodel.logicaltree.{LogicalModuleTree, LogicalTreeNode}
 import riscvconsole.devices.codec.codec_param.AUDIO_DATA_WIDTH
 
 
@@ -25,13 +22,6 @@ class CodecIO extends Bundle {
   val AUD_ADCDAT = Input(Bool())
   val AUD_DACDAT = Output(Bool())
 }
-
-case class OMCodec
-(
-  memoryRegions: Seq[OMMemoryRegion],
-  interrupts: Seq[OMInterrupt],
-  _types: Seq[String] = Seq("OMCodec", "OMDevice", "OMComponent"),
-) extends OMDevice
 
 object CodecCtrlRegs {
   val out_l       = 0x00
@@ -118,18 +108,6 @@ abstract class Codec(busWidthBytes: Int, c: CodecParams)(implicit p: Parameters)
       CodecCtrlRegs.status -> statusFields,
     )
     regmap(mapping :_*)
-    val omRegMap = OMRegister.convert(mapping:_*)
-  }
-
-  val logicalTreeNode = new LogicalTreeNode(() => Some(device)) {
-    def getOMComponents(resourceBindings: ResourceBindings, children: Seq[OMComponent] = Nil): Seq[OMComponent] = {
-      Seq(
-        OMCodec(
-          memoryRegions = DiplomaticObjectModelAddressing.getOMMemoryRegions("Codec", resourceBindings, Some(module.omRegMap)),
-          interrupts = DiplomaticObjectModelAddressing.describeGlobalInterrupts(device.describe(resourceBindings).name, resourceBindings),
-        )
-      )
-    }
   }
 }
 
@@ -175,7 +153,7 @@ case class CodecAttachParams
           cbus.clockNode
         case _: AsynchronousCrossing =>
           val codecClockGroup = ClockGroup()
-          codecClockGroup := where.asyncClockGroupsNode
+          codecClockGroup := where.allClockGroupsNode
           blockerOpt.map { _.clockNode := codecClockGroup } .getOrElse { codecClockGroup }
       })
 
@@ -189,8 +167,6 @@ case class CodecAttachParams
       case _: RationalCrossing => where.ibus.fromRational
       case _: AsynchronousCrossing => where.ibus.fromAsync
     }) := codec.intXing(intXType)
-
-    LogicalModuleTree.add(where.logicalTreeNode, codec.logicalTreeNode)
 
     codec
   }

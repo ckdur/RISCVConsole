@@ -88,7 +88,7 @@ class RVCHarness()(implicit p: Parameters) extends Module {
   dut.spi.foreach(_.dq.foreach(_.i := false.B)) // Tie down for now
 
   // SDRAM
-  dut.sdramio.foreach(sdramsim(_, reset.asBool()))
+  dut.sdramio.foreach(sdramsim(_, reset.asBool))
   dut.otherclock := clock
 
   // I2C

@@ -1,9 +1,8 @@
 package riscvconsole.devices.altera.ddr3
 
 import chisel3._
-import chisel3.experimental.{IO}
 import chisel3.util._
-import freechips.rocketchip.config.Field
+import org.chipsalliance.cde.config._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.amba.axi4._
@@ -18,7 +17,7 @@ trait HasQsysDDR3 { this: BaseSubsystem =>
   private val device = new MemoryDevice
   private val idBits = memPortParamsOpt.map(_.master.idBits).getOrElse(1)
 
-  val ddr3Dev = memPortParamsOpt.zipWithIndex.map{ case (MemoryPortParams(memPortParams, _), i) =>
+  val ddr3Dev = memPortParamsOpt.zipWithIndex.map{ case (MemoryPortParams(memPortParams, _, _), i) =>
     val base = AddressSet.misaligned(memPortParams.base, memPortParams.size)
     require(memPortParams.beatBytes == 4, s"QsysDDR3 does not support beatBytes${memPortParams.beatBytes} different to 4")
 

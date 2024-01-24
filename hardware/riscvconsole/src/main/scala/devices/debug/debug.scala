@@ -1,6 +1,6 @@
 package riscvconsole.devices.debug
 
-import chipsalliance.rocketchip.config.{Field, Parameters}
+import org.chipsalliance.cde.config._
 import chisel3._
 import chisel3.experimental.{Analog, attach, noPrefix}
 import chisel3.util.HasBlackBoxResource
