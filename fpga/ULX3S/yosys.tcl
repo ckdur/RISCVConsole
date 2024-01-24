@@ -1,8 +1,28 @@
-#  Slurp up the data file
-set fp [open $env(top_and_harness_files) r]
-set ALL_VSRC [read $fp]
-close $fp
+##############################################################################
+## Preset global variables and attributes
+##############################################################################
+set build_dir $env(build_dir)
+set MODEL $env(MODEL)
+yosys -import
 
-yosys::read_verilog $ALL_VSRC
-yosys::synth_ecp5 -json $env(build_dir)/$env(MODEL).json
+###############################################################
+#  Slurp up the data file
+###############################################################
+set fp [open $env(synth_list_f) r]
+# set ALL_VSRC [read $fp]
+set ALL_VSRC [split [string trim [read $fp]]]
+close $fp
+puts "all the verilog: $ALL_VSRC"
+
+################################################################
+## Verilog read
+################################################################
+read_verilog $ALL_VSRC
+
+
+################################################################
+## Verilog read
+################################################################
+synth_ecp5 -json $build_dir/$MODEL.json
+
 
