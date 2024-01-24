@@ -2,19 +2,23 @@ package riscvconsole.system
 
 import chisel3._
 import chisel3.util._
-import chipsalliance.rocketchip.config._
+import org.chipsalliance.cde.config._
 import freechips.rocketchip.amba.axi4._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.devices.debug._
-import freechips.rocketchip.util.PlusArg
-import riscvconsole.devices.codec.CodecIO
+import freechips.rocketchip.util._
+import riscvconsole.devices.codec._
 import riscvconsole.devices.sdram._
-import sifive.blocks.devices.gpio.{GPIOPortIO, IOFPortIO}
-import sifive.blocks.devices.i2c.I2CPort
+import sifive.blocks.devices.gpio._
+import sifive.blocks.devices.i2c._
 import sifive.blocks.devices.uart._
 import testchipip._
+import testchipip.dram._
+import testchipip.serdes._
+import testchipip.tsi._
+import testchipip.uart._
 
 class RVCHarness()(implicit p: Parameters) extends Module {
   val io = IO(new Bundle {
@@ -23,28 +27,31 @@ class RVCHarness()(implicit p: Parameters) extends Module {
 
   val ldut = LazyModule(new RVCSystem)
   val dut = Module(ldut.module)
+  dut.clock := clock
+  dut.reset := clock
 
   // Simulated memory.
   // Step 1: Our conversion
   p(ExtMem).foreach{ extmem =>
+    val memBase = extmem.master.base
     val memSize = extmem.master.size
     val lineSize = p(CacheBlockBytes)
-    val mem = Module(new SimDRAM(memSize, lineSize, p(SystemBusKey).dtsFrequency.getOrElse(100000000L), ldut.mem_axi4.head.params))
+    val mem = Module(new SimDRAM(memSize, lineSize, p(SystemBusKey).dtsFrequency.getOrElse(100000000L), memBase, ldut.mem_axi4.head.params, 0))
     mem.io.axi <> ldut.mem_axi4.head
     mem.io.clock := clock
     mem.io.reset := reset
   }
 
   // Debug tie off (This also handles the reset system)
-  dut.jtag.foreach { jtag =>
+  dut.outer.debug.map(_.systemjtag).foreach{ case Some(jtag) =>
     val debug_success = WireInit(false.B)
     val simjtag = Module(new SimJTAG(tickDelay=3))
-    jtag.TRSTn.foreach(_ := !reset.asBool) // NOTE: Normal reset
-    jtag.TMS := simjtag.io.jtag.TMS
-    jtag.TDI := simjtag.io.jtag.TDI
-    jtag.TCK := simjtag.io.jtag.TCK
-    simjtag.io.jtag.TDO.data := jtag.TDO.data
-    simjtag.io.jtag.TDO.driven := jtag.TDO.driven
+    jtag.jtag.TRSTn.foreach(_ := !reset.asBool) // NOTE: Normal reset
+    jtag.jtag.TMS := simjtag.io.jtag.TMS
+    jtag.jtag.TDI := simjtag.io.jtag.TDI
+    jtag.jtag.TCK := simjtag.io.jtag.TCK
+    simjtag.io.jtag.TDO.data := jtag.jtag.TDO.data
+    simjtag.io.jtag.TDO.driven := jtag.jtag.TDO.driven
 
     simjtag.io.clock := clock
     simjtag.io.reset := reset
@@ -62,10 +69,11 @@ class RVCHarness()(implicit p: Parameters) extends Module {
   // Serial interface (if existent) will be connected here
   io.success := false.B
 
-  (ldut.serial_tl zip ldut.serdesser).foreach { case (port, serdesser) =>
-    val bits = SerialAdapter.asyncQueue(port, clock, reset)
-    val ram = SerialAdapter.connectHarnessRAM(serdesser, bits, reset)
-    val ser_success = SerialAdapter.connectSimSerial(ram.module.io.tsi_ser, clock, reset)
+  ((ldut.serial_tls zip ldut.serdessers) zip p(SerialTLKey)).foreach { case ((port: DecoupledSerialIO, serdesser), params) =>
+    val ram = Module(LazyModule(new SerialRAM(serdesser, params)(serdesser.p)).module)
+    ram.io.ser.in <> port.out
+    port.in <> ram.io.ser.out
+    val ser_success = SimTSI.connect(ram.io.tsi, clock, reset)
     when (ser_success) { io.success := true.B }
   }
 

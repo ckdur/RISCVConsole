@@ -30,7 +30,7 @@ trait HasQsysDDR3 { this: BaseSubsystem =>
   }
 }
 
-trait HasQsysDDR3ModuleImp extends LazyModuleImp {
+trait HasQsysDDR3ModuleImp extends LazyRawModuleImp {
   val outer: HasQsysDDR3
   val ddr3refclk = p(QsysDDR3Mem).map{A => IO(Input(Clock())) }
   val ddr3refrstn = p(QsysDDR3Mem).map{A => IO(Input(Bool())) }

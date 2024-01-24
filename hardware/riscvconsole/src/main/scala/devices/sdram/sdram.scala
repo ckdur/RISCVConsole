@@ -256,7 +256,7 @@ trait HasSDRAM { this: BaseSubsystem =>
   }
 }
 
-trait HasSDRAMModuleImp extends LazyModuleImp {
+trait HasSDRAMModuleImp extends LazyRawModuleImp {
   val outer: HasSDRAM
   val sdramio = outer.sdramNodes.zipWithIndex.map { case(n,i) => n.makeIO()(ValName(s"sdram_$i")) }
 }

@@ -141,11 +141,11 @@ class WRAP_EHXPLLL(params: Map[String, Param], cfg: ecp5pllConfig) extends Black
        |    input LOCK
        |);
        |  wire CLKOP;
-       |  (* FREQUENCY_PIN_CLKI="${cfg.in_hz.doubleValue()/1000000.0}" *)
-       |  (* FREQUENCY_PIN_CLKOP="${cfg.out0_hz.doubleValue()/1000000.0}" *)
-       |  (* FREQUENCY_PIN_CLKOS="${cfg.out1_hz.doubleValue()/1000000.0}" *)
-       |  (* FREQUENCY_PIN_CLKOS2="${cfg.out2_hz.doubleValue()/1000000.0}" *)
-       |  (* FREQUENCY_PIN_CLKOS3="${cfg.out3_hz.doubleValue()/1000000.0}" *)
+       |  (* FREQUENCY_PIN_CLKI="${cfg.in_hz.doubleValue/1000000.0}" *)
+       |  (* FREQUENCY_PIN_CLKOP="${cfg.out0_hz.doubleValue/1000000.0}" *)
+       |  (* FREQUENCY_PIN_CLKOS="${cfg.out1_hz.doubleValue/1000000.0}" *)
+       |  (* FREQUENCY_PIN_CLKOS2="${cfg.out2_hz.doubleValue/1000000.0}" *)
+       |  (* FREQUENCY_PIN_CLKOS3="${cfg.out3_hz.doubleValue/1000000.0}" *)
        |  (* ICP_CURRENT="12" *) (* LPF_RESISTOR="8" *) (* MFG_ENABLE_FILTEROPAMP="1" *) (* MFG_GMCREF_SEL="2" *)
        |  EHXPLLL
        |  #(
@@ -401,13 +401,13 @@ class ULX3SSDRAM extends Bundle {
     sdram_dqm_o := io.sdram_dqm_o
     sdram_addr_o := io.sdram_addr_o
     sdram_ba_o := io.sdram_ba_o
-    io.sdram_data_i := VecInit((io.sdram_data_o.asBools() zip sdram_data_io).map{
+    io.sdram_data_i := VecInit((io.sdram_data_o.asBools zip sdram_data_io).map{
       case (o, an) =>
         val b = Module(new BB)
         b.io.T := !io.sdram_drive_o
         b.io.I := o
         attach(b.io.B, an)
         b.io.O
-    }).asUInt()
+    }).asUInt
   }
 }

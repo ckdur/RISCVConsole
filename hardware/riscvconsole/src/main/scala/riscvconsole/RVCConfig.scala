@@ -27,7 +27,7 @@ class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
   case SDRAMKey => Seq()
   case SRAMKey => Seq()
   //case freechips.rocketchip.subsystem.PeripheryMaskROMKey => Seq()
-  case SubsystemDriveAsyncClockGroupsKey => None
+  case SubsystemDriveClockGroupsFromIO => false // NOTE: Do not create the IO with the tags
 })
 
 class SetFrequency(freq: BigInt) extends Config((site, here, up) => {
@@ -165,4 +165,4 @@ class Nexys4DDRConfig extends Config(
     new freechips.rocketchip.subsystem.WithCoherentBusTopology ++  // Hierarchical buses with broadcast L2
     new freechips.rocketchip.system.BaseConfig)                    // "base" rocketchip system
 
-class RVCHarnessConfig extends Config(new SetFrequency(100000000) ++ new DE2Config)
+class RVCConfig extends Config(new SetFrequency(100000000) ++ new DE2Config)

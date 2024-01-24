@@ -88,7 +88,7 @@ CHECK_SUBMODULES_COMMAND = echo "Checking all submodules in generators/ are init
 
 SCALA_EXT = scala
 VLOG_EXT = sv v
-CHIPYARD_SOURCE_DIRS = $(addprefix $(base_dir)/hardware/chipyard/,generators sims/firesim/sim fpga/fpga-shells fpga/src)
+CHIPYARD_SOURCE_DIRS = $(addprefix $(base_dir)/,hardware/chipyard/generators hardware/chipyard/sims/firesim/sim hardware/chipyard/fpga/fpga-shells hardware/chipyard/fpga/src hardware/riscvconsole hardware/fpga-shells)
 CHIPYARD_SCALA_SOURCES = $(call lookup_srcs_by_multiple_type,$(CHIPYARD_SOURCE_DIRS),$(SCALA_EXT))
 CHIPYARD_VLOG_SOURCES = $(call lookup_srcs_by_multiple_type,$(CHIPYARD_SOURCE_DIRS),$(VLOG_EXT))
 BARSTOOLS_SOURCE_DIRS = $(addprefix $(base_dir)/hardware/chipyard/,tools/barstools)
@@ -268,7 +268,7 @@ $(SFC_MFC_TARGETS) &: $(TAPEOUT_CLASSPATH_TARGETS) $(FIRRTL_FILE) $(FINAL_ANNO_F
 # DOC include end: FirrtlCompiler
 
 $(TOP_MODS_FILELIST) $(MODEL_MODS_FILELIST) $(ALL_MODS_FILELIST) $(BB_MODS_FILELIST) $(MFC_MODEL_HRCHY_JSON_UNIQUIFIED) &: $(MFC_MODEL_HRCHY_JSON) $(MFC_TOP_HRCHY_JSON) $(MFC_FILELIST) $(MFC_BB_MODS_FILELIST)
-	$(base_dir)/scripts/uniquify-module-names.py \
+	$(base_dir)/hardware/chipyard/scripts/uniquify-module-names.py \
 		--model-hier-json $(MFC_MODEL_HRCHY_JSON) \
 		--top-hier-json $(MFC_TOP_HRCHY_JSON) \
 		--in-all-filelist $(MFC_FILELIST) \

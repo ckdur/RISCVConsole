@@ -3,7 +3,7 @@ package riscvconsole.shell.nexys4ddr
 import chisel3._
 import chisel3.util._
 import chisel3.experimental.{Analog, IO, attach}
-import chipsalliance.rocketchip.config.Parameters
+import org.chipsalliance.cde.config.Parameters
 import sifive.fpgashells.ip.xilinx.nexys4ddrmig._
 
 

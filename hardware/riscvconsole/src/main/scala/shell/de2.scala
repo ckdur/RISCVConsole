@@ -26,14 +26,14 @@ class DE2SDRAM extends Bundle {
     DQM := io.sdram_dqm_o
     ADDR := io.sdram_addr_o
     BA := io.sdram_ba_o
-    io.sdram_data_i := VecInit((io.sdram_data_o.asBools() zip DQ).map{
+    io.sdram_data_i := VecInit((io.sdram_data_o.asBools zip DQ).map{
       case (o, an) =>
         val b = Module(new ALT_IOBUF)
         b.io.oe := io.sdram_drive_o
         b.io.i := o
         attach(b.io.io, an)
         b.io.o
-    }).asUInt()
+    }).asUInt
   }
   def default = {
     CLK := false.B

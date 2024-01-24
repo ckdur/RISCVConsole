@@ -38,7 +38,7 @@ trait HasArtyA7MIG { this: BaseSubsystem =>
   }
 }
 
-trait HasArtyA7MIGModuleImp extends LazyModuleImp {
+trait HasArtyA7MIGModuleImp extends LazyRawModuleImp {
   val outer: HasArtyA7MIG
   val artyA7MIGPorts = outer.artyA7MIGDev.map { ddr =>
     val qsysio = IO(new XilinxArty100TMIGIO(0x10000000L))

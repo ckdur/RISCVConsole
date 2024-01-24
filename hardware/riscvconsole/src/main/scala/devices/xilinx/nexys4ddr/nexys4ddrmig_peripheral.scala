@@ -38,7 +38,7 @@ trait HasNexys4DDRMIG { this: BaseSubsystem =>
   }
 }
 
-trait HasNexys4DDRMIGModuleImp extends LazyModuleImp {
+trait HasNexys4DDRMIGModuleImp extends LazyRawModuleImp {
   val outer: HasNexys4DDRMIG
   val nexys4DDRMIGPorts = outer.nexys4DDRMIGDev.map { ddr =>
     val qsysio = IO(new XilinxNexys4DDRMIGIO(0x08000000L))

@@ -300,7 +300,7 @@ lazy val firechip = (project in file("generators/firechip"))
     Test / testGrouping := isolateAllTests( (Test / definedTests).value ),
     Test / testOptions += Tests.Argument("-oF")
   )*/
-lazy val fpga_shells = (project in file("./hardware/chipyard/fpga/fpga-shells"))
+lazy val fpga_shells = (project in file("./hardware/fpga-shells"))
   .dependsOn(rocketchip, rocketchip_blocks)
   .settings(libraryDependencies ++= rocketLibDeps.value)
   .settings(commonSettings)
@@ -310,6 +310,7 @@ lazy val fpga_platforms = (project in file("./hardware/chipyard/fpga"))
   .settings(commonSettings)
 
 lazy val riscvconsole = (project in file("hardware/riscvconsole"))
-  .dependsOn(tapeout, chipyard, fpga_shells).
-  settings(commonSettings)
+  .dependsOn(tapeout, chipyard, fpga_shells)
+  .settings(libraryDependencies ++= rocketLibDeps.value)
+  .settings(commonSettings)
 

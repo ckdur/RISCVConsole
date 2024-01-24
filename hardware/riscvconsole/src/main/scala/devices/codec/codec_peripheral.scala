@@ -19,7 +19,7 @@ trait HasPeripheryCodecBundle {
   val codec: Seq[CodecIO]
 }
 
-trait HasPeripheryCodecModuleImp extends LazyModuleImp with HasPeripheryCodecBundle {
+trait HasPeripheryCodecModuleImp extends LazyRawModuleImp with HasPeripheryCodecBundle {
   val outer: HasPeripheryCodec
   val codec = outer.codecNodes.zipWithIndex.map { case(n,i) => n.makeIO()(ValName(s"codec_$i")) }
 }

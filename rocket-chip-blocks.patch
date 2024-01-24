@@ -1,0 +1,17 @@
+diff --git a/src/main/scala/devices/gpio/GPIO.scala b/src/main/scala/devices/gpio/GPIO.scala
+index 5627f28..dafa608 100644
+--- a/src/main/scala/devices/gpio/GPIO.scala
++++ b/src/main/scala/devices/gpio/GPIO.scala
+@@ -225,6 +225,12 @@ abstract class GPIO(busWidthBytes: Int, c: GPIOParams)(implicit p: Parameters)
+       pre_xor  := Mux(iofEnReg.io.q(pin), iofPlusSwPinCtrl(pin), swPinCtrl(pin))
+     } else {
+       pre_xor := swPinCtrl(pin)
++      iofCtrl(pin) := DontCare
++      iof0Ctrl(pin) := DontCare
++      iof1Ctrl(pin) := DontCare
++      iofPlusSwPinCtrl(pin) := DontCare
++      poeReg.io := DontCare
++      iofEnReg.io := DontCare
+     }
+ 
+     port.pins(pin).o      := pre_xor

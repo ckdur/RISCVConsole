@@ -2,9 +2,11 @@ package riscvconsole.fpga
 
 import chisel3._
 import riscvconsole.system._
-import chipsalliance.rocketchip.config._
+import org.chipsalliance.cde.config._
 import chisel3.experimental.attach
+import freechips.rocketchip.devices.debug.{Debug, JtagDTMKey}
 import freechips.rocketchip.diplomacy.LazyModule
+import freechips.rocketchip.util.ResetCatchAndSync
 import riscvconsole.devices.codec.{CodecIO, CodecPinsFromPort, CodecSignals}
 import riscvconsole.shell.alteraLib._
 import riscvconsole.shell.arrow._
@@ -27,7 +29,9 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
   {
     val greset = WireInit(false.B)
     val platform = withReset(greset){ Module(LazyModule(new RVCSystem).module) }
-    greset := reset.asBool || platform.ndreset.getOrElse(false.B) // Put the ndreset from debug here
+    greset := reset.asBool || platform.outer.debug.map(_.ndreset).getOrElse(false.B) // Put the ndreset from debug here
+    platform.clock := clock
+    platform.reset := greset
 
     // default all gpio
     platform.gpio.foreach{ case gpio: GPIOPortIO =>
@@ -55,18 +59,30 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
       }
     }
 
+    // Debug additional connections
+    platform.outer.debug.foreach{ d =>
+      platform.outer.resetctrl.map { rcio => rcio.hartIsInReset.map { _ := reset } }
+      d.systemjtag.map { j =>
+        j.reset := ResetCatchAndSync(j.jtag.TCK, reset)
+        j.mfr_id := p(JtagDTMKey).idcodeManufId.U(11.W)
+        j.part_number := p(JtagDTMKey).idcodePartNum.U(16.W)
+        j.version := p(JtagDTMKey).idcodeVersion.U(4.W)
+      }
+      Debug.connectDebugClockAndReset(Some(d), clock)
+    }
+
     // JTAG
-    platform.jtag.foreach{ case jtag =>
-      jtag.TDI := ALT_IOBUF(HSMC_TX_n(11))
-      jtag.TMS := ALT_IOBUF(HSMC_TX_p(11))
-      jtag.TCK := ALT_IOBUF(HSMC_TX_n(10)).asClock
+    platform.outer.debug.map(_.systemjtag).foreach{ case Some(jtag) =>
+      jtag.jtag.TDI := ALT_IOBUF(HSMC_TX_n(11))
+      jtag.jtag.TMS := ALT_IOBUF(HSMC_TX_p(11))
+      jtag.jtag.TCK := ALT_IOBUF(HSMC_TX_n(10)).asClock
       val TDO_as_base = Wire(new BasePin)
-      TDO_as_base.o.oe := jtag.TDO.driven
-      TDO_as_base.o.oval := jtag.TDO.data
+      TDO_as_base.o.oe := jtag.jtag.TDO.driven
+      TDO_as_base.o.oval := jtag.jtag.TDO.data
       TDO_as_base.o.ie := false.B
       TDO_as_base.i.po.foreach(_ := false.B)
       ALT_IOBUF(HSMC_TX_p(10), TDO_as_base)
-      jtag.TRSTn.foreach(_ := sw(0))
+      jtag.jtag.TRSTn.foreach(_ := sw(0))
     }
 
     platform.uart.foreach{ case uart: UARTPortIO =>

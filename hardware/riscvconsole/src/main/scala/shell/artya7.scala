@@ -3,7 +3,7 @@ package riscvconsole.shell.artya7
 import chisel3._
 import chisel3.util._
 import chisel3.experimental.{Analog, IO, attach}
-import chipsalliance.rocketchip.config.Parameters
+import org.chipsalliance.cde.config.Parameters
 import sifive.fpgashells.ip.xilinx.arty100tmig._
 
 class ArtyA7Shell(implicit val p :Parameters) extends RawModule {

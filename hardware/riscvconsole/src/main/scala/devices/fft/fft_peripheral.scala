@@ -18,6 +18,6 @@ trait HasPeripheryFFT { this: BaseSubsystem =>
 trait HasPeripheryFFTBundle {
 }
 
-trait HasPeripheryFFTModuleImp extends LazyModuleImp with HasPeripheryFFTBundle {
+trait HasPeripheryFFTModuleImp extends LazyRawModuleImp with HasPeripheryFFTBundle {
   val outer: HasPeripheryFFT
 }
