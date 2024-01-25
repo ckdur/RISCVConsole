@@ -86,7 +86,7 @@ pack: $(build_dir)/$(MODEL).bit
 $(build_dir)/$(MODEL).bit: $(build_dir)/$(MODEL).config
 	ecppack $(build_dir)/$(MODEL).config $(build_dir)/$(MODEL).bit
 
-program:
+program: $(build_dir)/$(MODEL).bit
 	fujprog $(build_dir)/$(MODEL).bit
 
 .PHONY: clean program

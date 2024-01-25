@@ -131,7 +131,7 @@ ifeq ($(SUB_PROJECT),ulx3s)
 	MODEL             ?= ulx3sTop
 	VLOG_MODEL        ?= ulx3sTop
 	MODEL_PACKAGE     ?= riscvconsole.fpga
-	CONFIG            ?= RVCConfig
+	CONFIG            ?= ULX3SConfig
 	CONFIG_PACKAGE    ?= riscvconsole.system
 	GENERATOR_PACKAGE ?= riscvconsole
 	TB                ?= TestDriver

@@ -30,11 +30,20 @@ class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
   case SubsystemDriveClockGroupsFromIO => false // NOTE: Do not create the IO with the tags
 })
 
-class SetFrequency(freq: BigInt) extends Config((site, here, up) => {
-  case PeripheryBusKey => up(PeripheryBusKey).copy(dtsFrequency = Some(freq))
-  case SystemBusKey => up(SystemBusKey).copy(dtsFrequency = Some(freq))
+class SetFrequencySDRAM(freq: BigInt) extends Config((site, here, up) => {
   case SDRAMKey => up(SDRAMKey).map{sd => sd.copy(sdcfg = sd.sdcfg.copy(SDRAM_HZ = freq))}
 })
+
+class SetFrequency(freq: BigInt) extends Config (
+  new chipyard.config.WithPeripheryBusFrequency(freq.toDouble / 1000000.0) ++           // Default 500 MHz pbus
+    new chipyard.config.WithControlBusFrequency(freq.toDouble / 1000000.0) ++             // Default 500 MHz cbus
+    new chipyard.config.WithMemoryBusFrequency(freq.toDouble / 1000000.0) ++              // Default 500 MHz mbus
+    new chipyard.config.WithControlBusFrequency(freq.toDouble / 1000000.0) ++             // Default 500 MHz cbus
+    new chipyard.config.WithSystemBusFrequency(freq.toDouble / 1000000.0) ++              // Default 500 MHz sbus
+    new chipyard.config.WithFrontBusFrequency(freq.toDouble / 1000000.0) ++               // Default 500 MHz fbus
+    new chipyard.config.WithOffchipBusFrequency(freq.toDouble / 1000000.0) ++               // Default 500 MHz obus
+    new SetFrequencySDRAM(freq)
+)
 
 class WithSDRAM(cfg: SDRAMConfig) extends Config((site, here, up) => {
   case SDRAMKey => Seq(cfg)
@@ -164,5 +173,7 @@ class Nexys4DDRConfig extends Config(
     new freechips.rocketchip.subsystem.WithNMedCores(1) ++            // single rocket-core with VM support and FPU
     new freechips.rocketchip.subsystem.WithCoherentBusTopology ++  // Hierarchical buses with broadcast L2
     new freechips.rocketchip.system.BaseConfig)                    // "base" rocketchip system
+
+class ULX3SConfig extends Config(new SetFrequency(20000000) ++ new DE2Config)
 
 class RVCConfig extends Config(new SetFrequency(100000000) ++ new DE2Config)
