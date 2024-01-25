@@ -19,7 +19,7 @@ soft_dir=$(base_dir)/software
 bldr_dir?=$(soft_dir)/sdboot
 HEX_FILE?=$(build_dir)/sdboot.hex
 ROM_FILE ?= $(build_dir)/$(long_name).rom.v
-ROM_CONF_FILE ?= $(build_dir)/$(long_name).rom.conf
+ROM_CONF_FILE ?= $(build_dir)/$(long_name).rvc.rom.conf
 SDBOOT_TARGET_JUMP?=0x81F00000UL
 ROM_SCRIPT = $(base_dir)/hardware/vlsi_rom_gen_fpga
 #ROM_SCRIPT = $(base_dir)/hardware/vlsi_rom_gen
@@ -37,8 +37,8 @@ $(HEX_FILE):
 # setup misc. sim files
 #########################################################################################
 
-SIM_FILE_REQS += \
-	$(ROCKETCHIP_RSRCS_DIR)/vsrc/EICG_wrapper.v
+#SIM_FILE_REQS += \
+#	$(ROCKETCHIP_RSRCS_DIR)/vsrc/EICG_wrapper.v
 
 # copy files but ignore *.h files in *.f (match vcs)
 $(sim_files): $(SIM_FILE_REQS) $(ALL_MODS_FILELIST) | $(GEN_COLLATERAL_DIR)

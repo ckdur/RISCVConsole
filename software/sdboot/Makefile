@@ -5,7 +5,7 @@ CROSSCOMPILE?=riscv64-unknown-elf
 CC=$(CROSSCOMPILE)-gcc
 OBJCOPY=$(CROSSCOMPILE)-objcopy
 OBJDUMP=$(CROSSCOMPILE)-objdump
-CFLAGS_ARCH=-march=rv$(XLEN)imac
+CFLAGS_ARCH=-march=rv$(XLEN)imac_zifencei_zicsr
 ifeq ($(XLEN),64)
 CFLAGS_ARCH+= -mabi=lp64
 else #32

@@ -21,6 +21,7 @@ import testchipip._
 import testchipip.serdes.CanHavePeripheryTLSerial
 import org.chipsalliance.cde.config._
 import chipyard._
+import freechips.rocketchip.util.{ElaborationArtefacts, ROMGenerator}
 
 case class SRAMConfig
 (
@@ -131,4 +132,12 @@ class RVCSystemModuleImp[+L <: RVCSystem](_outer: L) extends ChipyardSubsystemMo
       o.clock := otherclock
     }
   }
+
+  // TODO: This is no longer reliable. We need to use BootROM instad of MaskROM
+  val maskROMscfg = outer.maskROMs.map(rom => (rom.module.rom.name, ROMGenerator.lookup(rom.module.rom)))
+  val res = new StringBuilder
+  maskROMscfg foreach { case (name, c) =>
+    res append s"name ${name} depth ${c.depth} width ${c.width}\n"
+  }
+  ElaborationArtefacts.add("rvc.rom.conf", res.toString)
 }
