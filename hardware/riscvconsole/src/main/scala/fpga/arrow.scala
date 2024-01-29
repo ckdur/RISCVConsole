@@ -8,7 +8,7 @@ import freechips.rocketchip.devices.debug.{Debug, JtagDTMKey}
 import freechips.rocketchip.diplomacy.LazyModule
 import freechips.rocketchip.util.ResetCatchAndSync
 import riscvconsole.devices.codec.{CodecIO, CodecPinsFromPort, CodecSignals}
-import riscvconsole.shell.alteraLib._
+import sifive.fpgashells.ip.altera._
 import riscvconsole.shell.arrow._
 import sifive.blocks.devices.pinctrl._
 import riscvconsole.util._
@@ -87,7 +87,7 @@ class ArrowTop(implicit p: Parameters) extends ArrowShell
 
     platform.uart.foreach{ case uart: UARTPortIO =>
       uart.rxd := ALT_IOBUF(HSMC_TX_n(0))  // HSMC_RX_p_0 / G12 / J3 - 36
-      ALT_IOBUF(HSMC_TX_p(0), uart.txd)    // HSMC_TX_p_0 / A9 / J3 - 40
+      ALT_IOBUF(uart.txd, HSMC_TX_p(0))    // HSMC_TX_p_0 / A9 / J3 - 40
     }
 
     // SPI (for SD)

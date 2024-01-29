@@ -2,7 +2,7 @@ package riscvconsole.shell.arrow
 
 import chisel3._
 import chisel3.experimental.Analog
-import riscvconsole.shell.alteraLib._
+import sifive.fpgashells.ip.altera._
 
 class AUD_CODEC_PORT extends Bundle {
   val XCK = Output(Bool())

@@ -1,20 +1,44 @@
 package riscvconsole.fpga
 
 import chisel3._
+import chisel3.experimental.attach
 import freechips.rocketchip.devices.debug._
 import riscvconsole.shell.ulx3s._
-import riscvconsole.shell.latticeLib._
+import sifive.fpgashells.ip.lattice._
 import riscvconsole.system._
 import org.chipsalliance.cde.config._
 import freechips.rocketchip.diplomacy.LazyModule
 import freechips.rocketchip.util.ResetCatchAndSync
 import riscvconsole.devices.codec.CodecIO
+import riscvconsole.devices.sdram.SDRAMIf
 import sifive.blocks.devices.pinctrl._
 import riscvconsole.util._
 import sifive.blocks.devices.gpio.GPIOPortIO
 import sifive.blocks.devices.i2c._
 import sifive.blocks.devices.spi._
 import sifive.blocks.devices.uart.UARTPortIO
+
+object ulx2sUtil {
+  def from_SDRAMIf(port: ULX3SSDRAM, io: SDRAMIf) = {
+    port.sdram_clk_o := io.sdram_clk_o
+    port.sdram_cke_o := io.sdram_cke_o
+    port.sdram_cs_o := io.sdram_cs_o
+    port.sdram_ras_o := io.sdram_ras_o
+    port.sdram_cas_o := io.sdram_cas_o
+    port.sdram_we_o := io.sdram_we_o
+    port.sdram_dqm_o := io.sdram_dqm_o
+    port.sdram_addr_o := io.sdram_addr_o
+    port.sdram_ba_o := io.sdram_ba_o
+    io.sdram_data_i := VecInit((io.sdram_data_o.asBools zip port.sdram_data_io).map{
+      case (o, an) =>
+        val b = Module(new BB)
+        b.io.T := !io.sdram_drive_o
+        b.io.I := o
+        attach(b.io.B, an)
+        b.io.O
+    }).asUInt
+  }
+}
 
 class ulx3sTop(implicit p: Parameters) extends ulx3sShell {
   val clock = clk_20mhz
@@ -75,7 +99,7 @@ class ulx3sTop(implicit p: Parameters) extends ulx3sShell {
       uart.rxd := ftdi_txd // ftdi_transmitted -> fpga_received
     }
 
-    sdram.from_SDRAMIf( platform.sdramio.head )
+    platform.sdramio.foreach(io => ulx2sUtil.from_SDRAMIf(sdram, io))
     platform.otherclock := clk_50mhz
 
     // SPI (for SD)

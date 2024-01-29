@@ -9,7 +9,7 @@ import freechips.rocketchip.diplomacy.LazyModule
 import freechips.rocketchip.util.ResetCatchAndSync
 import riscvconsole.devices.codec.{CodecIO, CodecPinsFromPort, CodecSignals}
 import riscvconsole.shell.de2._
-import riscvconsole.shell.alteraLib.ALT_IOBUF
+import sifive.fpgashells.ip.altera.ALT_IOBUF
 import sifive.blocks.devices.pinctrl._
 import riscvconsole.util._
 import sifive.blocks.devices.gpio.GPIOPortIO
@@ -89,7 +89,7 @@ class DE2Top(implicit p: Parameters) extends DE2Shell
 
     platform.uart.foreach { case uart: UARTPortIO =>
       uart.rxd := ALT_IOBUF(UART_RXD)
-      ALT_IOBUF(UART_TXD, uart.txd)
+      ALT_IOBUF(uart.txd, UART_TXD)
     }
 
     // SPI (for SD)
