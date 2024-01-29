@@ -2,7 +2,7 @@ package riscvconsole.shell.de2
 
 import chisel3._
 import chisel3.experimental.{Analog, attach}
-import riscvconsole.devices.sdram.SDRAMIf
+import sifive.fpgashells.shell.SDRAMIf
 import sifive.fpgashells.ip.altera._
 
 class DE2SDRAM extends Bundle {

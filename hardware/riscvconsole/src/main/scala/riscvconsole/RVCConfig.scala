@@ -10,6 +10,7 @@ import riscvconsole.devices.sdram._
 import riscvconsole.devices.fft._
 import riscvconsole.devices.xilinx.artya7ddr.ArtyA7MIGMem
 import riscvconsole.devices.xilinx.nexys4ddr.Nexys4DDRMIGMem
+import sifive.fpgashells.shell._
 
 class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
   case sifive.blocks.devices.uart.PeripheryUARTKey => Seq(

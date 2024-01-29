@@ -2,7 +2,7 @@ package riscvconsole.shell.ulx3s
 
 import chisel3._
 import chisel3.experimental.Analog
-import riscvconsole.devices.sdram.SDRAMIf
+import sifive.fpgashells.shell.SDRAMIf
 import sifive.fpgashells.ip.lattice._
 
 class ulx3sShell extends RawModule {

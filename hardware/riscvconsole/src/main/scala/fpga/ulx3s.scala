@@ -10,7 +10,7 @@ import org.chipsalliance.cde.config._
 import freechips.rocketchip.diplomacy.LazyModule
 import freechips.rocketchip.util.ResetCatchAndSync
 import riscvconsole.devices.codec.CodecIO
-import riscvconsole.devices.sdram.SDRAMIf
+import sifive.fpgashells.shell.SDRAMIf
 import sifive.blocks.devices.pinctrl._
 import riscvconsole.util._
 import sifive.blocks.devices.gpio.GPIOPortIO

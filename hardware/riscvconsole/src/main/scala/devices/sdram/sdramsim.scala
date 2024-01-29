@@ -3,6 +3,7 @@ package riscvconsole.devices.sdram
 import chisel3._
 import chisel3.experimental.{Analog, IntParam, StringParam, attach}
 import chisel3.util._
+import sifive.fpgashells.shell._
 
 class sdramsim(val cfg: sdram_bb_cfg) extends BlackBox(
   Map(
