@@ -14,7 +14,6 @@ import freechips.rocketchip.tilelink.{TLFragmenter, TLRAM, TLWidthWidget}
 import riscvconsole.devices.altera.ddr3._
 import riscvconsole.devices.codec._
 import riscvconsole.devices.fft._
-import riscvconsole.devices.sdram._
 import riscvconsole.devices.xilinx.artya7ddr._
 import riscvconsole.devices.xilinx.nexys4ddr._
 import testchipip._
@@ -48,7 +47,6 @@ class RVCSystem(implicit p: Parameters) extends ChipyardSubsystem
   with HasPeripheryUART
   with HasPeripherySPIFlash
   with HasPeripheryI2C
-  with HasSDRAM
   with HasQsysDDR3
   with HasArtyA7MIG
   with HasNexys4DDRMIG
@@ -105,7 +103,6 @@ class RVCSystemModuleImp[+L <: RVCSystem](_outer: L) extends ChipyardSubsystemMo
   with HasPeripheryUARTModuleImp
   with HasPeripherySPIFlashModuleImp
   with HasPeripheryI2CModuleImp
-  with HasSDRAMModuleImp
   with HasQsysDDR3ModuleImp
   with HasArtyA7MIGModuleImp
   with HasNexys4DDRMIGModuleImp
