@@ -128,14 +128,14 @@ endif
 # For the RISCV console (in ULX3S)
 ifeq ($(SUB_PROJECT),ulx3s)
 	SBT_PROJECT       ?= riscvconsole
-	MODEL             ?= ulx3sTop
-	VLOG_MODEL        ?= ulx3sTop
-	MODEL_PACKAGE     ?= riscvconsole.fpga
+	MODEL             ?= ULX3SHarness
+	VLOG_MODEL        ?= ULX3SHarness
+	MODEL_PACKAGE     ?= riscvconsole.fpga.ulx3s
 	CONFIG            ?= ULX3SConfig
 	CONFIG_PACKAGE    ?= riscvconsole.system
 	GENERATOR_PACKAGE ?= riscvconsole
 	TB                ?= TestDriver
-	TOP               ?= RVCSystem
+	TOP               ?= RVCDigitalTop
 endif
 # For the RISCV console (in Arrow)
 ifeq ($(SUB_PROJECT),arrow)

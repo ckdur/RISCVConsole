@@ -1,16 +1,18 @@
 package riscvconsole.system
 
+import chipyard._
 import org.chipsalliance.cde.config._
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.devices.debug._
 import freechips.rocketchip.devices.tilelink.MaskROMLocated
-import riscvconsole.devices.altera.ddr3.QsysDDR3Mem
+import freechips.rocketchip.diplomacy._
 import riscvconsole.devices.codec._
-import riscvconsole.devices.sdram._
 import riscvconsole.devices.fft._
-import riscvconsole.devices.xilinx.artya7ddr.ArtyA7MIGMem
-import riscvconsole.devices.xilinx.nexys4ddr.Nexys4DDRMIGMem
 import sifive.fpgashells.shell._
+
+class WithNoDesignKey extends Config((site, here, up) => {
+  case DesignKey => (p: Parameters) => new SimpleLazyRawModule()(p)
+})
 
 class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
   case sifive.blocks.devices.uart.PeripheryUARTKey => Seq(
@@ -19,40 +21,29 @@ class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
     sifive.blocks.devices.gpio.GPIOParams(0x10001000, gpio))
   case sifive.blocks.devices.spi.PeripherySPIKey => Seq(
     sifive.blocks.devices.spi.SPIParams(0x10002000))
-  case sifive.blocks.devices.i2c.PeripheryI2CKey => Seq(
-    sifive.blocks.devices.i2c.I2CParams(0x10003000))
+  //case sifive.blocks.devices.i2c.PeripheryI2CKey => Seq(
+  //  sifive.blocks.devices.i2c.I2CParams(0x10003000))
   //case sifive.blocks.devices.spi.PeripherySPIFlashKey => Seq(
   //  sifive.blocks.devices.spi.SPIFlashParams(0x10003000, 0x20000000L))
-  case MaskROMLocated(InSubsystem) => Seq(
-    freechips.rocketchip.devices.tilelink.MaskROMParams(0x20000000L, "MyBootROM", 4096))
-  case SDRAMKey => Seq()
-  case SRAMKey => Seq()
+  case BuildSystem => (p: Parameters) => new RVCDigitalTop()(p)
   //case freechips.rocketchip.subsystem.PeripheryMaskROMKey => Seq()
   case SubsystemDriveClockGroupsFromIO => false // NOTE: Do not create the IO with the tags
 })
 
-class SetFrequencySDRAM(freq: BigInt) extends Config((site, here, up) => {
-  case SDRAMKey => up(SDRAMKey).map{sd => sd.copy(sdcfg = sd.sdcfg.copy(SDRAM_HZ = freq))}
-})
-
 class SetFrequency(freq: BigInt) extends Config (
-  new chipyard.config.WithPeripheryBusFrequency(freq.toDouble / 1000000.0) ++           // Default 500 MHz pbus
-    new chipyard.config.WithControlBusFrequency(freq.toDouble / 1000000.0) ++             // Default 500 MHz cbus
-    new chipyard.config.WithMemoryBusFrequency(freq.toDouble / 1000000.0) ++              // Default 500 MHz mbus
-    new chipyard.config.WithControlBusFrequency(freq.toDouble / 1000000.0) ++             // Default 500 MHz cbus
-    new chipyard.config.WithSystemBusFrequency(freq.toDouble / 1000000.0) ++              // Default 500 MHz sbus
-    new chipyard.config.WithFrontBusFrequency(freq.toDouble / 1000000.0) ++               // Default 500 MHz fbus
-    new chipyard.config.WithOffchipBusFrequency(freq.toDouble / 1000000.0) ++               // Default 500 MHz obus
-    new SetFrequencySDRAM(freq)
+  new chipyard.harness.WithSerialTLTiedOff ++
+    new chipyard.harness.WithHarnessBinderClockFreqMHz(freq.toDouble / 1000000.0) ++
+    new chipyard.config.WithPeripheryBusFrequency(freq.toDouble / 1000000.0) ++
+    new chipyard.config.WithControlBusFrequency(freq.toDouble / 1000000.0) ++
+    new chipyard.config.WithMemoryBusFrequency(freq.toDouble / 1000000.0) ++
+    new chipyard.config.WithControlBusFrequency(freq.toDouble / 1000000.0) ++
+    new chipyard.config.WithSystemBusFrequency(freq.toDouble / 1000000.0) ++
+    new chipyard.config.WithFrontBusFrequency(freq.toDouble / 1000000.0) ++
+    new chipyard.config.WithOffchipBusFrequency(freq.toDouble / 1000000.0) ++
+    new chipyard.harness.WithAllClocksFromHarnessClockInstantiator ++
+    new chipyard.clocking.WithPassthroughClockGenerator ++
+    new freechips.rocketchip.subsystem.WithoutTLMonitors
 )
-
-class WithSDRAM(cfg: SDRAMConfig) extends Config((site, here, up) => {
-  case SDRAMKey => Seq(cfg)
-})
-
-class WithSRAM(cfg: SRAMConfig) extends Config((site, here, up) => {
-  case SRAMKey => Seq(cfg)
-})
 
 class WithCODEC extends Config((site, here, up) => {
   case PeripheryCodecKey => Seq(CodecParams(0x10004000))
@@ -62,26 +53,6 @@ class WithDefaultFFT extends Config((site, here, up) => {
   case PeripheryFFTKey => Seq(FFTParams(0x10005000, 10, Some(0x10006000)))
 })
 
-class WithQsysDDR3Mem extends Config((site, here, up) => {
-  case QsysDDR3Mem => Some(MemoryPortParams(MasterPortParams(0x80000000L, 0x40000000, 4, 4), 1))
-  case SRAMKey => Nil
-})
-
-class WithArtyA7MIGMem extends Config((site, here, up) => {
-  case ArtyA7MIGMem => Some(MemoryPortParams(MasterPortParams(0x80000000L, 0x10000000, 8, 4), 1))
-  case SRAMKey => Nil
-})
-
-class WithNexys4DDRMIGMem extends Config((site, here, up) => {
-  case Nexys4DDRMIGMem => Some(MemoryPortParams(MasterPortParams(0x80000000L, 0x08000000, 8, 4), 1))
-  case SRAMKey => Nil
-})
-
-class WithExtMem extends Config((site, here, up) => {
-  case ExtMem => Some(MemoryPortParams(MasterPortParams(0x80000000L, 0x40000000, 4, 4), 1))
-  case SRAMKey => Nil
-})
-
 class RemoveDebugClockGating extends Config((site, here, up) => {
   case DebugModuleKey => up(DebugModuleKey).map{ debug =>
     debug.copy(clockGate = false)
@@ -89,15 +60,15 @@ class RemoveDebugClockGating extends Config((site, here, up) => {
 })
 
 class ArrowConfig extends Config(
-  new WithQsysDDR3Mem ++
-    new RVCPeripheralsConfig(11) ++
+  new RVCPeripheralsConfig(11) ++
     new SetFrequency(50000000) ++
     new RemoveDebugClockGating ++
     new freechips.rocketchip.subsystem.WithRV32 ++
     new freechips.rocketchip.subsystem.WithTimebase(1000000) ++
     new freechips.rocketchip.subsystem.WithNBreakpoints(1) ++
     new freechips.rocketchip.subsystem.WithJtagDTM ++
-    new freechips.rocketchip.subsystem.WithNoMemPort ++              // no top-level memory port at 0x80000000
+    new chipyard.config.WithTLBackingMemory ++ // FPGA-shells converts the AXI to TL for us
+    new freechips.rocketchip.subsystem.WithExtMemSize(BigInt(1024) << 20) ++ // 256mb on Nexys4DDR
     new freechips.rocketchip.subsystem.WithNoMMIOPort ++           // no top-level MMIO master port (overrides default set in rocketchip)
     new freechips.rocketchip.subsystem.WithNoSlavePort ++          // no top-level MMIO slave port (overrides default set in rocketchip)
     new freechips.rocketchip.subsystem.WithDontDriveBusClocksFromSBus ++
@@ -106,25 +77,26 @@ class ArrowConfig extends Config(
     new freechips.rocketchip.subsystem.WithoutFPU() ++
     new freechips.rocketchip.subsystem.WithNMedCores(1) ++            // single rocket-core with VM support and FPU
     new freechips.rocketchip.subsystem.WithCoherentBusTopology ++  // Hierarchical buses with broadcast L2
-    new freechips.rocketchip.system.BaseConfig)                    // "base" rocketchip system
+    new chipyard.config.AbstractConfig)                    // "base" rocketchip system
 
 class DE2Config extends Config(
-  new WithSDRAM(SDRAMConfig(
-    address = 0x80000000L,
-    sdcfg = sdram_bb_cfg(
-      SDRAM_HZ = 50000000L,
-      SDRAM_DQM_W = 4,
-      SDRAM_DQ_W = 32,
-      SDRAM_READ_LATENCY = 2))
-  ) ++
-    new RVCPeripheralsConfig(10) ++
+  new RVCPeripheralsConfig(10) ++
     new SetFrequency(50000000) ++
+    new riscvconsole.fpga.ulx3s.WithULX3SJTAG ++
+    new riscvconsole.fpga.ulx3s.WithULX3SUART ++
+    new riscvconsole.fpga.ulx3s.WithULX3SSDRAMTL ++
+    new riscvconsole.fpga.ulx3s.WithULX3SUARTTSI ++
+    new riscvconsole.fpga.ulx3s.WithULX3SGPIOBinder ++
+    new riscvconsole.fpga.ulx3s.WithULX3SSDBinder ++
     new RemoveDebugClockGating ++
+    new WithNoDesignKey ++
+    new chipyard.iobinders.WithGPIOPunchthrough ++
     new freechips.rocketchip.subsystem.WithRV32 ++
     new freechips.rocketchip.subsystem.WithTimebase(1000000) ++
     new freechips.rocketchip.subsystem.WithNBreakpoints(1) ++
     new freechips.rocketchip.subsystem.WithJtagDTM ++
-    new freechips.rocketchip.subsystem.WithNoMemPort ++              // no top-level memory port at 0x80000000
+    new chipyard.config.WithTLBackingMemory ++ // FPGA-shells converts the AXI to TL for us
+    new freechips.rocketchip.subsystem.WithExtMemSize(BigInt(32) << 20) ++ // 32mb on DE2
     new freechips.rocketchip.subsystem.WithNoMMIOPort ++           // no top-level MMIO master port (overrides default set in rocketchip)
     new freechips.rocketchip.subsystem.WithNoSlavePort ++          // no top-level MMIO slave port (overrides default set in rocketchip)
     new freechips.rocketchip.subsystem.WithDontDriveBusClocksFromSBus ++
@@ -133,38 +105,18 @@ class DE2Config extends Config(
     new freechips.rocketchip.subsystem.WithoutFPU() ++
     new freechips.rocketchip.subsystem.WithNMedCores(1) ++            // single rocket-core with VM support and FPU
     new freechips.rocketchip.subsystem.WithCoherentBusTopology ++  // Hierarchical buses with broadcast L2
-    new freechips.rocketchip.system.BaseConfig)                    // "base" rocketchip system
-
-class ArtyA7Config extends Config(
-  new WithArtyA7MIGMem ++
-    new RVCPeripheralsConfig(8) ++
-    new SetFrequency(50000000) ++
-    new RemoveDebugClockGating ++
-    new freechips.rocketchip.subsystem.WithRV32 ++
-    new freechips.rocketchip.subsystem.WithTimebase(1000000) ++
-    new freechips.rocketchip.subsystem.WithNBreakpoints(1) ++
-    new freechips.rocketchip.subsystem.WithJtagDTM ++
-    new freechips.rocketchip.subsystem.WithNoMemPort ++              // no top-level memory port at 0x80000000
-    new freechips.rocketchip.subsystem.WithNoMMIOPort ++           // no top-level MMIO master port (overrides default set in rocketchip)
-    new freechips.rocketchip.subsystem.WithNoSlavePort ++          // no top-level MMIO slave port (overrides default set in rocketchip)
-    new freechips.rocketchip.subsystem.WithDontDriveBusClocksFromSBus ++
-    //new freechips.rocketchip.subsystem.WithInclusiveCache(nBanks = 1, nWays = 2, capacityKB = 16) ++       // use Sifive L2 cache
-    new freechips.rocketchip.subsystem.WithNExtTopInterrupts(0) ++ // no external interrupts
-    new freechips.rocketchip.subsystem.WithoutFPU() ++
-    new freechips.rocketchip.subsystem.WithNMedCores(1) ++            // single rocket-core with VM support and FPU
-    new freechips.rocketchip.subsystem.WithCoherentBusTopology ++  // Hierarchical buses with broadcast L2
-    new freechips.rocketchip.system.BaseConfig)                    // "base" rocketchip system
+    new chipyard.config.AbstractConfig)                    // "base" rocketchip system
 
 class Nexys4DDRConfig extends Config(
-  new WithNexys4DDRMIGMem ++
-    new RVCPeripheralsConfig(8) ++
+  new RVCPeripheralsConfig(8) ++
     new SetFrequency(50000000) ++
     new RemoveDebugClockGating ++
     new freechips.rocketchip.subsystem.WithRV32 ++
     new freechips.rocketchip.subsystem.WithTimebase(1000000) ++
     new freechips.rocketchip.subsystem.WithNBreakpoints(1) ++
     new freechips.rocketchip.subsystem.WithJtagDTM ++
-    new freechips.rocketchip.subsystem.WithNoMemPort ++              // no top-level memory port at 0x80000000
+    new chipyard.config.WithTLBackingMemory ++ // FPGA-shells converts the AXI to TL for us
+    new freechips.rocketchip.subsystem.WithExtMemSize(BigInt(256) << 20) ++ // 256mb on Nexys4DDR
     new freechips.rocketchip.subsystem.WithNoMMIOPort ++           // no top-level MMIO master port (overrides default set in rocketchip)
     new freechips.rocketchip.subsystem.WithNoSlavePort ++          // no top-level MMIO slave port (overrides default set in rocketchip)
     new freechips.rocketchip.subsystem.WithDontDriveBusClocksFromSBus ++
@@ -173,7 +125,7 @@ class Nexys4DDRConfig extends Config(
     new freechips.rocketchip.subsystem.WithoutFPU() ++
     new freechips.rocketchip.subsystem.WithNMedCores(1) ++            // single rocket-core with VM support and FPU
     new freechips.rocketchip.subsystem.WithCoherentBusTopology ++  // Hierarchical buses with broadcast L2
-    new freechips.rocketchip.system.BaseConfig)                    // "base" rocketchip system
+    new chipyard.config.AbstractConfig)                    // "base" rocketchip system
 
 class ULX3SConfig extends Config(new SetFrequency(20000000) ++ new DE2Config)
 
