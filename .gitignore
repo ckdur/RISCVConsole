@@ -23,4 +23,7 @@ generated-src
 .ivy2
 .sbt
 slpp_all
+software/sdboot/*.elf
+software/sdboot/*.bin
+software/sdboot/*.dump
 

@@ -58,7 +58,7 @@ inline unsigned int spi_min_clk_divisor(unsigned int input_khz, unsigned int max
   }
 }
 
-uint32_t volatile * spi = (void *)0;
+static volatile uint32_t * const spi = (void *)(SPI_CTRL_ADDR);
 
 static inline uint8_t spi_xfer(uint8_t d)
 {

@@ -76,9 +76,12 @@ $(build_dir)/$(MODEL).json: $(synth_list_f)
 
 pnr: $(build_dir)/$(MODEL).config
 
-$(build_dir)/$(MODEL).config: $(build_dir)/$(MODEL).json $(sim_dir)/ulx3s_v20.lpf
+#lpf=$(sim_dir)/ulx3s_v20.lpf
+lpf:=$(build_dir)/$(long_name).shell.lpf
+
+$(build_dir)/$(MODEL).config: $(build_dir)/$(MODEL).json $(lpf)
 	nextpnr-ecp5 --85k --json $(build_dir)/$(MODEL).json \
-		--lpf $(sim_dir)/ulx3s_v20.lpf \
+		--lpf $(lpf) \
 		--textcfg $(build_dir)/$(MODEL).config | tee $(build_dir)/nextpnr.log
 
 pack: $(build_dir)/$(MODEL).bit

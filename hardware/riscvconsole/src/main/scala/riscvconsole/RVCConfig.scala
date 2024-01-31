@@ -14,6 +14,10 @@ class WithNoDesignKey extends Config((site, here, up) => {
   case DesignKey => (p: Parameters) => new SimpleLazyRawModule()(p)
 })
 
+class WithRVCBuildSystem extends Config ((site, here, up) => {
+  case BuildSystem => (p: Parameters) => new RVCDigitalTop()(p)
+})
+
 class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
   case sifive.blocks.devices.uart.PeripheryUARTKey => Seq(
     sifive.blocks.devices.uart.UARTParams(0x10000000))
@@ -25,9 +29,7 @@ class RVCPeripheralsConfig(gpio: Int = 14) extends Config((site, here, up) => {
   //  sifive.blocks.devices.i2c.I2CParams(0x10003000))
   //case sifive.blocks.devices.spi.PeripherySPIFlashKey => Seq(
   //  sifive.blocks.devices.spi.SPIFlashParams(0x10003000, 0x20000000L))
-  case BuildSystem => (p: Parameters) => new RVCDigitalTop()(p)
   //case freechips.rocketchip.subsystem.PeripheryMaskROMKey => Seq()
-  case SubsystemDriveClockGroupsFromIO => false // NOTE: Do not create the IO with the tags
 })
 
 class SetFrequency(freq: BigInt) extends Config (
@@ -79,34 +81,6 @@ class ArrowConfig extends Config(
     new freechips.rocketchip.subsystem.WithCoherentBusTopology ++  // Hierarchical buses with broadcast L2
     new chipyard.config.AbstractConfig)                    // "base" rocketchip system
 
-class DE2Config extends Config(
-  new RVCPeripheralsConfig(10) ++
-    new SetFrequency(50000000) ++
-    new riscvconsole.fpga.ulx3s.WithULX3SJTAG ++
-    new riscvconsole.fpga.ulx3s.WithULX3SUART ++
-    new riscvconsole.fpga.ulx3s.WithULX3SSDRAMTL ++
-    new riscvconsole.fpga.ulx3s.WithULX3SUARTTSI ++
-    new riscvconsole.fpga.ulx3s.WithULX3SGPIOBinder ++
-    new riscvconsole.fpga.ulx3s.WithULX3SSDBinder ++
-    new RemoveDebugClockGating ++
-    new WithNoDesignKey ++
-    new chipyard.iobinders.WithGPIOPunchthrough ++
-    new freechips.rocketchip.subsystem.WithRV32 ++
-    new freechips.rocketchip.subsystem.WithTimebase(1000000) ++
-    new freechips.rocketchip.subsystem.WithNBreakpoints(1) ++
-    new freechips.rocketchip.subsystem.WithJtagDTM ++
-    new chipyard.config.WithTLBackingMemory ++ // FPGA-shells converts the AXI to TL for us
-    new freechips.rocketchip.subsystem.WithExtMemSize(BigInt(32) << 20) ++ // 32mb on DE2
-    new freechips.rocketchip.subsystem.WithNoMMIOPort ++           // no top-level MMIO master port (overrides default set in rocketchip)
-    new freechips.rocketchip.subsystem.WithNoSlavePort ++          // no top-level MMIO slave port (overrides default set in rocketchip)
-    new freechips.rocketchip.subsystem.WithDontDriveBusClocksFromSBus ++
-    //new freechips.rocketchip.subsystem.WithInclusiveCache(nBanks = 1, nWays = 2, capacityKB = 16) ++       // use Sifive L2 cache
-    new freechips.rocketchip.subsystem.WithNExtTopInterrupts(0) ++ // no external interrupts
-    new freechips.rocketchip.subsystem.WithoutFPU() ++
-    new freechips.rocketchip.subsystem.WithNMedCores(1) ++            // single rocket-core with VM support and FPU
-    new freechips.rocketchip.subsystem.WithCoherentBusTopology ++  // Hierarchical buses with broadcast L2
-    new chipyard.config.AbstractConfig)                    // "base" rocketchip system
-
 class Nexys4DDRConfig extends Config(
   new RVCPeripheralsConfig(8) ++
     new SetFrequency(50000000) ++
@@ -126,7 +100,3 @@ class Nexys4DDRConfig extends Config(
     new freechips.rocketchip.subsystem.WithNMedCores(1) ++            // single rocket-core with VM support and FPU
     new freechips.rocketchip.subsystem.WithCoherentBusTopology ++  // Hierarchical buses with broadcast L2
     new chipyard.config.AbstractConfig)                    // "base" rocketchip system
-
-class ULX3SConfig extends Config(new SetFrequency(20000000) ++ new DE2Config)
-
-class RVCConfig extends Config(new SetFrequency(100000000) ++ new DE2Config)

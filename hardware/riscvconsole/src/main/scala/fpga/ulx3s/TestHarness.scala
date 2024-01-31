@@ -6,7 +6,7 @@ import freechips.rocketchip.diplomacy._
 import org.chipsalliance.cde.config.Parameters
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.prci._
-import freechips.rocketchip.subsystem.SystemBusKey
+import freechips.rocketchip.subsystem.{CacheBlockBytes, MemoryBusKey, SystemBusKey}
 import sifive.fpgashells.shell.lattice._
 import sifive.fpgashells.shell._
 import sifive.fpgashells.clocks._
@@ -38,7 +38,12 @@ class ULX3SHarness(override implicit val p: Parameters) extends ULX3SShell {
     sourceId = IdRange(0, 1 << dp(ExtTLMem).get.master.idBits)
   )))))
   val sdramBlockDuringReset = LazyModule(new TLBlockDuringReset(4))
-  sdramOverlay.overlayOutput.sdram := sdramBlockDuringReset.node := sdramClient
+  sdramOverlay.overlayOutput.sdram := TLFragmenter(4, dp(MemoryBusKey).blockBytes) := TLWidthWidget(dp(MemoryBusKey).beatBytes) := sdramBlockDuringReset.node := sdramClient
+
+  val sdramClock = ClockSinkNode(freqMHz = sdramOverlay.cfg.SDRAM_HZ.toDouble / 1000000)
+  val sdramWrangler = LazyModule(new ResetWrangler())
+  val sdramGroup = ClockGroup()
+  sdramClock := sdramWrangler.node := sdramGroup := harnessSysPLLNode
 
   val ledOverlays = dp(LEDOverlayKey).map(_.place(LEDDesignInput()))
   val all_leds = ledOverlays.map(_.overlayOutput.led)
@@ -98,10 +103,13 @@ class ULX3SHarness(override implicit val p: Parameters) extends ULX3SShell {
     childClock := harnessBinderClock
     childReset := harnessBinderReset
 
-    sdramOverlay.mig.module.clock := harnessBinderClock
-    sdramOverlay.mig.module.reset := harnessBinderReset
-    sdramBlockDuringReset.module.clock := harnessBinderClock
-    sdramBlockDuringReset.module.reset := harnessBinderReset.asBool // || !sdramOverlay.mig.module.io.port.init_calib_complete
+    val sdramclk = sdramClock.in.head._1.clock
+    val sdramrst = sdramClock.in.head._1.reset
+
+    sdramOverlay.mig.module.clock := sdramclk
+    sdramOverlay.mig.module.reset := sdramrst
+    sdramBlockDuringReset.module.clock := sdramclk
+    sdramBlockDuringReset.module.reset := sdramrst.asBool // || !sdramOverlay.mig.module.io.port.init_calib_complete
 
     // other_leds(6) := ddrOverlay.mig.module.io.port.init_calib_complete
 

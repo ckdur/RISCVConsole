@@ -15,7 +15,6 @@ extern const gpt_guid gpt_guid_sifive_bare_metal;
 int main(void)
 {
 	REG32(uart, UART_REG_TXCTRL) = UART_TXEN;
-	spi = (void *)(SPI_CTRL_ADDR); // Default to the SPI
 
 	sd_init(CORE_CLK_KHZ);
 	
