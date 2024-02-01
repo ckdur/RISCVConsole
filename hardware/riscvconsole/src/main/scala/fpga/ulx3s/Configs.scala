@@ -61,7 +61,7 @@ class WithULX3STweaks extends Config (
     new riscvconsole.system.WithoutClockGating ++
     new riscvconsole.system.WithNoDesignKey ++
     new riscvconsole.system.WithRVCBuildSystem ++
-    new chipyard.iobinders.WithGPIOPunchthrough ++
+    new chipyard.iobinders.WithGPIOPunchthrough/* ++
     // Core configs
     new freechips.rocketchip.subsystem.WithRV32 ++
     new freechips.rocketchip.subsystem.WithNBreakpoints(1) ++
@@ -74,9 +74,9 @@ class WithULX3STweaks extends Config (
     new freechips.rocketchip.subsystem.WithNExtTopInterrupts(0) ++ // no external interrupts
     new freechips.rocketchip.subsystem.WithoutFPU() ++
     new freechips.rocketchip.subsystem.WithNSmallCores(1) ++            // single rocket-core with VM support and FPU
-    new freechips.rocketchip.subsystem.WithCoherentBusTopology  // Hierarchical buses with broadcast L2
+    new freechips.rocketchip.subsystem.WithCoherentBusTopology*/  // Hierarchical buses with broadcast L2
 )
 
 class RocketULX3SConfig extends Config(
   new WithULX3STweaks ++
-    new chipyard.config.AbstractConfig)
+    new chipyard.RocketConfig)

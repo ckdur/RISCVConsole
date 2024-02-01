@@ -80,7 +80,7 @@ class TLROMLatched(val base: BigInt, val size: Int, contentsDelayed: => Seq[Byte
 
     val (in, edge)= node.in(0)
 
-    val rom = Module(new BlackBoxedROMLatched(ROMConfig("", 0x1000, 8*beatBytes), bigs))
+    val rom = Module(new BlackBoxedROMLatched(ROMConfig("", depth, 8*beatBytes), bigs))
     rom.io.clock := clock
     rom.io.address := edge.addr_hi(in.a.bits.address - base.U)(log2Ceil(depth)-1, 0)
     rom.io.oe := true.B // active high tri state enable
