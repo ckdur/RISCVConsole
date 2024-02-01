@@ -129,6 +129,10 @@ def main():
             verilog = gen_rom(rom_hex_file=sys.argv[2],
                               **parse_line(line))
             print(verilog)
+        if len(lines) == 0:
+            verilog = gen_rom(rom_hex_file=sys.argv[2],
+                              **ROMParameters(name='MyBootROM', depth=4096, width=64)._asdict())
+            print(verilog)
 
 if __name__ == '__main__':
     main()

@@ -1,14 +1,17 @@
 package riscvconsole.system
 
 import chipyard._
+import chipyard.clocking._
 import org.chipsalliance.cde.config._
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.devices.debug._
-import freechips.rocketchip.devices.tilelink.MaskROMLocated
+import freechips.rocketchip.devices.tilelink._
 import freechips.rocketchip.diplomacy._
 import riscvconsole.devices.codec._
 import riscvconsole.devices.fft._
 import sifive.fpgashells.shell._
+
+case class LatchedBootROMLocated(loc: HierarchicalLocation) extends Field[Option[BootROMParams]](None)
 
 class WithNoDesignKey extends Config((site, here, up) => {
   case DesignKey => (p: Parameters) => new SimpleLazyRawModule()(p)
@@ -55,16 +58,15 @@ class WithDefaultFFT extends Config((site, here, up) => {
   case PeripheryFFTKey => Seq(FFTParams(0x10005000, 10, Some(0x10006000)))
 })
 
-class RemoveDebugClockGating extends Config((site, here, up) => {
-  case DebugModuleKey => up(DebugModuleKey).map{ debug =>
-    debug.copy(clockGate = false)
-  }
+class WithoutClockGating extends Config((site, here, up) => {
+  case DebugModuleKey => up(DebugModuleKey, site).map(_.copy(clockGate = false))
+  case ChipyardPRCIControlKey => up(ChipyardPRCIControlKey, site).copy(enableTileClockGating = false)
 })
 
 class ArrowConfig extends Config(
   new RVCPeripheralsConfig(11) ++
     new SetFrequency(50000000) ++
-    new RemoveDebugClockGating ++
+    new WithoutClockGating ++
     new freechips.rocketchip.subsystem.WithRV32 ++
     new freechips.rocketchip.subsystem.WithTimebase(1000000) ++
     new freechips.rocketchip.subsystem.WithNBreakpoints(1) ++
@@ -84,7 +86,7 @@ class ArrowConfig extends Config(
 class Nexys4DDRConfig extends Config(
   new RVCPeripheralsConfig(8) ++
     new SetFrequency(50000000) ++
-    new RemoveDebugClockGating ++
+    new WithoutClockGating ++
     new freechips.rocketchip.subsystem.WithRV32 ++
     new freechips.rocketchip.subsystem.WithTimebase(1000000) ++
     new freechips.rocketchip.subsystem.WithNBreakpoints(1) ++
