@@ -72,7 +72,8 @@ class TLROMLatched(val base: BigInt, val size: Int, contentsDelayed: => Seq[Byte
     val wrapSize = 1 << log2Ceil(contents.size)
     require (wrapSize <= size)
     val width = 8 * beatBytes
-    val depth = size/beatBytes
+    val depth = wrapSize/beatBytes
+    val depthbits = log2Ceil(depth)
 
     val words = (contents ++ Seq.fill(wrapSize-contents.size)(0.toByte)).grouped(beatBytes).toSeq
     val bigs = words.map(_.foldRight(BigInt(0)){ case (x,y) => (x.toInt & 0xff) | y << 8})
@@ -80,9 +81,9 @@ class TLROMLatched(val base: BigInt, val size: Int, contentsDelayed: => Seq[Byte
 
     val (in, edge)= node.in(0)
 
-    val rom = Module(new BlackBoxedROMLatched(ROMConfig("", depth, 8*beatBytes), bigs))
+    val rom = Module(new BlackBoxedROMLatched(ROMConfig("", depth, width), bigs))
     rom.io.clock := clock
-    rom.io.address := edge.addr_hi(in.a.bits.address - base.U)(log2Ceil(depth)-1, 0)
+    rom.io.address := edge.addr_hi(in.a.bits.address - base.U)(depthbits-1, 0)
     rom.io.oe := true.B // active high tri state enable
     rom.io.me := in.a.fire
 
