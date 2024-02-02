@@ -38,7 +38,12 @@ class ULX3SHarness(override implicit val p: Parameters) extends ULX3SShell {
     sourceId = IdRange(0, 1 << dp(ExtTLMem).get.master.idBits)
   )))))
   val sdramBlockDuringReset = LazyModule(new TLBlockDuringReset(4))
-  sdramOverlay.overlayOutput.sdram := TLFragmenter(4, dp(MemoryBusKey).blockBytes) := TLWidthWidget(dp(MemoryBusKey).beatBytes) := sdramBlockDuringReset.node := sdramClient
+  sdramOverlay.overlayOutput.sdram :=
+    TLFragmenter(4, dp(MemoryBusKey).blockBytes) :=
+    TLWidthWidget(dp(MemoryBusKey).beatBytes) :=
+    TLBuffer() :=
+    sdramBlockDuringReset.node :=
+    sdramClient
 
   val sdramClock = ClockSinkNode(freqMHz = sdramOverlay.cfg.SDRAM_HZ.toDouble / 1000000)
   val sdramWrangler = LazyModule(new ResetWrangler())

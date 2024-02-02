@@ -18,7 +18,7 @@ static int decode_sd_copy_error(int error)
   switch (error) {
     case SD_COPY_ERROR_CMD18: kputs("ERROR: CMD18\n");
     case SD_COPY_ERROR_CMD18_CRC: kputs("ERROR: CMD18_CRC\n");
-    default: kputs("ERROR: UNKNOWN\n");
+    default: kprintf("ERROR: UNKNOWN %d\n", error);
   }
   return error;
 }

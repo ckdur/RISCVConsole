@@ -65,13 +65,8 @@ class WithULX3STweaks extends Config (
     // Core configs
     new freechips.rocketchip.subsystem.WithRV32 ++
     new freechips.rocketchip.subsystem.WithNBreakpoints(1) ++
-    new freechips.rocketchip.subsystem.WithJtagDTM ++
-    new freechips.rocketchip.subsystem.WithNoMMIOPort ++           // no top-level MMIO master port (overrides default set in rocketchip)
-    new freechips.rocketchip.subsystem.WithNoSlavePort ++          // no top-level MMIO slave port (overrides default set in rocketchip)
-    new freechips.rocketchip.subsystem.WithDontDriveBusClocksFromSBus ++
-    //new freechips.rocketchip.subsystem.WithInclusiveCache(nBanks = 1, nWays = 2, capacityKB = 16) ++       // use Sifive L2 cache
+    //new freechips.rocketchip.subsystem.WithInclusiveCache(nWays = 2, capacityKB = 16) ++       // use Sifive L2 cache
     new chipyard.config.WithBroadcastManager ++ // no l2
-    new freechips.rocketchip.subsystem.WithNExtTopInterrupts(0) ++ // no external interrupts
     new freechips.rocketchip.subsystem.WithoutFPU() ++
     new freechips.rocketchip.subsystem.WithNSmallCores(1) ++            // single rocket-core with VM support and FPU
     new freechips.rocketchip.subsystem.WithCoherentBusTopology  // Hierarchical buses with broadcast L2
