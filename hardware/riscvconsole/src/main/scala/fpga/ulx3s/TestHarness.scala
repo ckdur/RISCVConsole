@@ -74,7 +74,7 @@ class ULX3SHarness(override implicit val p: Parameters) extends ULX3SShell {
     override def provideImplicitClockToLazyChildren = true
 
     all_leds.foreach(_ := DontCare)
-    clockOverlay.overlayOutput.node.out(0)._1.reset := ~resetPin
+    clockOverlay.overlayOutput.node.out(0)._1.reset := resetPin
 
     val clk = clockOverlay.overlayOutput.node.out.head._1.clock
 

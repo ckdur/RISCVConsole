@@ -241,7 +241,8 @@ int sd_copy(void* dst, uint32_t src_lba, size_t size)
     crc_exp |= sd_dummy();
 
     if (crc != crc_exp) {
-			kputs("\b- CRC mismatch ");
+			//kputs("- CRC mismatch ");
+			kprintf("- CRC mismatch %x != %x", crc, crc_exp);
 			rc = SD_COPY_ERROR_CMD18_CRC;
       break;
     }
@@ -305,7 +306,8 @@ int copy(void)
 		crc_exp |= sd_dummy();
 
 		if (crc != crc_exp) {
-			kputs("\b- CRC mismatch ");
+			//kputs("- CRC mismatch ");
+			kprintf("- CRC mismatch %x != %x", crc, crc_exp);
 			rc = 1;
 			break;
 		}

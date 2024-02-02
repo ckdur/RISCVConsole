@@ -41,4 +41,5 @@ foreach f_name $ALL_VHDL {
 ## Synthesize and create the netlist file
 ################################################################
 synth_ecp5 -top $MODEL -json $build_dir/$MODEL.json
+exit
 

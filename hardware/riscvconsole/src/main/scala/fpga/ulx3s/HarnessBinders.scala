@@ -58,7 +58,7 @@ class WithULX3SJTAG extends HarnessBinder({
     port.io.TDI := ath.jtagOverlay.getWrappedValue.TDI
     ath.jtagOverlay.getWrappedValue.TDO.data := port.io.TDO
     ath.jtagOverlay.getWrappedValue.TDO.driven := true.B
-    ath.ndreset.getWrappedValue := /*port.io.ndreset || */!ath.jtagOverlay.getWrappedValue.srst_n
+    ath.ndreset.getWrappedValue := !ath.jtagOverlay.getWrappedValue.srst_n
   }
 })
 
