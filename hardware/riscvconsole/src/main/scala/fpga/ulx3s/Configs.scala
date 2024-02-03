@@ -38,14 +38,14 @@ class WithULX3STweaks extends Config (
     new testchipip.boot.WithNoCustomBootPin ++
     new testchipip.boot.WithNoBootAddrReg ++
     new freechips.rocketchip.subsystem.WithTimebase(1000000) ++
-    new chipyard.harness.WithHarnessBinderClockFreqMHz(20.0) ++
-    new chipyard.config.WithPeripheryBusFrequency(20.0) ++
-    new chipyard.config.WithControlBusFrequency(20.0) ++
-    new chipyard.config.WithMemoryBusFrequency(20.0) ++
-    new chipyard.config.WithControlBusFrequency(20.0) ++
-    new chipyard.config.WithSystemBusFrequency(20.0) ++
-    new chipyard.config.WithFrontBusFrequency(20.0) ++
-    new chipyard.config.WithOffchipBusFrequency(20.0) ++
+    new chipyard.harness.WithHarnessBinderClockFreqMHz(50.0) ++
+    new chipyard.config.WithPeripheryBusFrequency(50.0) ++
+    new chipyard.config.WithControlBusFrequency(50.0) ++
+    new chipyard.config.WithMemoryBusFrequency(50.0) ++
+    new chipyard.config.WithControlBusFrequency(50.0) ++
+    new chipyard.config.WithSystemBusFrequency(50.0) ++
+    new chipyard.config.WithFrontBusFrequency(50.0) ++
+    new chipyard.config.WithOffchipBusFrequency(50.0) ++
     new chipyard.harness.WithAllClocksFromHarnessClockInstantiator ++
     new chipyard.clocking.WithPassthroughClockGenerator ++
     new freechips.rocketchip.subsystem.WithoutTLMonitors ++

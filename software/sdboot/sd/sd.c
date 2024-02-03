@@ -22,9 +22,9 @@
 #define SD_DATA_TOKEN 0xfe
 
 // SD card initialization must happen at 100-400kHz
-#define SD_POWER_ON_FREQ_KHZ 400L
-// SD cards normally support reading/writing at 20MHz
-long int sd_clk_freq = 5000L;
+#define SD_POWER_ON_FREQ_KHZ 200L
+// SD cards normally support reading/writing at 20MHz, but putting 5MHz
+const long int sd_clk_freq = 5000L;
 #define SD_POST_INIT_CLK_KHZ sd_clk_freq
 
 // Command frame starts by asserting low and then high for first two clock edges
@@ -37,7 +37,7 @@ long int sd_clk_freq = 5000L;
  * Get smallest clock divisor that divides input_khz to a quotient less than or
  * equal to max_target_khz;
  */
-inline unsigned int spi_min_clk_divisor(unsigned int input_khz, unsigned int max_target_khz)
+static inline unsigned int spi_min_clk_divisor(unsigned int input_khz, unsigned int max_target_khz)
 {
   // f_sck = f_in / (2 * (div + 1)) => div = (f_in / (2*f_sck)) - 1
   //
@@ -94,7 +94,7 @@ static uint8_t sd_cmd(uint8_t cmd, uint32_t arg, uint8_t crc)
 	do {
 		r = sd_dummy();
 		if (!(r & 0x80)) {
-//			dprintf("sd:cmd: %hx\r\n", r);
+			// kprintf("sd:cmd: %hx\r\n", r);
 			goto done;
 		}
 	} while (--n > 0);
