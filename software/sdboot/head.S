@@ -23,7 +23,9 @@ _prog_start:
 
 trap_entry:
   j trap_entry
-  .section .rodata
+
+.section .dtb
+.align 3
 dtb:
 // NOTE: Not necessary anymore. Chipyard will take care
 //  .incbin DEVICE_TREE

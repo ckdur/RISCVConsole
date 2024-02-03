@@ -28,11 +28,7 @@ SECTIONS
     *(.eh_frame)
   } >maskrom_mem  :text
 
-  .rodata ALIGN((ADDR(.eh_frame) + SIZEOF(.eh_frame)), 8) : AT(ALIGN((LOADADDR(.eh_frame) + SIZEOF(.eh_frame)), 8)) ALIGN_WITH_INPUT {
-    *(.rodata .rodata.* .gnu.linkonce.r.*)
-  } >maskrom_mem  :data
-
-  .srodata ALIGN((ADDR(.rodata) + SIZEOF(.rodata)), 8) : AT(ALIGN((LOADADDR(.rodata) + SIZEOF(.rodata)), 8)) ALIGN_WITH_INPUT {
+  .srodata ALIGN((ADDR(.eh_frame) + SIZEOF(.eh_frame)), 8) : AT(ALIGN((LOADADDR(.eh_frame) + SIZEOF(.eh_frame)), 8)) ALIGN_WITH_INPUT {
     *(.srodata.cst16)
     *(.srodata.cst8)
     *(.srodata.cst4)
@@ -47,6 +43,11 @@ SECTIONS
 
   .sdata ALIGN((ADDR(.data) + SIZEOF(.data)), 8) : AT(ALIGN((LOADADDR(.data) + SIZEOF(.data)), 8)) ALIGN_WITH_INPUT {
     *(.sdata .sdata.* .gnu.linkonce.s.*)
+  } >maskrom_mem  :data
+
+  .rodata ALIGN((ADDR(.sdata) + SIZEOF(.sdata)), 8) : AT(ALIGN((LOADADDR(.sdata) + SIZEOF(.sdata)), 8)) ALIGN_WITH_INPUT {
+    *(.rodata .rodata.* .gnu.linkonce.r.*)
+    *(.dtb) /* Must be last if this code is added to RC's BootROM */
   } >maskrom_mem  :data
 
   PROVIDE(_data = ADDR(.rodata));

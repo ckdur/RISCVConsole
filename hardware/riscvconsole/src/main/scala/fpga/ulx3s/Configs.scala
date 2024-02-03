@@ -68,7 +68,7 @@ class WithULX3STweaks extends Config (
     //new freechips.rocketchip.subsystem.WithInclusiveCache(nWays = 2, capacityKB = 16) ++       // use Sifive L2 cache
     new chipyard.config.WithBroadcastManager ++ // no l2
     new freechips.rocketchip.subsystem.WithoutFPU() ++
-    new freechips.rocketchip.subsystem.WithNSmallCores(1) ++            // single rocket-core with VM support and FPU
+    new freechips.rocketchip.subsystem.WithNMedCores(1) ++            // single rocket-core with VM support and FPU
     new freechips.rocketchip.subsystem.WithCoherentBusTopology  // Hierarchical buses with broadcast L2
 )
 
