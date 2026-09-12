@@ -3,7 +3,7 @@ package riscvconsole.devices.fft
 import chisel3._
 import chisel3.experimental.IntParam
 import chisel3.util._
-import freechips.rocketchip.config._
+import org.chipsalliance.cde.config._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.interrupts._
 import freechips.rocketchip.prci._
@@ -12,18 +12,8 @@ import freechips.rocketchip.subsystem._
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.devices.tilelink._
 import freechips.rocketchip.util._
-import freechips.rocketchip.diplomaticobjectmodel._
-import freechips.rocketchip.diplomaticobjectmodel.model._
-import freechips.rocketchip.diplomaticobjectmodel.logicaltree._
 
 case class FFTParams(address: BigInt, LOG2_FFT_LEN: Int = 8, dmaAddress: Option[BigInt] = None)
-
-case class OMFFT
-(
-  memoryRegions: Seq[OMMemoryRegion],
-  interrupts: Seq[OMInterrupt],
-  _types: Seq[String] = Seq("OMFFT", "OMDevice", "OMComponent"),
-) extends OMDevice
 
 object FFTCtrlRegs {
   val data_in     = 0x00
@@ -111,7 +101,7 @@ abstract class FFT(busWidthBytes: Int, c: FFTParams)(implicit p: Parameters)
     fft.io.wr_in := wr_in
     fft.io.start := start
     fft.io.syn_rst_n := !syn_rst
-    fft.io.rst_n := !reset.asBool()
+    fft.io.rst_n := !reset.asBool
     fft.io.clk := clock
 
     val (tl_in, tl_edge) = dmanode.map(A=>A.in(0)).unzip
@@ -121,14 +111,14 @@ abstract class FFT(busWidthBytes: Int, c: FFTParams)(implicit p: Parameters)
       val d_size = Reg(UInt()) // Saved size
       val d_source = Reg(UInt()) // Saved source
       val hasData = edge.hasData(tl.a.bits)
-      when (tl.d.fire()) { d_full := false.B }
-      when (tl.a.fire()) {
+      when (tl.d.fire) { d_full := false.B }
+      when (tl.a.fire) {
         d_full := true.B
         d_hasData := hasData
         d_size   := tl.a.bits.size
         d_source := tl.a.bits.source
       }
-      val d_data = fft.io.dout holdUnless RegNext(tl.a.fire())
+      val d_data = fft.io.dout holdUnless RegNext(tl.a.fire)
 
       tl.a.ready := !d_full
       tl.d.valid := d_full
@@ -136,7 +126,7 @@ abstract class FFT(busWidthBytes: Int, c: FFTParams)(implicit p: Parameters)
       tl.d.bits := edge.AccessAck(d_source, d_size, d_data)
       tl.d.bits.opcode := Mux(d_hasData, TLMessages.AccessAck, TLMessages.AccessAckData)
 
-      when(tl.a.fire()) {
+      when(tl.a.fire) {
         fft.io.addr_in := tl.a.bits.address(c.LOG2_FFT_LEN-1, 0)
         fft.io.addr_out := tl.a.bits.address(c.LOG2_FFT_LEN-1, 0)
         fft.io.din := tl.a.bits.data
@@ -175,18 +165,6 @@ abstract class FFT(busWidthBytes: Int, c: FFTParams)(implicit p: Parameters)
       FFTCtrlRegs.status -> statusFields,
     )
     regmap(mapping :_*)
-    val omRegMap = OMRegister.convert(mapping:_*)
-  }
-
-  val logicalTreeNode = new LogicalTreeNode(() => Some(device)) {
-    def getOMComponents(resourceBindings: ResourceBindings, children: Seq[OMComponent] = Nil): Seq[OMComponent] = {
-      Seq(
-        OMFFT(
-          memoryRegions = DiplomaticObjectModelAddressing.getOMMemoryRegions("FFT", resourceBindings, Some(module.omRegMap)),
-          interrupts = DiplomaticObjectModelAddressing.describeGlobalInterrupts(device.describe(resourceBindings).name, resourceBindings),
-        )
-      )
-    }
   }
 }
 
@@ -234,7 +212,7 @@ case class FFTAttachParams
           cbus.clockNode
         case _: AsynchronousCrossing =>
           val codecClockGroup = ClockGroup()
-          codecClockGroup := where.asyncClockGroupsNode
+          codecClockGroup := where.allClockGroupsNode
           blockerOpt.map { _.clockNode := codecClockGroup } .getOrElse { codecClockGroup }
       })
 
@@ -257,8 +235,6 @@ case class FFTAttachParams
       case _: RationalCrossing => where.ibus.fromRational
       case _: AsynchronousCrossing => where.ibus.fromAsync
     }) := fft.intXing(intXType)
-
-    LogicalModuleTree.add(where.logicalTreeNode, fft.logicalTreeNode)
 
     fft
   }

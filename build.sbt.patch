@@ -1,0 +1,25 @@
+diff --git a/build.sbt b/build.sbt
+index f56621cc..8123fdc1 100644
+--- a/build.sbt
++++ b/build.sbt
+@@ -445,7 +445,7 @@ lazy val rocketchip_inclusive_cache = withInitCheck((project in file("generators
+   .dependsOn(rocketchip)
+   .settings(libraryDependencies ++= rocketLibDeps.value)
+ 
+-lazy val fpga_shells = (project in file("./fpga/fpga-shells"))
++lazy val fpga_shells = (project in file("./fpga/fpga-shells-new"))
+   .dependsOn(rocketchip, rocketchip_blocks)
+   .settings(libraryDependencies ++= rocketLibDeps.value)
+   .settings(commonSettings)
+@@ -454,6 +454,11 @@ lazy val chipyard_fpga = (project in file("./fpga"))
+   .dependsOn(chipyard, fpga_shells)
+   .settings(commonSettings)
+ 
++lazy val riscvconsole = (project in file("./generators/riscvconsole"))
++  .dependsOn(chipyard, fpga_shells, chipyard_fpga)
++  .settings(chiselSettings)
++  .settings(commonSettings)
++
+ // Components of FireSim
+ 
+ lazy val firrtl2 = freshProject("firrtl2", file("./tools/firrtl2"))

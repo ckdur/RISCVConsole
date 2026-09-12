@@ -9,7 +9,7 @@
 	url = https://github.com/riscv/riscv-tests.git
 [submodule "hardware/fpga-shells"]
 	path = hardware/fpga-shells
-	url = https://github.com/uec-hanken/fpga-shells
+	url = https://github.com/ckdur/rocket-chip-fpga-shells.git
 [submodule "software/RISCVConsoleCode"]
 	path = software/RISCVConsoleCode
 	url = https://github.com/ckdur/RISCVConsoleCode.git

@@ -2,7 +2,7 @@ package riscvconsole.devices.fft
 
 import chisel3._
 
-import freechips.rocketchip.config.Field
+import org.chipsalliance.cde.config.Field
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.subsystem.BaseSubsystem
 
@@ -13,11 +13,4 @@ trait HasPeripheryFFT { this: BaseSubsystem =>
     val codec = FFTAttachParams(ps).attachTo(this)
     codec
   }
-}
-
-trait HasPeripheryFFTBundle {
-}
-
-trait HasPeripheryFFTModuleImp extends LazyModuleImp with HasPeripheryFFTBundle {
-  val outer: HasPeripheryFFT
 }

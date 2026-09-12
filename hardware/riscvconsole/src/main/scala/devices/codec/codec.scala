@@ -16,6 +16,7 @@ class Bidir extends Bundle {
 }
 
 import codec_param._
+
 class codec extends Module {
   val io = IO(new Bundle {
     val clear_audio_in_memory = Input(Bool())

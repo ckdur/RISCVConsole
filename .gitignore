@@ -20,4 +20,5 @@ env-riscv-tools.sh
 env-esp-tools.sh
 generated-src
 .bsp
+.vscode
 

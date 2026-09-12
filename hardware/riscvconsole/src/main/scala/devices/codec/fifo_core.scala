@@ -39,7 +39,7 @@ class fifo_core(conf: fifo_core_generic) extends Module {
 
   // And rdreg will set the ready of the dequeue (read action)
   queue.io.deq.ready := io.rdreq
-  io.rddata := RegEnable(queue.io.deq.bits, queue.io.deq.fire())
+  io.rddata := RegEnable(queue.io.deq.bits, queue.io.deq.fire)
 
   // The count of the elements
   //io.count := queue.io.count
