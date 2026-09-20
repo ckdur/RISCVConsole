@@ -4,7 +4,7 @@ import chisel3._
 import chisel3.util._
 import org.chipsalliance.cde.config.{Field, Parameters}
 import freechips.rocketchip.tilelink._
-import freechips.rocketchip.prci.{ClockBundle, ClockBundleParameters, ClockGroup, ClockSinkNode, ResetWrangler}
+import freechips.rocketchip.prci._
 import freechips.rocketchip.subsystem.SystemBusKey
 import sifive.fpgashells.shell.altera._
 import sifive.fpgashells.shell._
@@ -21,8 +21,74 @@ import sifive.blocks.devices.uart._
 import org.chipsalliance.diplomacy._
 import org.chipsalliance.diplomacy.lazymodule._
 import org.chipsalliance.diplomacy.bundlebridge._
+import sifive.fpgashells.devices.common._
+
+// It is an SDRAM, but we use the DDR placer just to not repeat code
+class SDRAMULX3SPlacedOverlay(val shell: ULX3SHarness, name: String, val designInput: DDRDesignInput, val shellInput: DDRShellInput)
+  extends DDRPlacedOverlay[ULX3SSDRAM](name, designInput, shellInput)
+{
+  val sdramParams = sdram_bb_cfg (
+    SDRAM_HZ = 50000000,
+    SDRAM_ADDR_W = 24,
+    SDRAM_COL_W = 9,
+    SDRAM_BANK_W = 2,
+    SDRAM_DQM_W = 2,
+    SDRAM_DQ_W = 16,
+    SDRAM_READ_LATENCY = 3
+  )
+  val memifParams             = SDRAMConfig(address = di.baseAddress, sdcfg = sdramParams)
+  val memifClockDomainWrapper = LazyModule(new ClockSinkDomain(take = Some(ClockParameters(sdramParams.SDRAM_HZ.toDouble / 1000000))))
+  val memif                   = memifClockDomainWrapper { LazyModule(new TLSDRAM(memifParams, 4, 4)) }
+  memifClockDomainWrapper.clockNode := ClockGroup() := shell.harnessSysPLLNode
+
+  val ioNode = memif.ioNode.makeSink()
+
+  def overlayOutput = DDROverlayOutput(ddr = memif.node)
+  def ioFactory = new ULX3SSDRAM
+
+  // val getStatus = shell { InModuleBody { Wire(new SDRAMIf) } }
+
+  shell { InModuleBody {
+    io.from_SDRAMIf(ioNode.bundle.asInstanceOf[SDRAMIf])
+
+    ULX3SSDRAMLocs.addr.zipWithIndex.foreach { case (pin, i) =>
+      shell.lpf.addPackagePin(IOPin(io.sdram_addr_o, i), pin)
+      shell.lpf.addIOStandard(IOPin(io.sdram_addr_o, i), "LVCMOS33", drive = Some(4))
+    }
+    ULX3SSDRAMLocs.data.zipWithIndex.foreach { case (pin, i) =>
+      shell.lpf.addPackagePin(IOPin(io.sdram_data_io(i)), pin)
+      shell.lpf.addIOStandard(IOPin(io.sdram_data_io(i)), "LVCMOS33", drive = Some(4))
+    }
+    ULX3SSDRAMLocs.ba.zipWithIndex.foreach { case (pin, i) =>
+      shell.lpf.addPackagePin(IOPin(io.sdram_ba_o(i)), pin)
+      shell.lpf.addIOStandard(IOPin(io.sdram_ba_o(i)), "LVCMOS33", drive = Some(4))
+    }
+    ULX3SSDRAMLocs.dqm.zipWithIndex.foreach { case (pin, i) =>
+      shell.lpf.addPackagePin(IOPin(io.sdram_dqm_o(i)), pin)
+      shell.lpf.addIOStandard(IOPin(io.sdram_dqm_o(i)), "LVCMOS33", drive = Some(4))
+    }
+    shell.lpf.addPackagePin(IOPin(io.sdram_clk_o), ULX3SSDRAMLocs.clk)
+    shell.lpf.addIOStandard(IOPin(io.sdram_clk_o), "LVCMOS33", drive = Some(4))
+    shell.lpf.addPackagePin(IOPin(io.sdram_cke_o), ULX3SSDRAMLocs.cke)
+    shell.lpf.addIOStandard(IOPin(io.sdram_cke_o), "LVCMOS33", drive = Some(4))
+    shell.lpf.addPackagePin(IOPin(io.sdram_cs_o), ULX3SSDRAMLocs.cs)
+    shell.lpf.addIOStandard(IOPin(io.sdram_cs_o), "LVCMOS33", drive = Some(4))
+    shell.lpf.addPackagePin(IOPin(io.sdram_we_o), ULX3SSDRAMLocs.we)
+    shell.lpf.addIOStandard(IOPin(io.sdram_we_o), "LVCMOS33", drive = Some(4))
+    shell.lpf.addPackagePin(IOPin(io.sdram_ras_o), ULX3SSDRAMLocs.ras)
+    shell.lpf.addIOStandard(IOPin(io.sdram_ras_o), "LVCMOS33", drive = Some(4))
+    shell.lpf.addPackagePin(IOPin(io.sdram_cas_o), ULX3SSDRAMLocs.cas)
+    shell.lpf.addIOStandard(IOPin(io.sdram_cas_o), "LVCMOS33", drive = Some(4))
+  } }
+}
+
+class SDRAMULX3SShellPlacer(val shell: ULX3SHarness, val shellInput: DDRShellInput)(implicit val valName: ValName)
+  extends DDRShellPlacer[LatticeShell] {
+  def place(designInput: DDRDesignInput) = new SDRAMULX3SPlacedOverlay(shell, valName.value, designInput, shellInput)
+}
 
 class ULX3SHarness(override implicit val p: Parameters) extends ULX3SShell {
+  val sdram     = Overlay(DDROverlayKey, new SDRAMULX3SShellPlacer(this, DDRShellInput()))
   val uart      = Overlay(UARTOverlayKey, new UARTULX3SShellPlacer(this, UARTShellInput()))
   val jtagseq   = Seq(1 ->  0, 1 ->  1, 1 ->  2, 1 ->  3, 1 -> 24)
   val jtag      = Overlay(JTAGDebugOverlayKey, new JTAGDebugULX3SShellPlacer(this, ULX3SGPIOGroup(jtagseq), JTAGDebugShellInput()))
@@ -76,22 +142,6 @@ class ULX3SHarness(override implicit val p: Parameters) extends ULX3SShell {
     )))))
   }
 
-  // Clock for a possible serial interface
-  val extClocks: Seq[(Double, ClockSinkNode)] = dp(testchipip.serdes.SerialTLKey).flatMap { f =>
-    val tlSerialClockFreq = f.phyParams match {
-      case params: testchipip.serdes.DecoupledInternalSyncSerialPhyParams => Some(params.freqMHz.toDouble)
-      case params: testchipip.serdes.DecoupledExternalSyncSerialPhyParams => None
-      case params: testchipip.serdes.CreditedSourceSyncSerialPhyParams => Some(params.freqMHz.toDouble)
-    }
-
-    tlSerialClockFreq.map { freqMHz =>
-      val thisClock = ClockSinkNode(freqMHz = freqMHz)
-      val thisGroup = ClockGroup()
-      thisClock := thisGroup := harnessSysPLLNode
-      (freqMHz, thisClock)
-    }
-  }.toSeq
-
   (ddrNode zip ddrClient).map{case (a, b) => a := b}
 
   override lazy val module = new ULX3SHarnessImpl(this)
@@ -130,17 +180,6 @@ class ULX3SHarnessImpl(_outer: ULX3SHarness) extends ULX3SShellImpl(_outer) with
   val topclocks = _outer.clockOverlay.map(_.asInstanceOf[SysClockULX3SPlacedOverlay].io)
   topclocks.foreach { topclock =>
     _outer.sdc.addGroup(Seq(IOPin(topclock).name))
-  }
-
-  // Put the generation of clocks
-  // TODO: Maybe this should be in a Overlay?
-  _outer.harnessSysPLL.plls.foreach{ case(pll, _) =>
-    //val qsyspll = pll.asInstanceOf[QsysALTPLL]
-    val sysOverlay: Clock = topclocks.head
-    /*qsyspll.getClockNames.zipWithIndex.foreach{ case(path, i) =>
-      _outer.sdc.addGeneratedClock(s"dut_clock_${i}", IOPin(sysOverlay), path, qsyspll.c.ratios(i))
-      _outer.sdc.addGroupOnlyNames(Seq(s"dut_clock_${i}"))
-    }*/
   }
 
   def referenceClockFreqMHz = _outer.dutFreqMHz

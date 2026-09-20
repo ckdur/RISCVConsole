@@ -172,6 +172,31 @@ $(BIT_FILE): $(QSF_FILE)
 	cd $(build_dir); quartus_sta $(MODEL)
 endif
 
+ifeq ($(FPGA_BRAND),nextpnr_ulx)
+synthesis: $(build_dir)/obj/$(MODEL).json
+
+export synth_list_f
+export MODEL
+export build_dir
+$(build_dir)/obj/$(MODEL).json: $(synth_list_f) $(common_fpga_dir)/ULX3S/scripts/yosys.tcl
+	yosys --tcl-scriptfile $(common_fpga_dir)/ULX3S/scripts/yosys.tcl | tee $(build_dir)/yosys.log
+
+pnr: $(build_dir)/obj/$(MODEL).config
+
+$(build_dir)/obj/$(MODEL).config: $(build_dir)/obj/$(MODEL).json $(build_dir)/$(long_name).shell.lpf
+	nextpnr-ecp5 --85k --json $(build_dir)/obj/$(MODEL).json \
+		--lpf $(build_dir)/$(long_name).shell.lpf \
+		--textcfg $(build_dir)/obj/$(MODEL).config | tee $(build_dir)/nextpnr.log
+
+BIT_FILE := $(build_dir)/obj/$(MODEL).bit
+$(BIT_FILE): $(build_dir)/obj/$(MODEL).config
+	ecppack $(build_dir)/obj/$(MODEL).config $(BIT_FILE)
+
+program:
+	fujprog $(build_dir)/obj/$(MODEL).bit
+endif
+
+
 .PHONY: bitstream
 bitstream: $(BIT_FILE)
 

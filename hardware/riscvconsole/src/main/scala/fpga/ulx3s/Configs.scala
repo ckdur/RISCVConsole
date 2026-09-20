@@ -22,7 +22,7 @@ class WithDefaultPeripherals extends Config((site, here, up) => {
   case PeripheryUARTKey => List(UARTParams(address = BigInt(0x64000000L)))
   case PeripherySPIFlashKey => Seq()
   case testchipip.tsi.UARTTSIClientKey => None
-  case testchipip.serdes.SerialTLKey => None
+  case testchipip.serdes.SerialTLKey => Nil
 })
 
 class WithSystemModifications extends Config((site, here, up) => {
@@ -36,7 +36,7 @@ class WithULX3SModifiers extends Config(
   // Clocking
   new chipyard.harness.WithHarnessBinderClockFreqMHz(50.0) ++
   new chipyard.config.WithUniformBusFrequencies(50.0) ++
-  //new chipyard.harness.WithAllClocksAreIgnored ++
+  new chipyard.harness.WithAllClocksFromHarnessClockInstantiator ++
   new chipyard.clocking.WithPassthroughClockGenerator ++
   // Clocking by default
   new chipyard.harness.WithClockFromHarness ++                     // all Clock I/O in ChipTop should be driven by harnessClockInstantiator
@@ -84,5 +84,6 @@ class WithULX3SModifiers extends Config(
 
 class RocketULX3SConfig extends Config(
   new WithULX3SModifiers ++
-  new chipyard.RocketConfig
+  new freechips.rocketchip.rocket.WithNMedCores(1) ++
+  new chipyard.config.AbstractConfig
 )
