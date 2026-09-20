@@ -15,3 +15,4 @@ class DefaultTopAndSystem extends Config((site, here, up) => {
 class RocketConfig extends Config(
   new DefaultTopAndSystem ++
   new chipyard.RocketConfig)
+

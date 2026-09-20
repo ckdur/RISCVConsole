@@ -20,13 +20,13 @@ ifeq ($(SUB_PROJECT),chipyard)
 endif
 # For the RISCV console (in ULX3S)
 ifeq ($(SUB_PROJECT),ulx3s)
-	MODEL             ?= ulx3sTop
-	VLOG_MODEL        ?= TestHarness
-	MODEL_PACKAGE     ?= riscvconsole.fpga
-	CONFIG            ?= RVCConfig
-	CONFIG_PACKAGE    ?= $(SBT_PROJECT)
+	MODEL             ?= ULX3SHarness
+	VLOG_MODEL        ?= $(MODEL)
+	MODEL_PACKAGE     ?= riscvconsole.fpga.ulx3s
+	CONFIG            ?= RocketULX3SConfig
+	CONFIG_PACKAGE    ?= riscvconsole.fpga.ulx3s
 	TB                ?= TestDriver
-	TOP               ?= RVCSystem
+	TOP               ?= ChipTop
 	BOARD             = ulx3s
 	FPGA_BRAND        = nextpnr_ulx
 endif

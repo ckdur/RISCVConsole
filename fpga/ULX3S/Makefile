@@ -1,37 +1,10 @@
-#########################################################################################
-# general path variables
-#########################################################################################
-base_dir=$(abspath ../..)
+base_dir=$(abspath ../../hardware/chipyard)
 sim_dir=$(abspath .)
+common_fpga_dir=$(abspath ..)
 
 SUB_PROJECT ?= ulx3s
-sim_name = verilator
 
-#########################################################################################
-# include shared variables
-#########################################################################################
-include $(base_dir)/variables.mk
-
-#########################################################################################
-# setup misc. sim files
-#########################################################################################
-
-SIM_FILE_REQS += \
-	$(ROCKETCHIP_RSRCS_DIR)/vsrc/EICG_wrapper.v
-
-# copy files but ignore *.h files in *.f (match vcs)
-$(sim_files): $(SIM_FILE_REQS) | $(build_dir)
-	cp -f $^ $(build_dir)
-	$(foreach file,\
-		$^,\
-		$(if $(filter %.h,$(file)),\
-			,\
-			echo "$(addprefix $(build_dir)/, $(notdir $(file)))" >> $@;))
-
-#########################################################################################
-# import other necessary rules and variables
-#########################################################################################
-include $(base_dir)/common.mk
+include $(common_fpga_dir)/common.mk
 
 #########################################################################################
 # vcs simulator types and rules
