@@ -76,6 +76,8 @@ class WithULX3SModifiers extends Config(
   // Buses
   new chipyard.config.WithTLBackingMemory ++
   new WithSystemModifications ++
+  new testchipip.soc.WithNoScratchpads ++
+  new freechips.rocketchip.subsystem.WithInclusiveCache(capacityKB = 32) ++
   new freechips.rocketchip.subsystem.WithDontDriveBusClocksFromSBus ++      // leave the bus clocks undriven by sbus
   new freechips.rocketchip.subsystem.WithoutTLMonitors ++
   new freechips.rocketchip.subsystem.WithNMemoryChannels(1) ++

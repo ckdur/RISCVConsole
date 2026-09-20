@@ -185,6 +185,7 @@ pnr: $(build_dir)/obj/$(MODEL).config
 
 $(build_dir)/obj/$(MODEL).config: $(build_dir)/obj/$(MODEL).json $(build_dir)/$(long_name).shell.lpf
 	nextpnr-ecp5 --85k --json $(build_dir)/obj/$(MODEL).json \
+		--package CABGA381 \
 		--lpf $(build_dir)/$(long_name).shell.lpf \
 		--textcfg $(build_dir)/obj/$(MODEL).config | tee $(build_dir)/nextpnr.log
 

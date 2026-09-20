@@ -60,12 +60,12 @@ class SDRAMULX3SPlacedOverlay(val shell: ULX3SHarness, name: String, val designI
       shell.lpf.addIOStandard(IOPin(io.sdram_data_io(i)), "LVCMOS33", drive = Some(4))
     }
     ULX3SSDRAMLocs.ba.zipWithIndex.foreach { case (pin, i) =>
-      shell.lpf.addPackagePin(IOPin(io.sdram_ba_o(i)), pin)
-      shell.lpf.addIOStandard(IOPin(io.sdram_ba_o(i)), "LVCMOS33", drive = Some(4))
+      shell.lpf.addPackagePin(IOPin(io.sdram_ba_o, i), pin)
+      shell.lpf.addIOStandard(IOPin(io.sdram_ba_o, i), "LVCMOS33", drive = Some(4))
     }
     ULX3SSDRAMLocs.dqm.zipWithIndex.foreach { case (pin, i) =>
-      shell.lpf.addPackagePin(IOPin(io.sdram_dqm_o(i)), pin)
-      shell.lpf.addIOStandard(IOPin(io.sdram_dqm_o(i)), "LVCMOS33", drive = Some(4))
+      shell.lpf.addPackagePin(IOPin(io.sdram_dqm_o, i), pin)
+      shell.lpf.addIOStandard(IOPin(io.sdram_dqm_o, i), "LVCMOS33", drive = Some(4))
     }
     shell.lpf.addPackagePin(IOPin(io.sdram_clk_o), ULX3SSDRAMLocs.clk)
     shell.lpf.addIOStandard(IOPin(io.sdram_clk_o), "LVCMOS33", drive = Some(4))
