@@ -9,8 +9,7 @@ import freechips.rocketchip.system._
 import freechips.rocketchip.tile._
 import sifive.blocks.devices.uart._
 import sifive.fpgashells.shell.DesignKey
-import chipyard.BuildSystem
-import chipyard.fpga.arty100t.WithNoDesignKey
+import sifive.blocks.devices.gpio._
 import sifive.blocks.devices.spi._
 
 // don't use FPGAShell's DesignKey
@@ -20,7 +19,8 @@ class WithNoDesignKey extends Config((site, here, up) => {
 
 class WithDefaultPeripherals extends Config((site, here, up) => {
   case PeripheryUARTKey => List(UARTParams(address = BigInt(0x64000000L)))
-  case PeripherySPIFlashKey => Seq()
+  case PeripherySPIFlashKey => Nil
+  case PeripheryGPIOKey => Seq(GPIOParams(address = 0x64006000L, width = 5))
   case testchipip.tsi.UARTTSIClientKey => None
   case testchipip.serdes.SerialTLKey => Nil
 })

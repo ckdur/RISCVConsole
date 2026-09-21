@@ -23,6 +23,21 @@ class WithTR4UARTTSI(uartBaudRate: BigInt = 115200) extends HarnessBinder({
   }
 })
 
+object WithSPISDCardCounter {
+  var cnt = 0
+}
+
+class WithTR4SPIBinder extends HarnessBinder({
+  case (th: HasHarnessInstantiators, port: SPIPort, chipId: Int) => {
+    val ath = th.asInstanceOf[LazyRawModuleImp].wrapper.asInstanceOf[TR4Harness]
+    WithSPISDCardCounter.cnt match {
+      case 0 =>
+        ath.io_qspi_bb.foreach(_.bundle <> port.io)
+    }
+    WithSPISDCardCounter.cnt = WithSPISDCardCounter.cnt + 1
+  }
+})
+
 class WithTR4SPIFlashBinder extends HarnessBinder({
   case (th: HasHarnessInstantiators, port: SPIFlashPort, chipId: Int) => {
     val ath = th.asInstanceOf[LazyRawModuleImp].wrapper.asInstanceOf[TR4Harness]

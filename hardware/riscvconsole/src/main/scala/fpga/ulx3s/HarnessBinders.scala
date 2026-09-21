@@ -23,13 +23,6 @@ class WithULX3SUARTTSI(uartBaudRate: BigInt = 115200) extends HarnessBinder({
   }
 })
 
-class WithULX3SSPIFlashBinder extends HarnessBinder({
-  case (th: HasHarnessInstantiators, port: SPIFlashPort, chipId: Int) => {
-    val ath = th.asInstanceOf[LazyRawModuleImp].wrapper.asInstanceOf[ULX3SHarness]
-    ath.io_qspi_bb(port.spiId).bundle <> port.io
-  }
-})
-
 class WithULX3SUARTBinder extends HarnessBinder({
   case (th: HasHarnessInstantiators, port: UARTPort, chipId: Int) => {
     val ath = th.asInstanceOf[LazyRawModuleImp].wrapper.asInstanceOf[ULX3SHarness]

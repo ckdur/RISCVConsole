@@ -59,7 +59,7 @@ class WithTR4Modifiers extends Config(
   new freechips.rocketchip.subsystem.WithJtagDTM ++                         // set the debug module to expose a JTAG port
   new freechips.rocketchip.subsystem.WithNExtTopInterrupts(0) ++                        // TODO: necessary?
   // Harness binders (From ChipTop to Harness)
-  new WithTR4SPIFlashBinder ++
+  new WithTR4SPIBinder ++
   new WithTR4UARTBinder ++
   new WithTR4GPIOBinder ++
   new WithTR4JTAGBinder ++

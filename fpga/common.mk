@@ -25,58 +25,71 @@ ifeq ($(SUB_PROJECT),ulx3s)
 	MODEL_PACKAGE     ?= riscvconsole.fpga.ulx3s
 	CONFIG            ?= RocketULX3SConfig
 	CONFIG_PACKAGE    ?= riscvconsole.fpga.ulx3s
-	TB                ?= TestDriver
+	TB                ?= none # unused
 	TOP               ?= ChipTop
 	BOARD             = ulx3s
 	FPGA_BRAND        = nextpnr_ulx
 endif
 # For the RISCV console (in Arrow)
 ifeq ($(SUB_PROJECT),arrow)
-	MODEL             ?= ArrowTop
-	VLOG_MODEL        ?= ArrowTop
-	MODEL_PACKAGE     ?= riscvconsole.fpga
-	CONFIG            ?= ArrowConfig
-	CONFIG_PACKAGE    ?= riscvconsole.system
-	TB                ?= TestDriver
-	TOP               ?= RVCSystem
-	BOARD             = arrow
-	FPGA_BRAND        = altera
+	MODEL             ?= ArrowHarness
+	VLOG_MODEL        ?= $(MODEL)
+	MODEL_PACKAGE     ?= riscvconsole.fpga.arrow
+	CONFIG            ?= RocketArrowConfig
+	CONFIG_PACKAGE    ?= riscvconsole.fpga.arrow
+	TB                ?= none # unused
+	TOP               ?= ChipTop
+	BOARD             ?= arrow
+	FPGA_BRAND        ?= altera
 endif
 # For the RISCV console (in DE2)
 ifeq ($(SUB_PROJECT),DE2)
-	MODEL             ?= DE2Top
-	VLOG_MODEL        ?= DE2Top
-	MODEL_PACKAGE     ?= riscvconsole.fpga
-	CONFIG            ?= DE2Config
-	CONFIG_PACKAGE    ?= riscvconsole.system
-	TB                ?= TestDriver
-	TOP               ?= RVCSystem
-	BOARD             = DE2
-	FPGA_BRAND        = altera
+	MODEL             ?= DE2Harness
+	VLOG_MODEL        ?= $(MODEL)
+	MODEL_PACKAGE     ?= riscvconsole.fpga.de2
+	CONFIG            ?= RocketDE2Config
+	CONFIG_PACKAGE    ?= riscvconsole.fpga.de2
+	TB                ?= none # unused
+	TOP               ?= ChipTop
+	BOARD             ?= DE2
+	FPGA_BRAND        ?= altera
 endif
-# For the RISCV console (in ArtyA7)
-ifeq ($(SUB_PROJECT),ArtyA7)
-	MODEL             ?= ArtyA7Top
-	VLOG_MODEL        ?= ArtyA7Top
-	MODEL_PACKAGE     ?= riscvconsole.fpga
-	CONFIG            ?= ArtyA7Config
-	CONFIG_PACKAGE    ?= riscvconsole.system
-	TB                ?= TestDriver
-	TOP               ?= RVCSystem
-	BOARD             = artya7
-	FPGA_BRAND        = xilinx
+# For the RISCV console (in TR4)
+ifeq ($(SUB_PROJECT),TR4)
+	MODEL             ?= TR4Harness
+	VLOG_MODEL        ?= $(MODEL)
+	MODEL_PACKAGE     ?= riscvconsole.fpga.tr4
+	CONFIG            ?= RocketTR4Config
+	CONFIG_PACKAGE    ?= riscvconsole.fpga.tr4
+	TB                ?= none # unused
+	TOP               ?= ChipTop
+	BOARD             ?= TR4
+	FPGA_BRAND        ?= altera
 endif
-# For the RISCV console (in Nexys4DDR)
-ifeq ($(SUB_PROJECT),Nexys4DDR)
-	MODEL             ?= Nexys4DDRTop
-	VLOG_MODEL        ?= Nexys4DDRTop
-	MODEL_PACKAGE     ?= riscvconsole.fpga
-	CONFIG            ?= Nexys4DDRConfig
-	CONFIG_PACKAGE    ?= riscvconsole.system
-	TB                ?= TestDriver
-	TOP               ?= RVCSystem
-	BOARD             = nexys4ddr
-	FPGA_BRAND        = xilinx
+# For the RISCV console (in arty100t)
+ifeq ($(SUB_PROJECT),arty100t)
+	# TODO: Fix with Arty
+	MODEL             ?= Arty100THarness
+	VLOG_MODEL        ?= Arty100THarness
+	MODEL_PACKAGE     ?= chipyard.fpga.arty100t
+	CONFIG            ?= RocketArty100TConfig
+	CONFIG_PACKAGE    ?= chipyard.fpga.arty100t
+	TB                ?= none # unused
+	TOP               ?= ChipTop
+	BOARD             ?= arty_a7_100
+	FPGA_BRAND        ?= xilinx
+endif
+# For the RISCV console (in nexysvideo)
+ifeq ($(SUB_PROJECT),nexysvideo)
+	MODEL             ?= NexysVideoHarness
+	VLOG_MODEL        ?= NexysVideoHarness
+	MODEL_PACKAGE     ?= chipyard.fpga.nexysvideo
+	CONFIG            ?= RocketNexysVideoConfig
+	CONFIG_PACKAGE    ?= chipyard.fpga.nexysvideo
+	TB                ?= none # unused
+	TOP               ?= ChipTop
+	BOARD             ?= nexys_video
+	FPGA_BRAND        ?= xilinx
 endif
 
 export USE_CHISEL6=1

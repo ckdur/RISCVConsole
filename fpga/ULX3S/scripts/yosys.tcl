@@ -1,5 +1,5 @@
 yosys -import
-plugin -i slang
+catch { plugin -i slang } ; # Because it can be version 0.67+ that has slang integrated
 yosys -import
 
 proc load_vsrc_manifest {vsrc_manifest} {
@@ -45,6 +45,6 @@ proc load_vsrc_manifest {vsrc_manifest} {
 lassign [load_vsrc_manifest $env(synth_list_f)] VERILOG_FILES SVERILOG_FILES VHD_FILES SOURCE_FILES
 
 read_slang -DSYNTHESIS --top $env(MODEL) --empty-blackboxes {*}$VERILOG_FILES {*}$SVERILOG_FILES
-file mkdir -p $env(build_dir)/obj
+file mkdir $env(build_dir)/obj
 synth_ecp5 -json $env(build_dir)/obj/$env(MODEL).json
 
