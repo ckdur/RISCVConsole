@@ -27,11 +27,14 @@
 // SPI SCLK frequency, in kHz
 // We are using the 25MHz High Speed mode. If this speed is not supported by the
 // SD card, consider changing to the Default Speed mode (12.5 MHz).
-#define SPI_CLK 	12500
+#define SPI_CLK 	7500
+
+#define SD_POWER_ON_FREQ_KHZ 400
 
 // SPI clock divisor value
 // @see https://ucb-bar.gitbook.io/baremetal-ide/baremetal-ide/using-peripheral-devices/sifive-ips/serial-peripheral-interface-spi
 #define SPI_DIV 	(((F_CLK * 1000) / SPI_CLK) / 2 - 1)
+#define SPI_POWER_DIV 	(((F_CLK * 1000) / SD_POWER_ON_FREQ_KHZ) / 2 - 1)
 
 static volatile uint32_t * const spi = (void *)(SPI_CTRL_ADDR);
 
@@ -90,7 +93,7 @@ static void sd_poweron(void)
 	long i;
 	// HACK: frequency change
 
-	REG32(spi, SPI_REG_SCKDIV) = SPI_DIV;
+	REG32(spi, SPI_REG_SCKDIV) = SPI_POWER_DIV;
 	REG32(spi, SPI_REG_CSMODE) = SPI_CSMODE_OFF;
 	for (i = 10; i > 0; i--) {
 		sd_dummy();

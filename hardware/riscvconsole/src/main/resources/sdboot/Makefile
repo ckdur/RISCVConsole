@@ -14,7 +14,7 @@ CFLAGS_RV32+= -I $(ROOT_DIR)/include -I.
 LFLAGS=-static -nostdlib -L $(ROOT_DIR)/linker -T sdboot.elf.lds
 
 # default to 50MHz but really should be overridden
-PBUS_CLK ?= 50000000
+PBUS_CLK ?= 50
 
 default: elf bin dump
 
