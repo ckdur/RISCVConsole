@@ -1,5 +1,6 @@
 package riscvconsole.fpga.ulx3s
 
+import sys.process._
 import org.chipsalliance.cde.config._
 import freechips.rocketchip.subsystem._
 import freechips.rocketchip.devices.debug._
@@ -7,6 +8,7 @@ import freechips.rocketchip.devices.tilelink._
 import freechips.rocketchip.diplomacy._
 import freechips.rocketchip.system._
 import freechips.rocketchip.tile._
+import freechips.rocketchip.util._
 import sifive.blocks.devices.uart._
 import sifive.fpgashells.shell.DesignKey
 import sifive.blocks.devices.gpio._
@@ -19,6 +21,9 @@ class WithNoDesignKey extends Config((site, here, up) => {
 
 class WithDefaultPeripherals extends Config((site, here, up) => {
   case PeripheryUARTKey => List(UARTParams(address = BigInt(0x64000000L)))
+  case PeripherySPIKey => List(
+    SPIParams(rAddress = BigInt(0x64001000L))
+  )
   case PeripherySPIFlashKey => Nil
   case PeripheryGPIOKey => Seq(GPIOParams(address = 0x64006000L, width = 5))
   case testchipip.tsi.UARTTSIClientKey => None
@@ -41,23 +46,14 @@ class WithULX3SModifiers extends Config(
   // Clocking by default
   new chipyard.harness.WithClockFromHarness ++                     // all Clock I/O in ChipTop should be driven by harnessClockInstantiator
   new chipyard.harness.WithResetFromHarness ++                     // reset controlled by harness
-  new chipyard.harness.WithAbsoluteFreqHarnessClockInstantiator ++ // generate clocks in harness with unsynthesizable ClockSourceAtFreqMHz
-  new chipyard.clocking.WithPassthroughClockGenerator ++
-  new chipyard.clocking.WithClockGroupsCombinedByName(("uncore",        /** create a "uncore" clock group tieing all the bus clocks together */
-    Seq("sbus", "mbus", "pbus", "fbus", "cbus", "obus", "implicit", "clock_tap"),
-    Seq("tile"))) ++
   new chipyard.config.WithNoSubsystemClockIO ++                        // drive the subsystem diplomatic clocks from ChipTop instead of using implicit clocks
   // Devices
   new WithDefaultPeripherals ++
   new testchipip.serdes.WithNoSerialTL ++                                          // No serial TL
-  //new chipyard.config.WithGPIO(width = 3) ++                                           // Add a regular GPIO of width 3
-  //new chipyard.config.WithUART(address = 0x64000000L) ++                               // Add UART (Disabled and moved to WithDefaultPeripherals because the abstracts adds another)
   new riscvconsole.config.WithoutClockGating ++                                 // No clock gating
-  new riscvconsole.config.WithJustJumpBootROM ++                                // The just jump boot ROM
-  new chipyard.config.WithDebugModuleAbstractDataWords(8) ++         // increase debug module data capacity
-  new freechips.rocketchip.subsystem.WithJtagDTM ++                         // set the debug module to expose a JTAG port
-  new freechips.rocketchip.subsystem.WithNExtTopInterrupts(0) ++                        // TODO: necessary?
+  new riscvconsole.config.WithSDBootBootROM ++
   // Harness binders (From ChipTop to Harness)
+  new WithULX3SSPIBinder ++
   new WithULX3SUARTBinder ++
   new WithULX3SGPIOBinder ++
   new WithULX3SJTAGBinder ++
@@ -69,7 +65,6 @@ class WithULX3SModifiers extends Config(
   new chipyard.iobinders.WithDebugIOCells(externalReset = false) ++
   new chipyard.iobinders.WithUARTIOCells ++
   new chipyard.iobinders.WithExtInterruptIOCells ++
-  new chipyard.iobinders.WithTLMemPunchthrough ++
   // Bootloader
   new testchipip.boot.WithNoBootAddrReg ++
   new testchipip.boot.WithNoCustomBootPin ++

@@ -91,7 +91,8 @@ class ULX3SHarness(override implicit val p: Parameters) extends ULX3SShell {
   import GPIOULX3SPinConstraints._
   val sdram     = Overlay(DDROverlayKey, new SDRAMULX3SShellPlacer(this, DDRShellInput()))
   val uart      = Overlay(UARTOverlayKey, new UARTULX3SShellPlacer(this, UARTShellInput()))
-  val jtagseq   = Seq(gp ->  0, gp ->  3, gp ->  2, gp ->  1, gp ->  4)
+  val sdspi     = Overlay(SPIOverlayKey, new SPIMediaULX3SShellPlacer(this, SPIShellInput()))
+  val jtagseq   = Seq(gp ->  0, gp ->  1, gp ->  2, gp ->  3, gp ->  4)
   val jtag      = Overlay(JTAGDebugOverlayKey, new JTAGDebugULX3SShellPlacer(this, ULX3SGPIOGroup(jtagseq), JTAGDebugShellInput()))
   val gpioseq   = Seq(gp ->  5, gp ->  6, gp ->  7, gp ->  8, gp ->  9)
   val gpio      = Overlay(GPIOOverlayKey, new GPIOPeripheralULX3SShellPlacer(this, ULX3SGPIOGroup(gpioseq), GPIOShellInput()))
@@ -112,6 +113,12 @@ class ULX3SHarness(override implicit val p: Parameters) extends ULX3SShell {
 
   val io_uart_bb = BundleBridgeSource(() => new UARTPortIO(dp(PeripheryUARTKey).headOption.getOrElse(UARTParams(0))))
   val uartOverlay = dp(UARTOverlayKey).head.place(UARTDesignInput(io_uart_bb))
+
+  val io_sdspi_bb = dp(PeripherySPIKey).map { spicfg => BundleBridgeSource(() => new SPIPortIO(spicfg)) }
+  ((dp(SPIOverlayKey) zip io_sdspi_bb) zip dp(PeripherySPIKey)).foreach {
+    case ((sdspi, sdspibb), spicfg) =>
+      sdspi.place(SPIDesignInput(spicfg, sdspibb))
+  }
 
   val ledOverlays = dp(LEDOverlayKey).map(_.place(LEDDesignInput()))
   val all_leds = ledOverlays.map(_.overlayOutput.led)

@@ -23,6 +23,21 @@ class WithULX3SUARTTSI(uartBaudRate: BigInt = 115200) extends HarnessBinder({
   }
 })
 
+object WithSPISDCardCounter {
+  var cnt = 0
+}
+
+class WithULX3SSPIBinder extends HarnessBinder({
+  case (th: HasHarnessInstantiators, port: SPIPort, chipId: Int) => {
+    val ath = th.asInstanceOf[LazyRawModuleImp].wrapper.asInstanceOf[ULX3SHarness]
+    WithSPISDCardCounter.cnt match {
+      case 0 =>
+        ath.io_sdspi_bb.foreach(_.bundle <> port.io)
+    }
+    WithSPISDCardCounter.cnt = WithSPISDCardCounter.cnt + 1
+  }
+})
+
 class WithULX3SUARTBinder extends HarnessBinder({
   case (th: HasHarnessInstantiators, port: UARTPort, chipId: Int) => {
     val ath = th.asInstanceOf[LazyRawModuleImp].wrapper.asInstanceOf[ULX3SHarness]
