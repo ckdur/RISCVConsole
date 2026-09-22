@@ -13,6 +13,7 @@ import sifive.blocks.devices.uart._
 import sifive.fpgashells.shell.DesignKey
 import sifive.blocks.devices.gpio._
 import sifive.blocks.devices.spi._
+import sifive.fpgashells.shell.lattice._
 
 // don't use FPGAShell's DesignKey
 class WithNoDesignKey extends Config((site, here, up) => {
@@ -31,13 +32,12 @@ class WithDefaultPeripherals extends Config((site, here, up) => {
 })
 
 class WithSystemModifications extends Config((site, here, up) => {
-  case ExtMem => up(ExtMem, site).map(x => x.copy(master = x.master.copy(
-    size = 0x2000000, beatBytes = 4
-  )))
+  case ExtMem => up(ExtMem, site).map(x => x.copy(master = x.master.copy(size = site(ULX3SSDRAMCfg).size))) // set extmem to SDRAM size (note the size)
 })
 
 class WithULX3SModifiers extends Config(
   new WithNoDesignKey ++
+  new riscvconsole.config.DefaultTopAndSystem ++
   // Clocking
   new chipyard.harness.WithHarnessBinderClockFreqMHz(50.0) ++
   new chipyard.config.WithUniformBusFrequencies(50.0) ++
@@ -53,11 +53,12 @@ class WithULX3SModifiers extends Config(
   new riscvconsole.config.WithoutClockGating ++                                 // No clock gating
   new riscvconsole.config.WithSDBootBootROM ++
   // Harness binders (From ChipTop to Harness)
-  new WithULX3SSPIBinder ++
-  new WithULX3SUARTBinder ++
-  new WithULX3SGPIOBinder ++
-  new WithULX3SJTAGBinder ++
-  new WithULX3SDDRMemBinder ++
+  new riscvconsole.fpga.ulx3s.WithULX3SJTAG ++
+  new riscvconsole.fpga.ulx3s.WithULX3SUART ++
+  new riscvconsole.fpga.ulx3s.WithULX3SSDRAMTL ++
+  new riscvconsole.fpga.ulx3s.WithULX3SUARTTSI ++
+  new riscvconsole.fpga.ulx3s.WithULX3SGPIOBinder ++
+  new riscvconsole.fpga.ulx3s.WithULX3SSDBinder ++
   // IO Cells (From DigitalTop to ChipTop)
   new chipyard.iobinders.WithSPIIOPunchthrough ++
   new riscvconsole.iobinders.WithSPIFlashIOPunchthrough ++
@@ -72,6 +73,7 @@ class WithULX3SModifiers extends Config(
   new chipyard.config.WithTLBackingMemory ++
   new WithSystemModifications ++
   new testchipip.soc.WithNoScratchpads ++
+  new freechips.rocketchip.subsystem.WithTimebase(1000000) ++
   new freechips.rocketchip.subsystem.WithInclusiveCache(capacityKB = 32) ++
   new freechips.rocketchip.subsystem.WithDontDriveBusClocksFromSBus ++      // leave the bus clocks undriven by sbus
   new freechips.rocketchip.subsystem.WithoutTLMonitors ++

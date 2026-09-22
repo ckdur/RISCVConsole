@@ -1,47 +1,65 @@
 package riscvconsole.fpga.ulx3s
 
 import chisel3._
+import freechips.rocketchip.util._
+import sifive.blocks.devices.uart._
+import sifive.fpgashells.shell._
 import chipyard.harness._
 import chipyard.iobinders._
-import freechips.rocketchip.diplomacy._
-import org.chipsalliance.diplomacy.lazymodule.LazyRawModuleImp
-import org.chipsalliance.diplomacy.nodes.HeterogeneousBag
-import sifive.fpgashells.shell.IOPin
-import sifive.fpgashells.shell.altera._
+import org.chipsalliance.diplomacy._
+import org.chipsalliance.diplomacy.lazymodule._
+import org.chipsalliance.diplomacy.nodes._
 import testchipip.serdes._
 
-class WithULX3SUARTTSI(uartBaudRate: BigInt = 115200) extends HarnessBinder({
+class WithULX3SUARTTSI extends HarnessBinder({
   case (th: HasHarnessInstantiators, port: UARTTSIPort, chipId: Int) => {
     val ath = th.asInstanceOf[LazyRawModuleImp].wrapper.asInstanceOf[ULX3SHarness]
-    ath.io_uart_bb.bundle <> port.io.uart
+    val harnessIO = IO(new UARTPortIO(port.io.uartParams)).suggestName("uart_tsi")
+    harnessIO <> port.io.uart
+    val packagePinsWithPackageIOs = Seq(
+      ("A9" , IOPin(harnessIO.rxd)),
+      ("D10", IOPin(harnessIO.txd)))
+    packagePinsWithPackageIOs foreach { case (pin, io) => {
+      ath.lpf.addPackagePin(io, pin)
+      ath.lpf.addIOBUF(io)
+    } }
+
     ath.other_leds(1) := port.io.dropped
-    ath.other_leds(2) := port.io.tsi2tl_state(0)
-    // TODO: Do not exist
-    //ath.other_leds(3) := port.io.tsi2tl_state(1)
-    //ath.other_leds(4) := port.io.tsi2tl_state(2)
-    //ath.other_leds(5) := port.io.tsi2tl_state(3)
+    //ath.other_leds(9) := port.io.tsi2tl_state(0)
+    //ath.other_leds(10) := port.io.tsi2tl_state(1)
+    //ath.other_leds(11) := port.io.tsi2tl_state(2)
+    //ath.other_leds(12) := port.io.tsi2tl_state(3)
   }
 })
 
-object WithSPISDCardCounter {
-  var cnt = 0
-}
 
-class WithULX3SSPIBinder extends HarnessBinder({
-  case (th: HasHarnessInstantiators, port: SPIPort, chipId: Int) => {
-    val ath = th.asInstanceOf[LazyRawModuleImp].wrapper.asInstanceOf[ULX3SHarness]
-    WithSPISDCardCounter.cnt match {
-      case 0 =>
-        ath.io_sdspi_bb.foreach(_.bundle <> port.io)
-    }
-    WithSPISDCardCounter.cnt = WithSPISDCardCounter.cnt + 1
+class WithULX3SSDRAMTL extends HarnessBinder({
+  case (th: HasHarnessInstantiators, port: TLMemPort, chipId: Int) => {
+    val artyTh = th.asInstanceOf[LazyRawModuleImp].wrapper.asInstanceOf[ULX3SHarness]
+    val bundles = artyTh.sdramClient.out.map(_._1)
+    val ddrClientBundle = Wire(new HeterogeneousBag(bundles.map(_.cloneType)))
+    bundles.zip(ddrClientBundle).foreach { case (bundle, io) => bundle <> io }
+    ddrClientBundle <> port.io
   }
 })
 
-class WithULX3SUARTBinder extends HarnessBinder({
+// Maps the UART device to the on-board USB-UART
+class WithULX3SUART extends HarnessBinder({
   case (th: HasHarnessInstantiators, port: UARTPort, chipId: Int) => {
     val ath = th.asInstanceOf[LazyRawModuleImp].wrapper.asInstanceOf[ULX3SHarness]
     ath.io_uart_bb.bundle <> port.io
+  }
+})
+
+class WithULX3SJTAG extends HarnessBinder({
+  case (th: HasHarnessInstantiators, port: JTAGPort, chipId: Int) => {
+    val ath = th.asInstanceOf[LazyRawModuleImp].wrapper.asInstanceOf[ULX3SHarness]
+    port.io.TCK := ath.jtagOverlay.getWrappedValue.TCK
+    port.io.TMS := ath.jtagOverlay.getWrappedValue.TMS
+    port.io.TDI := ath.jtagOverlay.getWrappedValue.TDI
+    ath.jtagOverlay.getWrappedValue.TDO.data := port.io.TDO
+    ath.jtagOverlay.getWrappedValue.TDO.driven := true.B
+    ath.ndreset.getWrappedValue := !ath.jtagOverlay.getWrappedValue.srst_n
   }
 })
 
@@ -52,27 +70,21 @@ class WithULX3SGPIOBinder extends HarnessBinder({
   }
 })
 
-class WithULX3SJTAGBinder extends HarnessBinder({
-  case (th: HasHarnessInstantiators, port: JTAGPort, chipId: Int) => {
+object SPITracker {
+  var i = 0
+  def incr = {
+    i = i + 1
+  }
+}
+
+class WithULX3SSDBinder extends HarnessBinder({
+  case (th: HasHarnessInstantiators, port: SPIPort, chipId: Int) => {
     val ath = th.asInstanceOf[LazyRawModuleImp].wrapper.asInstanceOf[ULX3SHarness]
-    // port.io.reset.foreach(_ := false.B) // NOTE: Configs with ULX3S should not have external reset for jtag
-    port.io.TCK := ath.jtagOverlay.getWrappedValue.TCK
-    port.io.TMS := ath.jtagOverlay.getWrappedValue.TMS
-    port.io.TDI := ath.jtagOverlay.getWrappedValue.TDI
-    ath.jtagOverlay.getWrappedValue.TDO.data := port.io.TDO
-    ath.jtagOverlay.getWrappedValue.TDO.driven := true.B
-    ath.ndreset.getWrappedValue := /*port.io.ndreset || */!ath.jtagOverlay.getWrappedValue.srst_n
-    // ath.jtagOverlay.getWrappedValue.srst_n is ignored
+    if(SPITracker.i == 0) {
+      ath.io_sd_bb.foreach{ io_sd_bb =>
+        io_sd_bb.bundle <> port.io
+      }
+      SPITracker.incr
+    }
   }
 })
-
-class WithULX3SDDRMemBinder extends HarnessBinder({
-  case (th: HasHarnessInstantiators, port: TLMemPort, chipId: Int) => {
-    val ath = th.asInstanceOf[LazyRawModuleImp].wrapper.asInstanceOf[ULX3SHarness]
-    val bundles = ath.ddrClient.get.out.map(_._1)
-    val ddrClientBundle = Wire(new HeterogeneousBag(bundles.map(_.cloneType)))
-    bundles.zip(ddrClientBundle).foreach { case (bundle, io) => bundle <> io }
-    ddrClientBundle <> port.io
-  }
-})
-
