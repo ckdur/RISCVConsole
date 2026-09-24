@@ -209,6 +209,10 @@ $(BIT_FILE): $(build_dir)/obj/$(MODEL).config
 
 program:
 	fujprog $(build_dir)/obj/$(MODEL).bit
+
+flash:
+	fujprog -j flash $(build_dir)/obj/$(MODEL).bit
+
 endif
 
 

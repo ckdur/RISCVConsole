@@ -80,11 +80,9 @@ object SPITracker {
 class WithULX3SSDBinder extends HarnessBinder({
   case (th: HasHarnessInstantiators, port: SPIPort, chipId: Int) => {
     val ath = th.asInstanceOf[LazyRawModuleImp].wrapper.asInstanceOf[ULX3SHarness]
-    if(SPITracker.i == 0) {
-      ath.io_sd_bb.foreach{ io_sd_bb =>
-        io_sd_bb.bundle <> port.io
-      }
-      SPITracker.incr
+    if(SPITracker.i < 2) {
+      ath.io_sd_bb(SPITracker.i).bundle <> port.io
     }
+    SPITracker.incr
   }
 })

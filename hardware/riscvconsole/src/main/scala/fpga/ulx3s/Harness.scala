@@ -65,13 +65,13 @@ class ULX3SHarness(override implicit val p: Parameters) extends ULX3SShell {
     placer.place(GPIODesignInput(gpiocfg, gpiobb))
   }
 
-  val io_sd_bb = if(dp(PeripherySPIKey).nonEmpty) {
-    val spicfg = dp(PeripherySPIKey).head
+  require(dp(PeripherySPIKey).size <= 2, "The ULX3S harness do not support more than 2 SPIs")
+  val io_sd_bb = dp(PeripherySPIKey).zipWithIndex.map { case(spicfg, i) =>
     val spibb = BundleBridgeSource(() => new SPIPortIO(spicfg))
-    val spi = dp(SDOverlayKey).head
+    val spi = if(i == 0) dp(SDOverlayKey).head else dp(SPIOverlayKey).head
     spi.place(SPIDesignInput(spicfg, spibb))
-    Some(spibb)
-  } else None
+    spibb
+  }
 
   override lazy val module = new HarnessLikeImpl
 

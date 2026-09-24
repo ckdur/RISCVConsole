@@ -23,7 +23,8 @@ class WithNoDesignKey extends Config((site, here, up) => {
 class WithDefaultPeripherals extends Config((site, here, up) => {
   case PeripheryUARTKey => List(UARTParams(address = BigInt(0x64000000L)))
   case PeripherySPIKey => List(
-    SPIParams(rAddress = BigInt(0x64001000L))
+    SPIParams(rAddress = BigInt(0x64001000L)),
+    SPIParams(rAddress = BigInt(0x64002000L))
   )
   case PeripherySPIFlashKey => Nil
   case PeripheryGPIOKey => Seq(GPIOParams(address = 0x64006000L, width = 5))
