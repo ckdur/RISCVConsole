@@ -27,7 +27,7 @@ class WithDefaultPeripherals extends Config((site, here, up) => {
     SPIParams(rAddress = BigInt(0x64002000L))
   )
   case PeripherySPIFlashKey => Nil
-  case PeripheryGPIOKey => Seq(GPIOParams(address = 0x64006000L, width = 5))
+  case PeripheryGPIOKey => Seq(GPIOParams(address = 0x64006000L, width = 32))
   case testchipip.tsi.UARTTSIClientKey => None
   case testchipip.serdes.SerialTLKey => Nil
 })

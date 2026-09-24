@@ -73,10 +73,22 @@ class ULX3SHarness(override implicit val p: Parameters) extends ULX3SShell {
     spibb
   }
 
+  // Borrow a clock for the chip
+  val slowClock = ClockSinkNode(freqMHz = 10)
+  val slowWrangler = LazyModule(new ResetWrangler())
+  val slowGroup = ClockGroup()
+  slowClock := slowWrangler.node := slowGroup := harnessSysPLLNode
+
   override lazy val module = new HarnessLikeImpl
 
   class HarnessLikeImpl extends ULX3SShellImpl(this) with HasHarnessInstantiators {
     override def provideImplicitClockToLazyChildren = true
+
+    val slowclk = slowClock.in.head._1.clock
+    val slow_clock_port = IO(Output(Clock()))
+    lpf.addPackagePin(IOPin(slow_clock_port), "E13") // Set to gn[27]
+    lpf.addIOBUF(IOPin(slow_clock_port), drive=Some(4))
+    slow_clock_port := slowclk
 
     all_leds.foreach(_ := DontCare)
     clockOverlay.overlayOutput.node.out(0)._1.reset := resetPin
