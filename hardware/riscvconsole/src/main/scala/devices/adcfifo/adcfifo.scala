@@ -47,8 +47,8 @@ abstract class ADCFIFO(busWidthBytes: Int, c: ADCFIFOParams)(implicit p: Paramet
 
     // Catched reset
     val crst = adcClk.reset.asBool // ResetCatchAndSync(portq.clk, reset.asBool) // NOTE: Do not need to sync here
-    val prst = WireInit(false.B)
-    portq.rst_n := !(crst || prst)
+    val prst = RegInit(false.B)
+    portq.rst_n := crst || prst
 
     // The valid to the ADC
     val valid = RegInit(false.B)
@@ -69,7 +69,7 @@ abstract class ADCFIFO(busWidthBytes: Int, c: ADCFIFOParams)(implicit p: Paramet
       ADCFIFOCtrlRegs.ctrl -> Seq(
         RegField(1, valid, RegFieldDesc("Valid", "ADC Persistent Valid", reset = Some(0))),
         RegField(7),
-        RegField(1, prst, RegFieldDesc("Reset", "ADC Reset Trigger", wrType = Some(RegFieldWrType.ONE_TO_SET)))
+        RegField(1, prst, RegFieldDesc("Reset", "ADC Reset Trigger", reset = Some(0)))
       )
     ):_*)
   }
