@@ -26,7 +26,7 @@ case object ExtraOverlayKey extends Field[Seq[DesignPlacer[GPIODirectLatticeDesi
 class ULX3SHarness(override implicit val p: Parameters) extends ULX3SShell with WithVisibleDigitalTopHarness {
   def dp = designParameters
 
-  val extraseq = Seq(26 -> 1, 25 -> 1, 24 -> 1, 23 -> 1, 22 -> 1, 21 -> 1, 20 -> 1, 19 -> 1, 18 -> 1)
+  val extraseq = Seq(27 -> 1, 26 -> 1, 25 -> 1, 24 -> 1, 23 -> 1, 22 -> 1, 21 -> 1, 20 -> 1, 19 -> 1)
   val extra = Overlay(ExtraOverlayKey, new GPIO0ULX3SShellPlacer(this, ULX3SGPIOGroup(extraseq), GPIOShellInput()))
 
   val clockOverlay = dp(ClockInputOverlayKey).map(_.place(ClockInputDesignInput())).head
