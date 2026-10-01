@@ -3,7 +3,7 @@ package riscvconsole.fpga.ulx3s
 import chisel3._
 import chisel3.util._
 import freechips.rocketchip.diplomacy._
-import org.chipsalliance.cde.config.Parameters
+import org.chipsalliance.cde.config.{Field, Parameters}
 import freechips.rocketchip.tilelink._
 import freechips.rocketchip.prci._
 import freechips.rocketchip.subsystem.{CacheBlockBytes, MemoryBusKey, SystemBusKey}
@@ -13,12 +13,21 @@ import sifive.fpgashells.clocks._
 import sifive.blocks.devices.uart._
 import chipyard._
 import chipyard.harness._
+import riscvconsole.devices.adcfifo.PeripheryADCFIFOKey
+import riscvconsole.fpga.vcu108.{HasHarnessInstantiatorsEx, WithVisibleDigitalTopHarness}
 import sifive.blocks.devices.gpio._
 import sifive.blocks.devices.spi._
 import sifive.fpgashells.ip.lattice.ecp5pllCompat
 
-class ULX3SHarness(override implicit val p: Parameters) extends ULX3SShell {
+import scala.collection.mutable.LinkedHashMap
+
+case object ExtraOverlayKey extends Field[Seq[DesignPlacer[GPIODirectLatticeDesignInput, GPIOShellInput, GPIODirectLatticeOverlayOutput]]](Nil)
+
+class ULX3SHarness(override implicit val p: Parameters) extends ULX3SShell with WithVisibleDigitalTopHarness {
   def dp = designParameters
+
+  val extraseq = Seq(26 -> 1, 25 -> 1, 24 -> 1, 23 -> 1, 22 -> 1, 21 -> 1, 20 -> 1, 19 -> 1, 18 -> 1)
+  val extra = Overlay(ExtraOverlayKey, new GPIO0ULX3SShellPlacer(this, ULX3SGPIOGroup(extraseq), GPIOShellInput()))
 
   val clockOverlay = dp(ClockInputOverlayKey).map(_.place(ClockInputDesignInput())).head
   val harnessSysPLL = dp(PLLFactoryKey)
@@ -73,22 +82,25 @@ class ULX3SHarness(override implicit val p: Parameters) extends ULX3SShell {
     spibb
   }
 
-  // Borrow a clock for the chip
-  val slowClock = ClockSinkNode(freqMHz = 10)
-  val slowWrangler = LazyModule(new ResetWrangler())
-  val slowGroup = ClockGroup()
-  slowClock := slowWrangler.node := slowGroup := harnessSysPLLNode
+  val extraOverlay = dp(ExtraOverlayKey).map { extr =>
+    extr.place(GPIODirectLatticeDesignInput(extraseq.length)).overlayOutput.io
+  }
+
+  // Borrowed clocks go here
+  val extClocks: Seq[(Double, ClockSinkNode)] = dp(PeripheryADCFIFOKey).map { case adc =>
+    val adcClock = ClockSinkNode(freqMHz = adc.freqMHz)
+    val adcGroup = ClockGroup()
+    adcClock := adcGroup := harnessSysPLLNode
+    (adc.freqMHz, adcClock)
+  }.toSeq
+
+  val _outer = this
 
   override lazy val module = new HarnessLikeImpl
 
-  class HarnessLikeImpl extends ULX3SShellImpl(this) with HasHarnessInstantiators {
+  class HarnessLikeImpl extends ULX3SShellImpl(this) with HasHarnessInstantiatorsEx {
     override def provideImplicitClockToLazyChildren = true
-
-    val slowclk = slowClock.in.head._1.clock
-    val slow_clock_port = IO(Output(Clock()))
-    lpf.addPackagePin(IOPin(slow_clock_port), "E13") // Set to gn[27]
-    lpf.addIOBUF(IOPin(slow_clock_port), drive=Some(4))
-    slow_clock_port := slowclk
+    val _harnessOuter = _outer
 
     all_leds.foreach(_ := DontCare)
     clockOverlay.overlayOutput.node.out(0)._1.reset := resetPin
@@ -116,6 +128,14 @@ class ULX3SHarness(override implicit val p: Parameters) extends ULX3SShell {
     def referenceClock = dutClock.in.head._1.clock
     def referenceReset = dutClock.in.head._1.reset
     def success = { require(false, "Unused"); false.B }
+    def referenceClocks = {
+      val m: LinkedHashMap[String, (Double, Clock)] = LinkedHashMap.empty
+      m("dut_clock") = (dutFreqMHz * (1000 * 1000), referenceClock)
+      extClocks.zipWithIndex.foreach{ case((freqMHz, cnode), i) =>
+        m(s"ext_clock_$i") = (freqMHz * (1000 * 1000), cnode.in.head._1.clock)
+      }
+      m
+    }
 
     childClock := harnessBinderClock
     childReset := harnessBinderReset

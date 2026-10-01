@@ -9,6 +9,7 @@ import chipyard.iobinders._
 import org.chipsalliance.diplomacy._
 import org.chipsalliance.diplomacy.lazymodule._
 import org.chipsalliance.diplomacy.nodes._
+import riscvconsole.iobinders._
 import testchipip.serdes._
 
 class WithULX3SUARTTSI extends HarnessBinder({
@@ -84,5 +85,23 @@ class WithULX3SSDBinder extends HarnessBinder({
       ath.io_sd_bb(SPITracker.i).bundle <> port.io
     }
     SPITracker.incr
+  }
+})
+
+class WithULX3SADCFIFOBinder extends HarnessBinder({
+  case (th: HasHarnessInstantiators, port: ADCFIFOPort, chipId: Int) => {
+    val ath = th.asInstanceOf[LazyRawModuleImp].wrapper.asInstanceOf[ULX3SHarness]
+    val extraio = ath.extraOverlay.head.getWrappedValue
+    val extraio_valid = extraio(0)
+    val extraio_rst_n = extraio(1)
+    val extraio_clk = extraio(2)
+    val extraio_io_valid = extraio(3)
+    val extraio_io_bits = extraio.slice(4, port.io.io.bits.getWidth)
+
+    UIntToAnalog(port.io.valid, extraio_valid, true.B)
+    UIntToAnalog(port.io.rst_n, extraio_rst_n, true.B)
+    UIntToAnalog(port.io.clk.asBool, extraio_clk, true.B)
+    port.io.io.valid := AnalogToUInt(extraio_io_valid)
+    port.io.io.bits := VecInit(extraio_io_bits.map { a => AnalogToUInt(a) }).asUInt
   }
 })

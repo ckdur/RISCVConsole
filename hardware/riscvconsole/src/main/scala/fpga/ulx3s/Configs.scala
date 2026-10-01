@@ -42,7 +42,7 @@ class WithULX3SModifiers extends Config(
   // Clocking
   new chipyard.harness.WithHarnessBinderClockFreqMHz(50.0) ++
   new chipyard.config.WithUniformBusFrequencies(50.0) ++
-  new chipyard.harness.WithAllClocksFromHarnessClockInstantiator ++
+  new riscvconsole.fpga.vcu108.WithAllClocksAreIgnored ++
   new chipyard.clocking.WithPassthroughClockGenerator ++
   // Clocking by default
   new chipyard.harness.WithClockFromHarness ++                     // all Clock I/O in ChipTop should be driven by harnessClockInstantiator
@@ -50,10 +50,12 @@ class WithULX3SModifiers extends Config(
   new chipyard.config.WithNoSubsystemClockIO ++                        // drive the subsystem diplomatic clocks from ChipTop instead of using implicit clocks
   // Devices
   new WithDefaultPeripherals ++
+  new riscvconsole.devices.adcfifo.WithADCFIFO ++
   new testchipip.serdes.WithNoSerialTL ++                                          // No serial TL
   new riscvconsole.config.WithoutClockGating ++                                 // No clock gating
   new riscvconsole.config.WithSDBootBootROM ++
   // Harness binders (From ChipTop to Harness)
+  new riscvconsole.fpga.ulx3s.WithULX3SADCFIFOBinder ++
   new riscvconsole.fpga.ulx3s.WithULX3SJTAG ++
   new riscvconsole.fpga.ulx3s.WithULX3SUART ++
   new riscvconsole.fpga.ulx3s.WithULX3SSDRAMTL ++
@@ -61,6 +63,7 @@ class WithULX3SModifiers extends Config(
   new riscvconsole.fpga.ulx3s.WithULX3SGPIOBinder ++
   new riscvconsole.fpga.ulx3s.WithULX3SSDBinder ++
   // IO Cells (From DigitalTop to ChipTop)
+  new riscvconsole.iobinders.WithADCFIFOIOPunchthrough ++
   new chipyard.iobinders.WithSPIIOPunchthrough ++
   new riscvconsole.iobinders.WithSPIFlashIOPunchthrough ++
   new chipyard.iobinders.WithGPIOPunchthrough ++

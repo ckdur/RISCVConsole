@@ -6,6 +6,7 @@ import org.chipsalliance.cde.config.Parameters
 class DigitalTop (implicit p: Parameters) extends chipyard.DigitalTop()(p)
   with riscvconsole.devices.codec.HasPeripheryCodec
   with riscvconsole.devices.fft.HasPeripheryFFT
+  with riscvconsole.devices.adcfifo.HasPeripheryADCFIFO
 {
   // Add the chosen, for the bootargs to be output in the console at boot
   /*val chosen = new Device {
