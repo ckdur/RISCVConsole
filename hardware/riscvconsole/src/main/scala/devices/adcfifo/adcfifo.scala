@@ -45,6 +45,9 @@ abstract class ADCFIFO(busWidthBytes: Int, c: ADCFIFOParams)(implicit p: Paramet
     val (adcClk, _) = adcClock.in(0)
     portq.clk := adcClk.clock
 
+    // Polarity of the clock
+    val cpol = RegInit(false.B)
+
     // Catched reset
     val crst = adcClk.reset.asBool // ResetCatchAndSync(portq.clk, reset.asBool) // NOTE: Do not need to sync here
     val prst = RegInit(false.B)
@@ -56,7 +59,7 @@ abstract class ADCFIFO(busWidthBytes: Int, c: ADCFIFOParams)(implicit p: Paramet
 
     // To make the sampling clock async. This clock is requested
     val q = Module(new AsyncQueue(UInt(c.bits.W)))
-    q.io.enq_clock := adcClk.clock
+    q.io.enq_clock := (adcClk.clock.asBool ^ cpol).asClock
     q.io.enq_reset := crst
     q.io.enq.valid := portq.io.valid
     q.io.enq.bits := portq.io.bits
@@ -69,7 +72,9 @@ abstract class ADCFIFO(busWidthBytes: Int, c: ADCFIFOParams)(implicit p: Paramet
       ADCFIFOCtrlRegs.ctrl -> Seq(
         RegField(1, valid, RegFieldDesc("Valid", "ADC Persistent Valid", reset = Some(0))),
         RegField(7),
-        RegField(1, prst, RegFieldDesc("Reset", "ADC Reset Trigger", reset = Some(0)))
+        RegField(1, prst, RegFieldDesc("Reset", "ADC Reset Trigger", reset = Some(0))),
+        RegField(7),
+        RegField(1, cpol, RegFieldDesc("CPOL", "Clock Polarity", reset = Some(0)))
       )
     ):_*)
   }

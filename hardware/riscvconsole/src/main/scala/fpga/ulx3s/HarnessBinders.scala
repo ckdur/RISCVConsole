@@ -96,12 +96,12 @@ class WithULX3SADCFIFOBinder extends HarnessBinder({
     val extraio_rst_n = extraio(1)
     val extraio_clk = extraio(2)
     val extraio_io_valid = extraio(3)
-    val extraio_io_bits = extraio.slice(4, port.io.io.bits.getWidth)
+    val extraio_io_bits = extraio.slice(4, 4 + port.io.io.bits.getWidth)
 
     UIntToAnalog(port.io.valid, extraio_valid, true.B)
     UIntToAnalog(port.io.rst_n, extraio_rst_n, true.B)
     UIntToAnalog(port.io.clk.asBool, extraio_clk, true.B)
     port.io.io.valid := AnalogToUInt(extraio_io_valid)
-    port.io.io.bits := VecInit(extraio_io_bits.map { a => AnalogToUInt(a) }).asUInt
+    port.io.io.bits := VecInit(extraio_io_bits.map { a => AnalogToUInt(a).asBool }.reverse).asUInt
   }
 })
