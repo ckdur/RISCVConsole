@@ -241,7 +241,10 @@ int main(void)
 	    sd_cmd16() ||
 	    copy()) {
 		kputs("ERROR");
-		return 1;
+		// Nothing valid in RAM, so wait here for the payload to be loaded via JTAG
+		kputs("WAITING FOR JTAG (load payload, then resume at 0x10004)");
+		while (1)
+			__asm__ __volatile__ ("wfi");
 	}
 
 	kputs("BOOT");

@@ -67,6 +67,29 @@ cd linux-custom
 sudo dd if=./opensbi/build/platform/ratona/firmware/fw_payload.bin of=/dev/sdX1 conv=fsync bs=4096
 ```
 
+## Loading programs through JTAG (optional)
+
+Instead of writing the SD card every time, a program (e.g. `software/RISCVConsoleCode`) can be loaded
+into RAM through the JTAG adapter. The SD card boot still works as before: on reset `sdboot` copies the
+SD partition to RAM and jumps there. If the SD card is missing or fails, `sdboot` now waits for JTAG
+instead of jumping into an empty RAM.
+
+The bootrom has a fixed JTAG entry at `0x10004`, which jumps to the payload in RAM (`0x80000000`) with
+`a0 = hartid` and `a1 = DTB`, exactly like the SD boot path.
+
+```shell
+source ~/init_riscv-multi.sh
+cd software/RISCVConsoleCode && make elf && cd ..
+
+# Reset, load the ELF into RAM and run it
+./jtag-boot.sh RISCVConsoleCode/build/out.elf
+
+# Same, but open gdb halted at the program entry (breakpoints, stepping, etc.)
+./jtag-boot.sh -g RISCVConsoleCode/build/out.elf
+```
+
+Use `OPENOCD_CFG=/path/to/adapter.cfg` to select another adapter config (default `software/ftdi.cfg`).
+
 ## Toolchain
 
 A compilation of 32-bit toolchain should work. The configuration that worked is as follows:

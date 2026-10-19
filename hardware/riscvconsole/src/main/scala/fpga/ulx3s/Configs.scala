@@ -46,7 +46,7 @@ class WithULX3SModifiers extends Config(
   new chipyard.clocking.WithPassthroughClockGenerator ++
   // Clocking by default
   new chipyard.harness.WithClockFromHarness ++                     // all Clock I/O in ChipTop should be driven by harnessClockInstantiator
-  new chipyard.harness.WithResetFromHarness ++                     // reset controlled by harness
+  new riscvconsole.fpga.ulx3s.WithULX3SResetFromHarness ++         // reset controlled by harness and debug ndreset
   new chipyard.config.WithNoSubsystemClockIO ++                        // drive the subsystem diplomatic clocks from ChipTop instead of using implicit clocks
   // Devices
   new WithDefaultPeripherals ++
@@ -57,6 +57,7 @@ class WithULX3SModifiers extends Config(
   // Harness binders (From ChipTop to Harness)
   new riscvconsole.fpga.ulx3s.WithULX3SADCFIFOBinder ++
   new riscvconsole.fpga.ulx3s.WithULX3SJTAG ++
+  new riscvconsole.fpga.ulx3s.WithULX3SDebugNDReset ++
   new riscvconsole.fpga.ulx3s.WithULX3SUART ++
   new riscvconsole.fpga.ulx3s.WithULX3SSDRAMTL ++
   new riscvconsole.fpga.ulx3s.WithULX3SUARTTSI ++
@@ -67,7 +68,8 @@ class WithULX3SModifiers extends Config(
   new chipyard.iobinders.WithSPIIOPunchthrough ++
   new riscvconsole.iobinders.WithSPIFlashIOPunchthrough ++
   new chipyard.iobinders.WithGPIOPunchthrough ++
-  new chipyard.iobinders.WithDebugIOCells(externalReset = false) ++
+  new riscvconsole.iobinders.WithDebugNDResetPunchthrough ++
+  new chipyard.iobinders.WithDebugIOCells(externalReset = true) ++  // DTM reset separated from the system reset, for ndreset
   new chipyard.iobinders.WithUARTIOCells ++
   new chipyard.iobinders.WithExtInterruptIOCells ++
   // Bootloader

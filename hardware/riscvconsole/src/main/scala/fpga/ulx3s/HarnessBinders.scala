@@ -60,7 +60,24 @@ class WithULX3SJTAG extends HarnessBinder({
     port.io.TDI := ath.jtagOverlay.getWrappedValue.TDI
     ath.jtagOverlay.getWrappedValue.TDO.data := port.io.TDO
     ath.jtagOverlay.getWrappedValue.TDO.driven := true.B
+    // The DTM and debug module only reset with the board reset, not with ndreset
+    port.io.reset.foreach(_ := th.referenceReset.asBool)
     ath.ndreset.getWrappedValue := !ath.jtagOverlay.getWrappedValue.srst_n
+  }
+})
+
+class WithULX3SDebugNDReset extends HarnessBinder({
+  case (th: HasHarnessInstantiators, port: DebugResetPort, chipId: Int) => {
+    val ath = th.asInstanceOf[LazyRawModuleImp].wrapper.asInstanceOf[ULX3SHarness]
+    ath.debugNDReset.getWrappedValue := port.io.asBool
+  }
+})
+
+// Same as WithResetFromHarness, but also resets the ChipTop on debug module ndreset
+class WithULX3SResetFromHarness extends HarnessBinder({
+  case (th: HasHarnessInstantiators, port: ResetPort, chipId: Int) => {
+    val ath = th.asInstanceOf[LazyRawModuleImp].wrapper.asInstanceOf[ULX3SHarness]
+    port.io := (th.referenceReset.asBool || ath.debugNDReset.getWrappedValue).asAsyncReset
   }
 })
 

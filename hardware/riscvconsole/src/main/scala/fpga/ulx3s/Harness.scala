@@ -68,6 +68,9 @@ class ULX3SHarness(override implicit val p: Parameters) extends ULX3SShell with 
   val uartOverlay = dp(UARTOverlayKey).head.place(UARTDesignInput(io_uart_bb))
 
   val jtagOverlay = dp(JTAGDebugOverlayKey).head.place(JTAGDebugDesignInput()).overlayOutput.jtag
+  // ndreset requested by the debug module (e.g. OpenOCD "reset halt"). Resets the ChipTop,
+  // but not the JTAG DTM / debug module, nor the PLLs and SDRAM controller
+  val debugNDReset = InModuleBody { WireInit(false.B) }
 
   val io_gpio_bb = dp(PeripheryGPIOKey).map { p => BundleBridgeSource(() => new GPIOPortIO(p)) }
   ((dp(GPIOOverlayKey) zip io_gpio_bb) zip dp(PeripheryGPIOKey)).map { case ((placer, gpiobb), gpiocfg) =>
