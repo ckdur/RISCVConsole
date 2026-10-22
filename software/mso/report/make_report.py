@@ -132,7 +132,10 @@ def fig_sweep(sines, build):
     f = np.array([s["freq"] for s in sines]) / 1e3
     # ENOB vs frequency
     fig, ax = plt.subplots(figsize=(FIG_W, 2.4))
-    ax.semilogx(f, [s["enob"] for s in sines], color=SERIES[0], marker="o", ms=4)
+    ax.semilogx(f, [s["enob"] for s in sines], color=SERIES[0], marker="o", ms=4, label="Measured")
+    ax.semilogx(f, [s["enob_static"] for s in sines], color=SERIES[1], marker="o", ms=3.5,
+                label="Predicted from the static transfer (ramp)")
+    ax.legend(loc="lower left", bbox_to_anchor=(0, 1.0), ncol=2)
     ax.set_xlabel("Input frequency (kHz)")
     khz_axis(ax)
     ax.set_ylabel("ENOB (bits)")
@@ -222,15 +225,15 @@ def write_tex(build, runs, ramp, sines):
     # Sweep table
     with open(os.path.join(build, "table_sweep.tex"), "w") as fo:
         fo.write("\\begin{tabular}{S[table-format=3.3] S[table-format=1.3] S[table-format=2.2] "
-                 "S[table-format=2.2] S[table-format=2.2] S[table-format=1.2] S[table-format=-2.1] "
+                 "S[table-format=2.2] S[table-format=2.2] S[table-format=2.2] S[table-format=1.2] S[table-format=-2.1] "
                  "S[table-format=2.1] S[table-format=-2.1] S[table-format=-2.1] S[table-format=-2.1]}\n\\toprule\n"
-                 "{$f_{in}$ (\\si{kHz})} & {$A_{in}$ (\\si{V})} & {$A$ (LSB)} & {SINAD} & {SNR} & {ENOB} & "
+                 "{$f_{in}$ (\\si{kHz})} & {$A_{in}$ (\\si{V})} & {$A$ (LSB)} & {SINAD} & {SINAD$_{st}$} & {SNR} & {ENOB} & "
                  "{THD} & {SFDR} & {H2} & {H3} & {H5} \\\\\n"
-                 " & & & {(\\si{dB})} & {(\\si{dB})} & {(bits)} & {(\\si{dB})} & {(\\si{dB})} & {(\\si{dBc})} "
+                 " & & & {(\\si{dB})} & {(\\si{dB})} & {(\\si{dB})} & {(bits)} & {(\\si{dB})} & {(\\si{dB})} & {(\\si{dBc})} "
                  "& {(\\si{dBc})} & {(\\si{dBc})} \\\\\n\\midrule\n")
         for s in sines:
-            fo.write("%.3f & %.3f & %.2f & %.2f & %.2f & %.2f & %.1f & %.1f & %.1f & %.1f & %.1f \\\\\n" % (
-                s["freq"] / 1e3, s["scope_amp_v"], s["amp"], s["sinad"], s["snr"], s["enob"], s["thd"], s["sfdr"],
+            fo.write("%.3f & %.3f & %.2f & %.2f & %.2f & %.2f & %.2f & %.1f & %.1f & %.1f & %.1f & %.1f \\\\\n" % (
+                s["freq"] / 1e3, s["scope_amp_v"], s["amp"], s["sinad"], s["sinad_static"], s["snr"], s["enob"], s["thd"], s["sfdr"],
                 s["harm"][2]["dbc"], s["harm"][3]["dbc"], s["harm"][5]["dbc"]))
         fo.write("\\bottomrule\n\\end{tabular}\n")
 
@@ -271,6 +274,8 @@ def main():
     if ramp is None or not sines:
         print("runs.csv needs one ramp and at least one sine")
         sys.exit(1)
+    for s in sines:
+        s["sinad_static"], s["enob_static"] = aa.static_model(ramp, s)
 
     fig_transfer(ramp, build)
     fig_dnl_inl(ramp, build)
@@ -284,14 +289,15 @@ def main():
     summary = {
         "ramp": {"vmin": ramp["vmin"], "vmax": ramp["vmax"], "lsb_v": ramp["lsb"], "t": ramp["t"].tolist(),
                  "dnl": ramp["dnl"].tolist(), "inl": ramp["inl"].tolist(), "hits": ramp["hits"].tolist()},
-        "sines": [{k: s[k] for k in ("name", "freq", "amp", "offset", "sinad", "snr", "enob", "thd", "sfdr",
+        "sines": [{k: s[k] for k in ("name", "freq", "amp", "offset", "sinad", "sinad_static", "enob_static", "snr", "enob", "thd", "sfdr",
                                      "clip", "scope_amp_v", "scope_offset_v")} |
                   {"harm": {str(k): v for k, v in s["harm"].items()}} for s in sines],
     }
     with open(os.path.join(build, "results.json"), "w") as fo:
         json.dump(summary, fo, indent=1, default=float)
 
-    shutil.copy(os.path.join(REPORT_DIR, "report.tex"), build)
+    for f in ("report.tex", "theory.tex"):
+        shutil.copy(os.path.join(REPORT_DIR, f), build)
     setup = os.path.join(results, "setup.tex")
     shutil.copy(setup if os.path.exists(setup) else os.path.join(REPORT_DIR, "setup.tex"), build)
     subprocess.run(["latexmk", "-pdf", "-interaction=nonstopmode", "-halt-on-error", "report.tex"],

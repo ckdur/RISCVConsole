@@ -136,6 +136,19 @@ def analyze_sine(prefix, freq):
     }
 
 
+def static_model(r, s):
+    """SINAD/ENOB that the static transfer measured by the ramp alone predicts for the sine s:
+    the fitted input sine (in volts) is quantized with the measured transition levels, without noise."""
+    n = len(s["codes"])
+    tt = np.arange(n) / FS
+    t, lsb = r["t"], r["lsb"]
+    vin = t[0] + (s["offset"] - 0.5) * lsb + s["amp"] * lsb * np.cos(2 * np.pi * s["freq"] * tt + s["phase"])
+    x = np.searchsorted(t, vin).astype(float)
+    _, amp, _, _, y = sine_fit(x, FS, s["freq"])
+    sinad = 20 * np.log10(amp / np.sqrt(2) / np.sqrt(np.mean((x - y) ** 2)))
+    return sinad, (sinad - 1.76) / 6.02
+
+
 def print_ramp(r):
     print("Scope ramp: %.4f V .. %.4f V" % (r["vmin"], r["vmax"]))
     print("Samples: %d, code 0: %d, code %d: %d" % (r["n"], r["hits"][0], NCODES - 1, r["hits"][-1]))

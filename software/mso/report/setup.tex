@@ -1,20 +1,116 @@
 % Description of the device and the bench. Edit freely: copied into the build directory,
 % or put a setup.tex in the results directory to override it for one set of measurements.
+% Macros like \AdcFs, \SineAmplMv come from the generated results.tex.
 
 \newcommand{\ReportTitle}{SAR ADC Characterization}
 \newcommand{\ReportAuthor}{Ckristian Duran}
 \newcommand{\DeviceName}{SAR ADC test chip}
 
+% Description of the single-ended to differential front end (shown in the setup section)
+\newcommand{\FrontEndDescription}{%
+The ADC has a differential input. The single-ended DDS output is converted to a differential
+pair by a front end built from discrete components on the test board.
+% TODO: describe the circuit: topology (op-amp / transformer / resistive), components, gain,
+% common-mode voltage and how it is set, input impedance, bandwidth.
+In this report all voltages are single-ended, measured at the input of the front end;
+the gain and common mode of the front end are therefore included in the transfer
+characteristic.}
+
 \newcommand{\SetupDescription}{%
-\begin{itemize}
-  \item \textbf{Device:} \AdcBits-bit differential SAR ADC, clocked at \SI{10}{MHz}
-        (one conversion every 7 clocks, $f_s = \SI{\AdcFs}{MS/s}$).
-  \item \textbf{Digital interface:} ADCFIFO peripheral of RISCVConsole on a ULX3S (ECP5-85F)
-        board. Samples cross into the \SI{50}{MHz} bus clock through an asynchronous FIFO and the
-        CPU stores \AdcSamples{} consecutive samples in RAM, dumped afterwards through JTAG.
-  \item \textbf{Stimulus:} DDS channel 1 of a Vimu MSO20 (VmMsoOpenSDK), driven single-ended.
-  \item \textbf{Front end:} single-ended to differential conversion stage.
-        % TODO: describe the circuit (topology, components, gain, common mode)
-  \item \textbf{Voltage reference for the measurement:} MSO20 CH1 on the DDS output, DC coupled,
-        \SI{\pm 1}{V} range.
-\end{itemize}}
+\subsection{Signal chain}
+Figure~\ref{fig:bench} shows the bench. The MSO20 generates the stimulus with its DDS and
+measures the same node with its oscilloscope channel~1, which is the voltage reference of all
+the measurements. The front end converts it to a differential signal for the ADC. The ADC is
+clocked and read by a RISC-V system (RISCVConsole) running on a ULX3S FPGA board, which stores
+the samples in RAM; the host reads them back through JTAG.
+
+\begin{figure}[H]\centering
+\begin{tikzpicture}[
+    font=\footnotesize, >=Stealth,
+    blk/.style={draw, rounded corners=2pt, align=center, minimum height=10mm, minimum width=20mm,
+                inner sep=3pt, fill=white},
+    grp/.style={draw, dashed, rounded corners=3pt, inner sep=6pt},
+    lbl/.style={font=\scriptsize, align=center}]
+  % Analog side
+  \node[blk] (dds)   at (0, 0)    {MSO20\\DDS ch.\,1};
+  \node[blk] (scope) at (0, -1.8) {MSO20\\scope CH1};
+  \node[blk] (host)  at (0, -3.6) {Host PC\\VmMsoOpenSDK,\\OpenOCD, Python};
+  \node[blk, minimum width=24mm] (fe)  at (3.4, 0) {Single-ended to\\differential front end};
+  \node[blk, minimum width=24mm] (adc) at (7.0, 0) {\AdcBits-bit SAR ADC\\(test chip)};
+  % FPGA side
+  \node[blk] (pll)  at (10.8, 1.6)  {PLL\\\SI{10}{MHz}};
+  \node[blk] (fifo) at (10.8, 0)    {ADCFIFO\\async FIFO};
+  \node[blk] (cpu)  at (10.8, -1.8) {RV64 core\\\SI{50}{MHz}};
+  \node[blk] (ram)  at (10.8, -3.6) {RAM\\\texttt{adc\_buf}};
+  \node[grp, fit=(pll)(fifo)(cpu)(ram)] (fpga) {};
+  \node[lbl, anchor=south] at (fpga.north) {ULX3S (ECP5-85F), RISCVConsole};
+
+  \draw[->] (dds) -- node[lbl, above] {$v_{in}$} (fe);
+  \draw[->] (1.55, 0) |- (scope.east);
+  \fill (1.55, 0) circle (1pt);
+  \draw[->, double] (fe) -- node[lbl, above] {$v_p, v_n$} (adc);
+  \draw[->] (adc) -- node[lbl, above] {\AdcBits\,b, valid} (fifo);
+  \draw[->] (pll.west) -| node[lbl, pos=0.25, above] {clk, rst\_n, valid} (adc.north);
+  \draw[->] (fifo) -- node[lbl, left] {TileLink} (cpu);
+  \draw[->] (cpu) -- (ram);
+  \draw[<->] (scope) -- node[lbl, right] {USB} (host);
+  \draw[<->] (ram.west) -- node[lbl, above] {JTAG (FT232H): boot, \texttt{adc\_buf} dump} (host.east);
+  \draw[->] (cpu.east) -- ++(1.0, 0) |- node[lbl, pos=0.25, right] {UART\\report} (6, -4.9) -| (host.south);
+\end{tikzpicture}
+\caption{Measurement bench.}
+\label{fig:bench}
+\end{figure}
+
+\subsection{Equipment}
+\begin{center}\small
+\begin{tabular}{lp{0.62\textwidth}}
+\toprule
+Device under test & \DeviceName: \AdcBits-bit differential SAR ADC \\
+Front end & Single-ended to differential conversion (see below) \\
+Signal source & Vimu MSO20BL (hardware 2.0), DDS channel~1, controlled with VmMsoOpenSDK
+  (\texttt{software/mso/mso\_dds}) \\
+Voltage reference & MSO20 oscilloscope CH1 on the DDS output, DC coupled, \SI{\pm 1}{V} range
+  (\SI{9.9}{mV} per step), 8192 samples per capture \\
+Digital host & ULX3S, Lattice ECP5-85F, RISCVConsole SoC: RV64IMAC Rocket core, all buses at \SI{50}{MHz} \\
+ADC clock & \SI{10}{MHz} from the FPGA PLL, one conversion every 7 clocks
+  ($f_s = \SI{\AdcFs}{MS/s}$) \\
+Debug and data link & FT232H JTAG adapter (OpenOCD), ULX3S USB UART at \SI{115200}{baud} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Front end}
+\FrontEndDescription
+
+\subsection{ADC interface}
+The ADC connects to the ULX3S header through the ADCFIFO peripheral of RISCVConsole
+(base address \texttt{0x64003000}):
+\begin{center}\small
+\begin{tabular}{llll}
+\toprule
+Signal & Direction & ULX3S pin & Function \\
+\midrule
+\texttt{valid} & FPGA $\to$ ADC & GN27 (E13) & Enables the conversions (control bit 0) \\
+\texttt{rst\_n} & FPGA $\to$ ADC & GN26 (C13) & ADC reset: system reset or control bit 8 \\
+\texttt{clk} & FPGA $\to$ ADC & GN25 (E14) & \SI{10}{MHz} conversion clock \\
+\texttt{io\_valid} & ADC $\to$ FPGA & GN24 (D16) & A new result is ready \\
+\texttt{bits[4:0]} & ADC $\to$ FPGA & GN23 \ldots\ GN19 & Result, MSB on GN23, LSB on GN19 \\
+\bottomrule
+\end{tabular}
+\end{center}
+The results are captured on the ADC clock (control bit 16 selects the edge; the inverted edge is
+used here) into an asynchronous FIFO of 8 entries that crosses into the \SI{50}{MHz} bus clock.
+The firmware (\texttt{RISCVConsoleCode/src/adc.c}) enables the ADC, flushes the FIFO, then reads
+the data register in a tight loop, storing \AdcSamples{} consecutive results in RAM. Bit 31 of the
+data register flags an empty FIFO; the FIFO drops results when it is full, so the firmware also
+counts the empty reads. In every capture of this report the empty reads are about a quarter of
+all the reads, so the CPU outpaces the ADC and the record has no gaps. The capture duration
+measured with the CLINT timer confirms the sample rate.
+
+\subsection{Procedure}
+Each measurement (\texttt{adc\_run.sh}) configures and enables the DDS, captures the scope, boots
+the capture firmware through JTAG (\texttt{jtag-boot.sh}), logs its UART report, and dumps
+\texttt{adc\_buf} through JTAG while the DDS keeps running. \texttt{adc\_sweep.sh} runs a ramp
+and then the sine at every frequency of the sweep; \texttt{report/make\_report.py} analyzes the
+runs and builds this document.
+}

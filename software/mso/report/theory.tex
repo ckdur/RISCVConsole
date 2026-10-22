@@ -1,0 +1,110 @@
+% Theory of the measurements. Generic: uses only macros from results.tex.
+
+\subsection{Ideal quantizer}
+An $N$-bit ADC maps its input onto $2^N$ codes. Code $k$ is output for inputs between the
+transition levels $T_k$ and $T_{k+1}$; the ideal levels are equally spaced by one LSB,
+$Q = (T_{2^N-1} - T_1)/(2^N - 2)$. For an input that is busy enough, the quantization error is
+uniform in $[-Q/2, Q/2]$, with power $Q^2/12$. A full-scale sine has power
+$(2^N Q)^2/8$, so an ideal ADC has
+\begin{equation}
+\text{SNR}_{ideal} = 10\log_{10}\frac{(2^N Q)^2/8}{Q^2/12} = 6.02\,N + 1.76\ \text{dB},
+\end{equation}
+\SI{31.9}{dB} for $N = \AdcBits$. A real ADC adds nonlinearity, noise and dynamic errors to the
+quantization error; the effective number of bits is the resolution of an ideal ADC with the
+same signal to noise and distortion ratio:
+\begin{equation}
+\text{ENOB} = \frac{\text{SINAD} - 1.76}{6.02}.
+\end{equation}
+The ENOB in this report is referred to the amplitude of the applied sine, which is smaller than
+full scale (to avoid clipping). An ideal \AdcBits-bit quantizer driven by the same amplitude
+reaches a little less than \AdcBits{} bits, about 4.7 bits for a sine of 27 LSB peak-to-peak.
+
+\subsection{Static linearity: the histogram test}
+The transition levels are measured with the code density (histogram) test of IEEE~1241. The input
+is a triangle that overdrives both ends of the range, so the end codes $0$ and $2^N-1$ appear and
+every inner code is crossed at a constant slope. With a linear ramp from $V_{min}$ to $V_{max}$ the
+voltage is uniformly distributed in time, and the number of samples $H_k$ that land in code $k$ is
+proportional to its width. With $M$ samples in total and the cumulative histogram
+$C_k = \sum_{j \le k} H_j$, the transition levels are
+\begin{equation}
+T_k = V_{min} + (V_{max} - V_{min})\,\frac{C_{k-1}}{M}, \qquad k = 1 \ldots 2^N - 1.
+\end{equation}
+From them, with the end-point LSB $Q$ defined above,
+\begin{equation}
+\text{DNL}_k = \frac{T_{k+1} - T_k}{Q} - 1, \qquad
+\text{INL}_k = \frac{T_k - \left(T_1 + (k-1)\,Q\right)}{Q}.
+\end{equation}
+DNL is the error of the width of each code (a code with $\text{DNL} = -1$ is missing); INL is the
+deviation of each transition from the straight line through the first and last transitions, so
+offset and gain errors are removed.
+
+Three details make the test accurate:
+\begin{itemize}
+  \item \textbf{Whole periods.} The capture of $M$ samples must hold an integer number of ramp
+        periods; otherwise the leftover fraction of a period lands on different codes from run to
+        run and biases the histogram. The ramp frequency is $f = 10\,f_s/M$ (10 periods).
+  \item \textbf{Ramp ends.} $V_{min}$ and $V_{max}$ come from the scope capture. Since the
+        voltage of a triangle is uniformly distributed, the sorted scope samples are a straight line
+        against their rank; fitting the central 80\,\% and extrapolating to the ends averages the
+        \SI{9.9}{mV} scope quantization and the noise.
+  \item \textbf{Slow slope.} At \SI{\RampFreq}{Hz} the ramp moves about one LSB every 60 samples,
+        so every code is hit many times per crossing and noise only smooths the transitions.
+\end{itemize}
+The accuracy of $T_k$ is limited by the linearity of the DDS ramp and by the gain and offset
+accuracy of the scope; the DNL and INL, which are relative, depend only on the ramp linearity.
+
+\subsection{Dynamic performance: sine fit}
+\paragraph{Coherent sampling.} The sine frequencies are $f_{in} = J f_s / M$ with $J$ an odd
+prime: the record holds exactly $J$ periods, and since $J$ and $M = 2^{16}$ share no factor every
+sample falls on a different phase of the sine, so the record exercises the whole transfer
+characteristic instead of repeating a few points. The integer number of periods also places the
+fundamental and its harmonics exactly on FFT bins.
+
+\paragraph{Four-parameter fit.} Following IEEE~1057, the record $x_n$ is fitted by least squares to
+\begin{equation}
+y_n = A\cos(2\pi f t_n + \varphi) + C, \qquad t_n = n / f_s,
+\end{equation}
+where $A$, $\varphi$ and $C$ are linear parameters for a given $f$, and $f$ is refined around the
+nominal value by minimizing the residual. Everything that is not the fitted sine (quantization,
+nonlinearity, noise, jitter) stays in the residual, so
+\begin{equation}
+\text{SINAD} = 20\log_{10}\frac{A/\sqrt{2}}{\sqrt{\tfrac{1}{M}\sum_n (x_n - y_n)^2}}.
+\end{equation}
+The fitted amplitude $A$ against frequency also gives the amplitude response of the front end
+and the ADC sampler; the amplitude measured on the scope at each frequency checks that the
+stimulus itself stays flat.
+
+\paragraph{Static model.} To separate static from dynamic errors, the fitted sine is converted back
+to volts and quantized with the transition levels $T_k$ measured by the ramp, without noise. The
+SINAD of this synthetic record (SINAD$_{st}$) is what the static transfer alone allows; the
+difference to the measured SINAD is caused by noise and by frequency dependent effects of the
+front end and the sampler.
+
+\subsection{Spectrum, harmonics and folding}
+The spectrum uses a 4-term Blackman--Harris window, which keeps the energy of each tone in a few
+bins even if the ADC and DDS clocks are slightly off; the power of a tone is summed over $\pm 4$
+bins. Sampled at $f_s$, a harmonic $h f_{in}$ above the Nyquist frequency $f_s/2$ appears at its
+alias
+\begin{equation}
+f_h = \left| h f_{in} - f_s \cdot \operatorname{round}\!\left(\frac{h f_{in}}{f_s}\right) \right|,
+\end{equation}
+so at high input frequencies the harmonics fold back below the fundamental. With $P_1$ the power of
+the fundamental, $P_h$ of harmonic $h$, $P_{noise}$ the rest of the band and $P_{spur}$ the largest
+other tone:
+\begin{equation}
+\text{THD} = 10\log_{10}\frac{\sum_{h=2}^{7} P_h}{P_1}, \quad
+\text{SNR} = 10\log_{10}\frac{P_1}{P_{noise}}, \quad
+\text{SFDR} = 10\log_{10}\frac{P_1}{P_{spur}}.
+\end{equation}
+Harmonics are given in dBc, relative to the fundamental; the spectrum plots are in dBFS, relative to
+a full-scale sine of $2^{N-1}$ LSB amplitude.
+
+\subsection{What the differential front end can and cannot cause}
+A balanced differential path cancels even-order distortion: a nonlinearity that is the same on both
+legs adds the same even terms to $v_p$ and $v_n$, and they vanish in $v_p - v_n$. A gain or phase
+imbalance between the legs of the single-ended to differential conversion breaks the cancellation,
+so a rising second harmonic points to the front end. Bandwidth limits in the front end or in the
+sampling network of the ADC reduce the fitted amplitude at high frequency while the input stays
+flat. Errors tied to specific codes, such as narrow or wide codes at the transitions of one bit,
+cannot come from an analog front end: they are mismatches of the capacitive DAC of the SAR ADC,
+which also produce mostly odd harmonics for a sine centered in the range.

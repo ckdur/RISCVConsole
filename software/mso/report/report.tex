@@ -6,6 +6,8 @@
 \usepackage{amsmath}
 \usepackage{float}
 \usepackage{caption}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, fit, calc}
 \usepackage[hidelinks]{hyperref}
 \sisetup{detect-all, table-number-alignment=center}
 \DeclareSIUnit{\dBc}{dBc}
@@ -42,21 +44,16 @@ SINAD / ENOB at \SI{\SineRefFreq}{kHz} & \SI{\SineRefSinad}{dB} / \SineRefEnob{}
 \section{Setup}
 \SetupDescription
 
-\section{Method}
+\section{Measurement theory}
+\input{theory.tex}
+
+\section{Settings of this data set}
 \begin{itemize}
-  \item \textbf{Static linearity:} histogram test with a triangle of \SI{\RampFreq}{Hz}
-        (10 periods in the capture) from \SIrange{\RampVmin}{\RampVmax}{V}, overdriving both ends
-        of the range (overdriven: \RampOverdriven). With a linear input, the number of hits of a code
-        is proportional to its width; the transition levels $T_k$ follow from the cumulative histogram
-        and the ramp ends measured on the scope. DNL and INL use the end-point line through
-        $T_1$ and $T_{\AdcLastCode}$.
-  \item \textbf{Dynamic performance:} sine of \SI{\SineAmplMv}{mV} peak-to-peak setting and
-        \SI{\SineBiasMv}{mV} bias, at frequencies with an odd prime number of periods in the capture.
-        SINAD comes from a 4-parameter sine fit (residual including quantization, distortion and
-        noise), $\text{ENOB} = (\text{SINAD} - 1.76)/6.02$. Harmonics, THD, SNR and SFDR come from a
-        Blackman--Harris windowed spectrum, with harmonics folded into the first Nyquist zone.
-  \item \textbf{Input amplitude:} a sine fit of the scope capture gives the real amplitude at the
-        DDS output for each frequency, to separate a stimulus roll-off from the ADC response.
+  \item \textbf{Ramp:} triangle of \SI{\RampFreq}{Hz} (10 periods in the capture) from
+        \SIrange{\RampVmin}{\RampVmax}{V}; both end codes reached: \RampOverdriven.
+  \item \textbf{Sines:} DDS amplitude setting \SI{\SineAmplMv}{mV} peak-to-peak, bias \SI{\SineBiasMv}{mV},
+        odd prime number of periods in the capture of \AdcSamples{} samples.
+  \item \textbf{ADC:} $f_s = \SI{\AdcFs}{MS/s}$; end-point line through $T_1$ and $T_{\AdcLastCode}$.
 \end{itemize}
 
 \section{Static linearity}
@@ -95,11 +92,11 @@ SINAD / ENOB at \SI{\SineRefFreq}{kHz} & \SI{\SineRefSinad}{dB} / \SineRefEnob{}
 \begin{table}[H]\centering\scriptsize
 \setlength{\tabcolsep}{3pt}
 \input{table_sweep.tex}
-\caption{Sweep results. $A_{in}$: input amplitude measured on the scope; $A$: fitted ADC amplitude.}
+\caption{Sweep results. $A_{in}$: input amplitude measured on the scope; $A$: fitted ADC amplitude; SINAD$_{st}$: SINAD predicted from the static transfer.}
 \end{table}
 \begin{figure}[H]\centering
 \includegraphics{fig/sweep_enob.pdf}
-\caption{ENOB versus input frequency.}
+\caption{ENOB versus input frequency, measured and predicted from the static transfer alone (SINAD$_{st}$).}
 \end{figure}
 \begin{figure}[H]\centering
 \includegraphics{fig/sweep_harmonics.pdf}
