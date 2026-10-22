@@ -1,0 +1,20 @@
+% Description of the device and the bench. Edit freely: copied into the build directory,
+% or put a setup.tex in the results directory to override it for one set of measurements.
+
+\newcommand{\ReportTitle}{SAR ADC Characterization}
+\newcommand{\ReportAuthor}{Ckristian Duran}
+\newcommand{\DeviceName}{SAR ADC test chip}
+
+\newcommand{\SetupDescription}{%
+\begin{itemize}
+  \item \textbf{Device:} \AdcBits-bit differential SAR ADC, clocked at \SI{10}{MHz}
+        (one conversion every 7 clocks, $f_s = \SI{\AdcFs}{MS/s}$).
+  \item \textbf{Digital interface:} ADCFIFO peripheral of RISCVConsole on a ULX3S (ECP5-85F)
+        board. Samples cross into the \SI{50}{MHz} bus clock through an asynchronous FIFO and the
+        CPU stores \AdcSamples{} consecutive samples in RAM, dumped afterwards through JTAG.
+  \item \textbf{Stimulus:} DDS channel 1 of a Vimu MSO20 (VmMsoOpenSDK), driven single-ended.
+  \item \textbf{Front end:} single-ended to differential conversion stage.
+        % TODO: describe the circuit (topology, components, gain, common mode)
+  \item \textbf{Voltage reference for the measurement:} MSO20 CH1 on the DDS output, DC coupled,
+        \SI{\pm 1}{V} range.
+\end{itemize}}

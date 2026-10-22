@@ -1,0 +1,118 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{caption}
+\usepackage[hidelinks]{hyperref}
+\sisetup{detect-all, table-number-alignment=center}
+\DeclareSIUnit{\dBc}{dBc}
+\DeclareSIUnit{\dBFS}{dBFS}
+\setlength{\emergencystretch}{2em}
+
+\input{results.tex}
+\input{setup.tex}
+
+\title{\ReportTitle}
+\author{\ReportAuthor}
+\date{\today\\[2pt]\small Data set: \texttt{\ResultsDir}}
+
+\begin{document}
+\maketitle
+
+\section*{Summary}
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Resolution & \AdcBits{} bits \\
+Sample rate & \SI{\AdcFs}{MS/s} \\
+Input range (first to last transition)$^\dagger$ & \SIrange{\TFirst}{\TLast}{V} \\
+LSB & \SI{\Lsb}{mV} \\
+DNL & \numrange{\DnlMin}{\DnlMax} LSB \\
+INL (end point) & \numrange{\InlMin}{\InlMax} LSB \\
+Missing codes & \MissingCodes \\
+SINAD / ENOB at \SI{\SineRefFreq}{kHz} & \SI{\SineRefSinad}{dB} / \SineRefEnob{} bits \\
+\bottomrule
+\end{tabular}\\[2pt]
+{\footnotesize $^\dagger$ Single-ended voltage at the input of the front end.}
+\end{center}
+
+\section{Setup}
+\SetupDescription
+
+\section{Method}
+\begin{itemize}
+  \item \textbf{Static linearity:} histogram test with a triangle of \SI{\RampFreq}{Hz}
+        (10 periods in the capture) from \SIrange{\RampVmin}{\RampVmax}{V}, overdriving both ends
+        of the range (overdriven: \RampOverdriven). With a linear input, the number of hits of a code
+        is proportional to its width; the transition levels $T_k$ follow from the cumulative histogram
+        and the ramp ends measured on the scope. DNL and INL use the end-point line through
+        $T_1$ and $T_{\AdcLastCode}$.
+  \item \textbf{Dynamic performance:} sine of \SI{\SineAmplMv}{mV} peak-to-peak setting and
+        \SI{\SineBiasMv}{mV} bias, at frequencies with an odd prime number of periods in the capture.
+        SINAD comes from a 4-parameter sine fit (residual including quantization, distortion and
+        noise), $\text{ENOB} = (\text{SINAD} - 1.76)/6.02$. Harmonics, THD, SNR and SFDR come from a
+        Blackman--Harris windowed spectrum, with harmonics folded into the first Nyquist zone.
+  \item \textbf{Input amplitude:} a sine fit of the scope capture gives the real amplitude at the
+        DDS output for each frequency, to separate a stimulus roll-off from the ADC response.
+\end{itemize}
+
+\section{Static linearity}
+\begin{figure}[H]\centering
+\includegraphics{fig/transfer.pdf}
+\caption{Transfer characteristic from the histogram test.}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics{fig/dnl_inl.pdf}
+\caption{DNL and INL.}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics{fig/histogram.pdf}
+\caption{Code histogram of the ramp. An ideal ADC has the same number of hits for every inner code.}
+\end{figure}
+\begin{table}[H]\centering\small
+\input{table_codes.tex}
+\caption{Code histogram, transition levels and nonlinearity.}
+\end{table}
+
+\section{Dynamic performance}
+\begin{figure}[H]\centering
+\includegraphics{fig/sine_time.pdf}
+\caption{ADC output for the \SI{\SineRefFreq}{kHz} sine and its fit.}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics{fig/spectrum_low.pdf}
+\caption{Spectrum at \SI{\SineRefFreq}{kHz}.}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics{fig/spectrum_high.pdf}
+\caption{Spectrum at \SI{\SineHighFreq}{kHz}, the highest frequency of the sweep.}
+\end{figure}
+
+\section{Frequency sweep}
+\begin{table}[H]\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
+\input{table_sweep.tex}
+\caption{Sweep results. $A_{in}$: input amplitude measured on the scope; $A$: fitted ADC amplitude.}
+\end{table}
+\begin{figure}[H]\centering
+\includegraphics{fig/sweep_enob.pdf}
+\caption{ENOB versus input frequency.}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics{fig/sweep_harmonics.pdf}
+\caption{Total harmonic distortion and main harmonics versus input frequency.}
+\end{figure}
+\begin{figure}[H]\centering
+\includegraphics{fig/sweep_amplitude.pdf}
+\caption{Amplitude response of the ADC and of the stimulus, relative to the lowest frequency.}
+\end{figure}
+
+\section{Notes}
+\begin{itemize}
+\input{notes.tex}
+\end{itemize}
+
+\end{document}
