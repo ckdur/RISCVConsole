@@ -1,3 +1,4 @@
 mso_dds
 results/*/report/
 __pycache__/
+pcbfix/build/
