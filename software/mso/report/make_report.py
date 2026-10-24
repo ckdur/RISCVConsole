@@ -291,14 +291,19 @@ def fig_compare(ramp, sines, sim, build):
     st = sim["static"]
     fig, (a1, a2) = plt.subplots(2, 1, figsize=(FIG_W, 3.6), sharex=True)
     k = np.arange(1, aa.NCODES - 1)
-    a1.bar(k - 0.19, ramp["dnl"], width=0.36, color=SERIES[0], label="Measured")
-    a1.bar(k + 0.19, st["dnl"], width=0.36, color=SERIES[1], label="Simulated (schematic)")
+    runs = [("Measured", ramp["dnl"], ramp["inl"]), ("Simulated (schematic)", st["dnl"], st["inl"])]
+    tp = (sim.get("pex") or {}).get("tapeout")
+    if tp:
+        runs.append(("Simulated (post-layout)", tp["dnl"], tp["inl"]))
+    wd = 0.8 / len(runs)
+    for i, (lbl, dnl, _) in enumerate(runs):
+        a1.bar(k + (i - (len(runs) - 1) / 2) * wd, dnl, width=wd, color=SERIES[i], label=lbl)
     a1.axhline(0, color=INK2, lw=0.6)
     a1.set_ylabel("DNL (LSB)")
-    a1.legend(loc="lower left", bbox_to_anchor=(0, 1.0), ncol=2)
+    a1.legend(loc="lower left", bbox_to_anchor=(0, 1.0), ncol=3)
     k2 = np.arange(1, aa.NCODES)
-    a2.plot(k2, ramp["inl"], color=SERIES[0], marker="o", ms=3, label="Measured")
-    a2.plot(k2, st["inl"], color=SERIES[1], marker="o", ms=3, label="Simulated (schematic)")
+    for i, (lbl, _, inl) in enumerate(runs):
+        a2.plot(k2, inl, color=SERIES[i], marker="o", ms=3, label=lbl)
     a2.axhline(0, color=INK2, lw=0.6)
     a2.set_ylabel("INL (LSB)")
     a2.set_xlabel("Code (transition k-1 to k for INL)")
@@ -392,6 +397,48 @@ def write_compare_tex(build, ramp, sines, sim):
             m("SimFeEnobHigh", "%.2f" % fe[-1]["enob"])
             m("SimFeAmpHigh", "%.2f" % fe[-1]["amp"])
             m("SimFeHtwoMax", "%.0f" % max(f["harm"]["2"]["dbc"] for f in fe))
+    # Post-layout simulations (static only): tapeout (Pex...) and hierarchical re-layout (Hier...)
+    for key, tag in (("tapeout", "Pex"), ("hier", "Hier")):
+        p = (sim.get("pex") or {}).get(key)
+        if not p:
+            continue
+        m(tag + "Source", tex_escape(p["source"]))
+        for b in range(aa.BITS):
+            m(tag + "BitW" + "ABCDEFGH"[b], "%.3f" % p["weights"][b])
+            m(tag + "BitE" + "ABCDEFGH"[b], "%+.1f" % (round((p["weights"][b] / 2 ** b - 1) * 100, 1) or 0.0))
+        m(tag + "Lsb", "%.2f" % (p["lsb_v"] * 1e3))
+        m(tag + "GainErr", "%.1f" % (p["gain_err"] * 100))
+        i_p, d_p = np.array(p["inl"]), np.array(p["dnl"])
+        m(tag + "DnlMin", "%.2f" % d_p.min())
+        m(tag + "DnlMax", "%.2f" % d_p.max())
+        m(tag + "InlRms", "%.2f" % np.sqrt(np.mean(i_p ** 2)))
+        m(tag + "InlCorr", "%.2f" % np.corrcoef(i_m, i_p)[0, 1])
+        m(tag + "DnlCorr", "%.2f" % np.corrcoef(d_m, d_p)[0, 1])
+        m(tag + "CmpInlRms", "%.2f" % np.sqrt(np.mean((i_m - i_p) ** 2)))
+        m(tag + "CmpDnlRms", "%.2f" % np.sqrt(np.mean((d_m - d_p) ** 2)))
+        t_p = np.array(p["t"])
+        t_m = ramp["t"][0] + (t_p - t_p[0]) / (t_p[-1] - t_p[0]) * (ramp["t"][-1] - ramp["t"][0])
+        sinad, enob = aa.static_model({"t": t_m, "lsb": ramp["lsb"]}, sines[0])
+        m(tag + "StSinad", "%.2f" % sinad)
+        m(tag + "StEnob", "%.2f" % enob)
+        par = p.get("plate_par")
+        if par and key == "tapeout":
+            cols = ["VOUTH", "VOUTL", "supply", "vref/vin", "controls", "own"]
+            with open(os.path.join(build, "table_par.tex"), "w") as fo:
+                fo.write("\\begin{tabular}{ll S[table-format=3.1] *{6}{S[table-format=2.1]}}\n\\toprule\n"
+                         "Half & Plate & {Total} & {VOUTH} & {VOUTL} & {Supplies} & {VREF/VIN/VIP} & {Controls} & "
+                         "{VSH--FL} \\\\\n\\midrule\n")
+                for half in ("H", "L"):
+                    for b in range(aa.BITS):
+                        for kind in ("VSH", "FL"):
+                            e = par["%s%d_%s" % (half, b, kind)]
+                            n = e["units"]
+                            fo.write("%s & bit %d %s & %.1f & %s \\\\\n" % (
+                                half, b, kind, e["total_f"] / n * 1e15,
+                                " & ".join("%.1f" % (e[c] / n * 1e15) for c in cols)))
+                    if half == "H":
+                        fo.write("\\midrule\n")
+                fo.write("\\bottomrule\n\\end{tabular}\n")
     with open(os.path.join(build, "results_sim.tex"), "w") as fo:
         fo.write("\n".join(L) + "\n")
     if not sim["sines"]:
@@ -539,7 +586,7 @@ def main():
     fig_sweep(sines, build)
     write_tex(build, runs, ramp, sines)
     write_frontend_tex(build, ramp, *fig_frontend(sines, build))
-    for f in ("comparison.tex", "results_sim.tex", "table_cmp.tex"):
+    for f in ("comparison.tex", "results_sim.tex", "table_cmp.tex", "table_par.tex"):
         if os.path.exists(os.path.join(build, f)):
             os.remove(os.path.join(build, f))
     if sim_path:
