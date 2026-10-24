@@ -7,6 +7,7 @@
 \usepackage{float}
 \usepackage{caption}
 \usepackage{tikz}
+\usepackage[siunitx, RPvoltages]{circuitikz}
 \usetikzlibrary{arrows.meta, positioning, fit, calc}
 \usepackage[hidelinks]{hyperref}
 \sisetup{detect-all, table-number-alignment=center}
@@ -15,6 +16,7 @@
 \setlength{\emergencystretch}{2em}
 
 \input{results.tex}
+\input{results_fe.tex}
 \input{setup.tex}
 
 \title{\ReportTitle}
@@ -107,9 +109,15 @@ SINAD / ENOB at \SI{\SineRefFreq}{kHz} & \SI{\SineRefSinad}{dB} / \SineRefEnob{}
 \caption{Amplitude response of the ADC and of the stimulus, relative to the lowest frequency.}
 \end{figure}
 
+\input{frontend.tex}
+
+\IfFileExists{comparison.tex}{\input{comparison.tex}}{}
+
 \section{Notes}
 \begin{itemize}
 \input{notes.tex}
 \end{itemize}
+
+\input{references.tex}
 
 \end{document}

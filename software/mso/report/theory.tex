@@ -20,7 +20,7 @@ full scale (to avoid clipping). An ideal \AdcBits-bit quantizer driven by the sa
 reaches a little less than \AdcBits{} bits, about 4.7 bits for a sine of 27 LSB peak-to-peak.
 
 \subsection{Static linearity: the histogram test}
-The transition levels are measured with the code density (histogram) test of IEEE~1241. The input
+The transition levels are measured with the code density (histogram) test of IEEE~1241~\cite{ieee1241}. The input
 is a triangle that overdrives both ends of the range, so the end codes $0$ and $2^N-1$ appear and
 every inner code is crossed at a constant slope. With a linear ramp from $V_{min}$ to $V_{max}$ the
 voltage is uniformly distributed in time, and the number of samples $H_k$ that land in code $k$ is
@@ -60,7 +60,7 @@ sample falls on a different phase of the sine, so the record exercises the whole
 characteristic instead of repeating a few points. The integer number of periods also places the
 fundamental and its harmonics exactly on FFT bins.
 
-\paragraph{Four-parameter fit.} Following IEEE~1057, the record $x_n$ is fitted by least squares to
+\paragraph{Four-parameter fit.} Following IEEE~1057~\cite{ieee1057}, the record $x_n$ is fitted by least squares to
 \begin{equation}
 y_n = A\cos(2\pi f t_n + \varphi) + C, \qquad t_n = n / f_s,
 \end{equation}

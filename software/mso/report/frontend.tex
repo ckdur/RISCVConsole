@@ -1,0 +1,115 @@
+% Analysis of the adapter board (front end and references). Macros from results_fe.tex.
+\section{Effects of the adapter board}
+\label{sec:board}
+
+\subsection{Gain and offset}
+The measured transitions go from \SI{\TFirst}{V} to \SI{\TLast}{V} instead of
+\SI{\FeTFirstIdeal}{V} to \SI{\FeTLastIdeal}{V}: the LSB is \SI{\Lsb}{mV} instead of
+\SI{\FeLsbIdeal}{mV} (gain error \SI{\FeGainErr}{\percent}) and the middle of the range is at
+\SI{\FeMid}{V} instead of \SI{\BoardVmid}{V} (\SI{\FeOffsetMv}{mV}, \FeOffsetLsb{} LSB). The
+front end doubles any error of the \SI{0.6}{V} of R1/R2 and adds the offsets of the two halves of
+U5~\cite{lmv358}; the references are known only from a multimeter reading
+(\SI{\BoardVrefn}{V} and \SI{\BoardVrefp}{V}), and \SI{10}{mV} on either is \SI{2.5}{\percent} of the
+\SI{0.4}{V} span. Neither error limits the ENOB: both are removed by the
+end-point line and by the sine fit.
+
+\subsection{Static linearity is not set by the front end}
+At low frequency the front end is linear: the op-amps have all their loop gain, and H2, the
+harmonic a single-ended stage would produce, is below \SI{-45}{dBc}. The SINAD measured with
+the sines below \SI{50}{kHz} is the same, within \SI{0.3}{dB}, as the SINAD predicted from the
+ramp transfer alone (SINAD$_{st}$ in the sweep table), so the low-frequency ENOB of
+\SineRefEnob{} bits is entirely the static nonlinearity of the conversion: noise, jitter and
+dynamic errors are negligible in comparison. An ideal \AdcBits-bit quantizer would give
+$20 \log_{10}(A \sqrt{6}) \approx \SI{30.2}{dB}$ (4.7 bits) for the same amplitude.
+
+The DNL repeats with a period of 8 codes and the INL jumps at codes 8, 16 and 24, the signature
+of errors in the binary weights of the capacitive DAC. A least-squares fit of the transition levels
+to $T_k = \sum_b w_b\, b_b(k) + c$, with $b_b(k)$ the bits of $k$, gives
+\begin{center}\small
+\begin{tabular}{lccccc}
+\toprule
+Bit & 0 & 1 & 2 & 3 & 4 \\
+\midrule
+Weight (LSB) & \BitWA & \BitWB & \BitWC & \BitWD & \BitWE \\
+Ideal & 1 & 2 & 4 & 8 & 16 \\
+Error (\%) & \BitEA & \BitEB & \BitEC & \BitED & \BitEE \\
+\bottomrule
+\end{tabular}
+\end{center}
+and the INL left after the fit is \InlResidRms{} LSB rms (\InlRms{} LSB before). Errors of several
+percent in units made of tens of MOS capacitors are not random mismatch; they come from the chip
+(the layout parasitics of the DAC, which the schematic simulation of
+Section~\ref{sec:comparison} does not include) or from the references. Because the references
+have no decoupling capacitor at the chip (Figure~\ref{fig:refs}), the charge that the DAC draws
+at every bit decision (\SI{100}{ns}) is supplied by the trace capacitance and by the open-loop
+output impedance of a \SI{1}{MHz} op-amp, which cannot correct it within the bit time. Such a
+disturbance depends on the bits already decided, so it would also appear as weight errors.
+The measurements of this report cannot separate the two causes. Repeating the ramp with
+\SI{100}{nF} and \SI{1}{\micro F} ceramic capacitors at pins 44 and 45 would: if the INL does not
+change, the errors are in the chip.
+
+\subsection{Dynamic performance is limited by the front end}
+The two outputs of the front end do not have the same path: $v_p$ goes through one op-amp at
+unity gain (bandwidth $\approx$ GBW), $v_n$ through that op-amp and then the inverting stage, which
+has a noise gain of 2 (bandwidth $\approx$ GBW/2). With the LMV358 (GBW about \SI{1}{MHz}, slew rate
+about \SI{1}{V/\micro s}~\cite{lmv358}) both are close to the frequencies of the sweep. A linear
+model with single-pole op-amps and the RC network of Figure~\ref{fig:frontend} reproduces the
+measured roll-off of the ADC amplitude up to \SI{500}{kHz} with GBW = \SI{\FeGbw}{MHz}
+(Figure~\ref{fig:fe}). It has three consequences:
+\begin{enumerate}
+  \item \textbf{Amplitude loss.} At \SI{\FeHighFreq}{kHz} the differential amplitude falls to
+        \FeHighRel{} of its low-frequency value. The ENOB is referred to the amplitude actually
+        converted, so a smaller signal alone costs ENOB: the SINAD$_q$ column of
+        Table~\ref{tab:fe} is what an ideal quantizer gives for the measured amplitude.
+  \item \textbf{Common-mode ripple.} The phase lag of $v_n$ against $v_p$ turns part of the signal
+        into common mode at the input frequency: \FeHighCm\,\% of the differential amplitude at
+        \SI{\FeHighFreq}{kHz}. With $v_p$ and $v_n$ no longer opposite, the second-order terms of the
+        sampling switches and MOS capacitors of the two sides no longer cancel, which could produce H2
+        ($v_p^2 - v_n^2 = v_d \cdot 2 v_{cm}$). The measured H2 stays at \SI{-45}{dBc} while the
+        ripple is small and rises to \SI{-24}{dBc} once the ripple exceeds about \SI{20}{\percent} of
+        the signal, above \SI{200}{kHz} (Figure~\ref{fig:fe}). The transistor-level simulation with the
+        modelled ripple (Section~\ref{sec:comparison}) shows, however, that the converter rejects it
+        well (H2 below \SI{-50}{dBc}). The measured H2 therefore comes from the op-amps themselves
+        near their slew limit (next item), which the linear model does not include; the ripple is a
+        symptom of the same bandwidth problem, not the direct cause.
+  \item \textbf{Slew rate.} At \SI{\FeHighFreq}{kHz} the input needs \SI{\FeHighSlew}{V/\micro s},
+        close to the slew rate of the LMV358, which also has to charge \SI{2.5}{nF} through
+        \SI{47.5}{\ohm}. The measured amplitude (\FeHighRel{} of the low-frequency value) is below
+        the linear model (\FeHighModel): the op-amps slew, which distorts the signal and explains
+        the extra loss.
+\end{enumerate}
+The circuit of SBOA216~\cite{sboa216} works as intended; its bandwidth is simply that of its
+op-amps. For signals up to \SI{650}{kHz} it needs op-amps with tens of MHz of GBW and
+\SI{10}{V/\micro s} of slew rate, or a fully differential amplifier, which drives both outputs
+through the same path and keeps them opposite.
+
+\begin{figure}[H]\centering
+\includegraphics{fig/frontend.pdf}
+\caption{Top: differential gain of the front end, measured (fitted ADC amplitude relative to the
+lowest frequency) and from the linear model. Middle: common-mode ripple at the ADC input relative to
+the differential signal (model). Bottom: measured H2.}
+\label{fig:fe}
+\end{figure}
+\begin{table}[H]\centering\small
+\input{table_fe.tex}
+\caption{Front-end analysis. $A$: fitted ADC amplitude; diff.\ gain relative to the lowest
+frequency; CM/diff.: common-mode ripple of the model; slew: slew rate needed for the input
+amplitude; SINAD$_q$: SINAD of an ideal \AdcBits-bit quantizer at the amplitude $A$.}
+\label{tab:fe}
+\end{table}
+
+\subsection{Conclusions on the measurement setup}
+\begin{itemize}
+  \item Up to \SI{50}{kHz} the front end does not limit the measurement: the ENOB of
+        \SineRefEnob{} bits is the static nonlinearity of the converter, mainly binary weight errors
+        of the DAC.
+  \item Above \SI{100}{kHz} the front end degrades the measurement: the LMV358 halves of
+        the SBOA216 converter have different bandwidths, so the amplitude falls, the input common
+        mode moves at the signal frequency (H2) and, near \SI{650}{kHz}, the op-amps slew. The
+        drop of ENOB with frequency is mostly the board, not the ADC.
+  \item The references have no decoupling at the chip. This may contribute to the weight errors
+        and should be fixed before the static linearity is attributed to the chip.
+  \item The supply of the ADC is \SI{1.2}{V} and its references are at
+        \SI{\BoardVrefn}{V}/\SI{\BoardVrefp}{V}, so the simulations used for the comparison are run
+        at these conditions, not at the \SI{1.8}{V} of the design testbench.
+\end{itemize}

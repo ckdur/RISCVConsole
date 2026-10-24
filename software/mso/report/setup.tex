@@ -6,15 +6,89 @@
 \newcommand{\ReportAuthor}{Ckristian Duran}
 \newcommand{\DeviceName}{SAR ADC test chip}
 
-% Description of the single-ended to differential front end (shown in the setup section)
+% Description of the adapter board and its single-ended to differential front end
+% (shown in the setup section). Board: pcbs/IHP130_ASICONE_ADP_QFN48_0p5Q_Adapter.
 \newcommand{\FrontEndDescription}{%
-The ADC has a differential input. The single-ended DDS output is converted to a differential
-pair by a front end built from discrete components on the test board.
-% TODO: describe the circuit: topology (op-amp / transformer / resistive), components, gain,
-% common-mode voltage and how it is set, input impedance, bandwidth.
-In this report all voltages are single-ended, measured at the input of the front end;
-the gain and common mode of the front end are therefore included in the transfer
-characteristic.}
+The chip sits on the adapter board \texttt{IHP130\_ASICONE\_ADP\_QFN48\_0p5Q\_Adapter}, which
+plugs into the ULX3S header and carries the supplies, the references and the front end of the ADC.
+
+\paragraph{Supplies.} The \SI{5}{V} of the ULX3S header feeds two LDOs: a TLV75533 (\SI{3.3}{V}),
+which supplies the op-amps and the I/O of the chip, and a TLV75512 (\SI{1.2}{V})~\cite{tlv755p},
+which supplies the core of the chip and, through jumper JP5, the supply pin of the ADC
+(\texttt{adc\_vdd}, pin~2). The ADC therefore runs at \SI{1.2}{V}. Every supply pin of the chip has
+\SI{10}{\micro F} and \SI{100}{nF} on the board. The \SI{1.2}{V} LDO is also the reference of the
+three potentiometers and of the \SI{0.6}{V} divider of the front end.
+
+\paragraph{Single-ended to differential converter.} Figure~\ref{fig:frontend} is the circuit of
+the TI application note SBOA216~\cite{sboa216}, built with the two halves of an
+LMV358~\cite{lmv358} on \SI{3.3}{V}. U5A is a unity-gain buffer and gives $v_p = v_{in}$; U5B is a
+difference amplifier with two \SI{1}{k\ohm} resistors whose non-inverting input is the
+\SI{0.6}{V} of the divider R1/R2, and gives $v_n = 2 \cdot \SI{0.6}{V} - v_{in}$. The ADC then sees
+$v_d = v_p - v_n = 2 (v_{in} - \SI{0.6}{V})$ with a common mode of \SI{0.6}{V}. Each output goes
+through \SI{47.5}{\ohm} to a capacitor network: \SI{1.2}{nF} across the pair (differential pole at
+$1/(2\pi \cdot \SI{47.5}{\ohm} \cdot \SI{2.52}{nF}) = \SI{1.33}{MHz}$) and \SI{120}{pF} from each
+side to ground (common-mode pole at \SI{28}{MHz}). This network is the charge reservoir for the
+sampling capacitors of the ADC (about \SI{1}{pF} per side, 2400 times smaller), and the resistors
+isolate the op-amps from the capacitive load. The DDS output drives the non-inverting input of
+U5A, with jumper JP8 open so that the potentiometer RV3 is disconnected; the scope channel
+measures the same node.
+
+\paragraph{References.} RV1 and RV2 (\SI{10}{k\ohm} potentiometers on \SI{1.2}{V}) set the
+references, buffered by the two halves of a second LMV358 (U4) and connected through jumpers JP6
+and JP7: $V_{REFP} = \SI{\BoardVrefp}{V}$ (pin~45) and $V_{REFN} = \SI{\BoardVrefn}{V}$ (pin~44),
+measured with a multimeter. There is no capacitor on the reference nets at the chip: the
+op-amp outputs, the traces and the jumpers are all the ADC sees.
+
+\paragraph{Ideal transfer.} With these values the differential LSB is
+$2 (V_{REFP} - V_{REFN}) / 2^{\AdcBits} = \SI{25}{mV}$, that is \SI{\FeLsbIdeal}{mV} at the input of
+the front end, and the transitions are ideally at
+$T_k = \SI{\BoardVmid}{V} + (k - 2^{\AdcBits - 1}) \cdot \SI{\FeLsbIdeal}{mV}$: from
+\SI{\FeTFirstIdeal}{V} to \SI{\FeTLastIdeal}{V}. In this report all voltages are single-ended, measured at the input of
+the front end, so the gain and the common mode of the front end are part of the transfer characteristic.
+
+\begin{figure}[H]\centering
+\begin{circuitikz}[scale=0.8, transform shape, font=\footnotesize]
+  \draw (0,0) node[left, align=right]{$v_{in}$\\(DDS, scope)} to[short, o-] (1.0,0);
+  \node[op amp, noinv input up, anchor=+] (A) at (1.0,0) {\scriptsize U5A};
+  \draw (A.-) -- ++(-0.3,0) |- ++(0,-0.9) -| (A.out);
+  \draw (A.out) to[short, -*] ($(A.out)+(0.5,0)$) coordinate (P);
+  \draw (P) to[R, l=$R_6$ \SI{47.5}{\ohm}] ++(2.6,0) -- (10.5,0 |- P) coordinate (VP);
+  \node[op amp, anchor=-] (B) at (5.4,-3.0) {\scriptsize U5B};
+  \draw (P) to[R, l_=$R_3$ \SI{1}{k\ohm}] (P |- B.-) -- (B.-);
+  \coordinate (N) at ($(B.-)+(-0.6,0)$);
+  \coordinate (P2) at ($(B.out)+(0.4,0)$);
+  \draw (N) to[short, *-] (N |- 0,-1.6) to[R, l=$R_4$ \SI{1}{k\ohm}] (P2 |- 0,-1.6) -- (P2);
+  \draw (B.out) to[short, -*] (P2) to[R, l=$R_5$ \SI{47.5}{\ohm}] (P2 -| VP) coordinate (VN);
+  \draw (B.+) -- (3.0,0 |- B.+) coordinate (D2);
+  \draw (D2) to[R, l_=$R_1$ \SI{10}{k\ohm}, *-o] ++(-2.2,0) node[left]{\SI{1.2}{V}};
+  \draw (D2) to[R, l=$R_2$ \SI{10}{k\ohm}] ++(0,-1.5) node[ground]{};
+  \draw (VP) to[C, *-*, l_=$C_{19}$ \SI{1.2}{nF}] (VN);
+  \draw (VP) -- (11.6,0 |- VP) coordinate (VP2) to[short, -o] (13.0,0 |- VP)
+        node[right, align=left]{$v_p$: VIP\\(JP9, pin 42)};
+  \draw (VN) -- (11.6,0 |- VN) coordinate (VN2) to[short, -o] (13.0,0 |- VN)
+        node[right, align=left]{$v_n$: VIN\\(JP10, pin 43)};
+  \draw (VP2) to[C, *-, l=$C_{20}$ \SI{120}{pF}] ++(0,-1.3) node[ground]{};
+  \draw (VN2) to[C, *-, l=$C_{21}$ \SI{120}{pF}] ++(0,-1.3) node[ground]{};
+\end{circuitikz}
+\caption{Single-ended to differential front end of the adapter board (U5: LMV358 on
+\SI{3.3}{V}). $v_p = v_{in}$, $v_n = \SI{1.2}{V} - v_{in}$ at low frequency.}
+\label{fig:frontend}
+\end{figure}
+
+\begin{figure}[H]\centering
+\begin{circuitikz}[scale=0.82, transform shape, font=\footnotesize]
+  \draw (0,1.6) node[left]{\SI{1.2}{V}} to[short, o-] (0.6,1.6) to[pR, n=pot, l_=RV1 \SI{10}{k\ohm}] (0.6,-0.4)
+        node[ground]{};
+  \draw (pot.wiper) -- (1.7,0.6) coordinate (W);
+  \node[op amp, noinv input up, anchor=+] (U) at (W) {\scriptsize U4A};
+  \draw (U.-) -- ++(-0.3,0) |- ++(0,-0.9) -| (U.out);
+  \draw (U.out) to[short] ++(0.6,0) to[switch, l=JP6] ++(1.6,0) to[short, -o] ++(1.4,0)
+        node[right, align=left]{VREFP (pin 45), \SI{\BoardVrefp}{V}\\no capacitor at the pin};
+\end{circuitikz}
+\caption{Reference buffer (VREFP shown; VREFN is the same with RV2, U4B, JP7 and pin~44).}
+\label{fig:refs}
+\end{figure}
+}
 
 \newcommand{\SetupDescription}{%
 \subsection{Signal chain}
@@ -66,8 +140,9 @@ the samples in RAM; the host reads them back through JTAG.
 \begin{tabular}{lp{0.62\textwidth}}
 \toprule
 Device under test & \DeviceName: \AdcBits-bit differential SAR ADC \\
-Front end & Single-ended to differential conversion (see below) \\
-Signal source & Vimu MSO20BL (hardware 2.0), DDS channel~1, controlled with VmMsoOpenSDK
+Adapter board & \texttt{IHP130\_ASICONE\_ADP\_QFN48\_0p5Q\_Adapter}: LDOs, references and front end (see below) \\
+Front end & Single-ended to differential converter of SBOA216~\cite{sboa216} with LMV358~\cite{lmv358} \\
+Signal source & Vimu MSO20BL (hardware 2.0), DDS channel~1, controlled with VmMsoOpenSDK~\cite{mso20}
   (\texttt{software/mso/mso\_dds}) \\
 Voltage reference & MSO20 oscilloscope CH1 on the DDS output, DC coupled, \SI{\pm 1}{V} range
   (\SI{9.9}{mV} per step), 8192 samples per capture \\
@@ -79,7 +154,7 @@ Debug and data link & FT232H JTAG adapter (OpenOCD), ULX3S USB UART at \SI{11520
 \end{tabular}
 \end{center}
 
-\subsection{Front end}
+\subsection{Adapter board and front end}
 \FrontEndDescription
 
 \subsection{ADC interface}
