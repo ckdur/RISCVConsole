@@ -397,8 +397,9 @@ def write_compare_tex(build, ramp, sines, sim):
             m("SimFeEnobHigh", "%.2f" % fe[-1]["enob"])
             m("SimFeAmpHigh", "%.2f" % fe[-1]["amp"])
             m("SimFeHtwoMax", "%.0f" % max(f["harm"]["2"]["dbc"] for f in fe))
-    # Post-layout simulations (static only): tapeout (Pex...) and hierarchical re-layout (Hier...)
-    for key, tag in (("tapeout", "Pex"), ("hier", "Hier")):
+    # Post-layout simulations (static only): tapeout (Pex...), hierarchical re-layout (Hier...), and
+    # the tapeout netlist with only (PexPl...) or without (PexNp...) the capacitors of the DAC plates
+    for key, tag in (("tapeout", "Pex"), ("hier", "Hier"), ("plates", "PexPl"), ("noplates", "PexNp")):
         p = (sim.get("pex") or {}).get(key)
         if not p:
             continue

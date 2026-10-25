@@ -6,13 +6,24 @@
 The ADC was simulated at transistor level in \texttt{saradc\_auto} (data set\\
 \texttt{\SimSource}):
 ngspice-47~\cite{ngspice} with the PSP103 models of the PDK~\cite{ihppdk} (\SimPdk), typical corner,
-\SI{25}{\celsius}, the post-route schematic netlist without layout parasitics, no noise and no mismatch.
+\SI{25}{\celsius}, no noise and no mismatch; the post-route schematic netlist\ifdefined\PexBitEA{} and, for the
+static transfer, the post-layout netlist of the taped-out layout (Section~\ref{sec:cmp_pex})\fi.
 The operating point is that of the adapter board: supply \SI{1.2}{V}, references
 \SI{\BoardVrefn}{V}/\SI{\BoardVrefp}{V}, input common mode \SI{0.6}{V}, clock \SI{10}{MHz} with 7
 clocks per conversion. The simulated input is the differential voltage at the pins of the macro, so its
 LSB is twice the LSB at the input of the board ($v_d = 2(v_{in} - \SI{0.6}{V})$); both are compared in
 their own end-point LSB below.
 
+\ifdefined\PexBitEA
+The layout parasitics come from a split extraction of the taped-out GDS (details in the simulation
+report): neither Magic~\cite{magic} (capacitances two orders of magnitude too large, no comparison
+possible in Netgen~\cite{netgen}) nor KLayout-PEX~\cite{kpex} on the whole layout (single-threaded
+2.5D engine, runs of up to \SI{16}{h} without result) gave a usable netlist, but KLayout-PEX 0.3.12
+does extract small windows. The layout is cut into 81 windows along fillers and taps, every window is
+extracted (2.5D, coupling capacitances, no resistance) and the windows are joined again by net name.
+The joined netlist has the 24\,198 transistors of the schematic and 68\,519 capacitors, and matches
+the schematic in the transistor widths on every one of its 572 named nets.
+\else
 The layout parasitics are not included because neither extractor gave a usable netlist (details in the
 simulation report):
 \begin{itemize}
@@ -27,15 +38,16 @@ simulation report):
         removed) stopped after \SI{16}{h}.
 \end{itemize}
 The post-layout comparison will be added when an extraction is available.
+\fi
 
 \subsection{Static transfer}
 \begin{figure}[H]\centering
 \includegraphics{fig/cmp_dnl_inl.pdf}
-\caption{DNL and INL of the chip (ramp test) and of the schematic simulation (bisection of the
-transition levels), each in its own end-point LSB.}
+\caption{DNL and INL of the chip (ramp test) and of the simulation (bisection of the transition
+levels) of the schematic\ifdefined\PexBitEA{} and of the post-layout netlist\fi, each in its own end-point LSB.}
 \label{fig:cmp_static}
 \end{figure}
-The simulated converter is ideal within the resolution of the simulation: DNL from \num{\SimDnlMin} to
+The schematic converter is ideal within the resolution of the simulation: DNL from \num{\SimDnlMin} to
 \num{\SimDnlMax} LSB, INL from \num{\SimInlMin} to \num{\SimInlMax} LSB (\SimInlRms{} LSB rms), no missing codes,
 binary weights within \SI{0.1}{\percent}. The chip has the same functionality (monotonic, no missing
 codes) but not the same linearity:
@@ -48,11 +60,20 @@ Weight, measured (LSB) & \BitWA & \BitWB & \BitWC & \BitWD & \BitWE \\
 Error, measured (\%) & \BitEA & \BitEB & \BitEC & \BitED & \BitEE \\
 Weight, simulated (LSB) & \SimBitWA & \SimBitWB & \SimBitWC & \SimBitWD & \SimBitWE \\
 Error, simulated (\%) & \SimBitEA & \SimBitEB & \SimBitEC & \SimBitED & \SimBitEE \\
+\ifdefined\PexBitEA
+Weight, post-layout (LSB) & \PexBitWA & \PexBitWB & \PexBitWC & \PexBitWD & \PexBitWE \\
+Error, post-layout (\%) & \PexBitEA & \PexBitEB & \PexBitEC & \PexBitED & \PexBitEE \\
+\fi
 \bottomrule
 \end{tabular}
 \end{center}
-The measured INL (\InlRms{} LSB rms) differs from the simulated one by \CmpInlRms{} LSB rms, i.e.\ all of
-it. The gain error is \SI{\FeGainErr}{\percent} measured against \SI{\SimGainErr}{\percent} simulated;
+The measured INL (\InlRms{} LSB rms) differs from the schematic one by \CmpInlRms{} LSB rms, i.e.\ all of
+it.\ifdefined\PexBitEA{} The post-layout netlist does not: its weight errors have the sign of the measured
+ones on all five bits, its INL is \PexInlRms{} LSB rms, and it differs from the measured INL by
+\PexCmpInlRms{} LSB rms (correlation \PexInlCorr{} for the INL, \PexDnlCorr{} for the DNL);
+Section~\ref{sec:cmp_pex} explains where the errors come from.\fi{} The gain error is \SI{\FeGainErr}{\percent} measured against \SI{\SimGainErr}{\percent} simulated
+(schematic\ifdefined\PexBitEA; \SI{\PexGainErr}{\percent} post-layout, where the wiring capacitance of the
+top plates attenuates the DAC\fi);
 the measured value also contains the tolerance of the front-end gain (R3/R4) and of the reference
 voltages, which are known only to the resolution of the multimeter (\SI{10}{mV} on either is
 \SI{2.5}{\percent} of the span), so it does not by itself show a difference of the chip. The offset of
@@ -60,13 +81,63 @@ voltages, which are known only to the resolution of the multimeter (\SI{10}{mV} 
 \SI{0.6}{V} divider and the op-amp offsets, doubled by the front end) or from the offset of the comparator,
 which a simulation without mismatch cannot show.
 
+\ifdefined\PexBitEA
+\subsection{Post-layout simulation: where the weight errors come from}
+\label{sec:cmp_pex}
+Each bit of the DAC is a group of MOS capacitors between a switched plate (VSH, connected to the input,
+to VOUTH or to VOUTL) and a floating plate (FL); VOUTH and VOUTL are the inputs of the comparator. The
+unit capacitor is \SI{67.8}{fF} with FL floating. The wiring of the plates adds capacitance of the same
+order (Table~\ref{tab:par}): about \SI{100}{fF} per unit on VSH and 65 to \SI{75}{fF} on FL, mostly to
+the supplies, which only scales the weights, but also several femtofarads per unit directly to VOUTH and
+VOUTL, which changes how much charge each bit moves onto the comparator inputs, and that part is
+different for every bit:
+\begin{itemize}
+  \item bits 1 and 3 have extra bridges on Metal5/TopMetal1 and about \SI{10}{\percent} more wiring capacitance per
+        unit on both plates;
+  \item the switched plate of the MSB couples \SI{11.3}{fF} per unit to the comparator input of its
+        own half, the other bits about \SI{5}{fF} to each input;
+  \item the floating plates of bits 0 to 3 couple 7 to \SI{10}{fF} per unit to the comparator input of
+        the other half, those of the MSB less than \SI{1}{fF};
+  \item the two halves are not symmetric: the floating plates of the upper half couple about \SI{10}{fF}
+        to VOUTH and less than \SI{1}{fF} to VOUTL, those of the lower half 3 and \SI{7}{fF} to VOUTH and VOUTL.
+\end{itemize}
+With all parasitics the taped-out netlist gives weight errors of
+\PexBitEA/\PexBitEB/\PexBitEC/\PexBitED/\PexBitEE\,\% (bit 0 to 4, measured
+\BitEA/\BitEB/\BitEC/\BitED/\BitEE\,\%).
+\ifdefined\PexPlBitEA
+With only the capacitors on the plates it gives \PexPlBitEA/\PexPlBitEB/\PexPlBitEC/\PexPlBitED/\PexPlBitEE\,\%%
+\ifdefined\PexNpBitEA{} and with all the other capacitors (top plates, switches, controls, without the plates)
+\PexNpBitEA/\PexNpBitEB/\PexNpBitEC/\PexNpBitED/\PexNpBitEE\,\%\fi: each part alone already has the
+pattern of the measurement (the two do not simply add: their sum is larger than the errors of the full
+netlist). The plate wiring also
+makes the attenuation of the DAC (the gain error); the other part is the capacitance of the top
+plates and of the switch control nets, which couple the switching of each bit into the comparator
+inputs.
+\fi
+The same circuit placed again with one half of the DAC as a macro mirrored into the other half
+(hierarchical re-layout, not fabricated) gives \HierBitEA/\HierBitEB/\HierBitEC/\HierBitED/\HierBitEE\,\%
+and \HierInlRms{} LSB rms of INL instead of \PexInlRms{}: the symmetry of the two halves halves the
+INL, but the bit-to-bit differences of the plate wiring remain.
+\IfFileExists{table_par.tex}{%
+\begin{table}[H]\centering\scriptsize
+\input{table_par.tex}
+\caption{Wiring capacitance of the plates of the taped-out layout per unit capacitor (\si{fF}), split
+by the net on the other side. H is the lower half (MSB on VOUTH), L the upper half (MSB on VOUTL, the
+other bits with VOUTH and VOUTL exchanged). VSH--FL is the coupling between the two plates of the same
+bit, in parallel with the unit capacitors.}
+\label{tab:par}
+\end{table}}{}
+\fi
+
 \subsection{Effective number of bits}
 The ENOB measured at low frequency, \SineRefEnob{} bits at \SI{\SineRefFreq}{kHz}, is what the measured
 static transfer predicts (Section~\ref{sec:board}). Quantizing the same fitted input with the simulated
 transition levels, scaled to the measured end points, gives \SimStSinad{}~dB, i.e.\ \SimStEnob{} bits,
 practically the \SI{30.2}{dB} of an ideal \AdcBits-bit quantizer at this amplitude. The schematic
 therefore allows about one bit more than the chip delivers, and the whole difference is the static
-nonlinearity, the binary weight errors of the DAC.
+nonlinearity, the binary weight errors of the DAC.\ifdefined\PexBitEA{} With the post-layout transition
+levels the same input gives \PexStSinad~dB, \PexStEnob{} bits: the layout parasitics account for about
+half of the lost bit.\fi
 
 \IfFileExists{table_cmp.tex}{%
 \subsection{Dynamic performance}
@@ -121,12 +192,27 @@ running; this subsection is completed when it finishes.}
 \begin{itemize}
   \item \textbf{Consistent}: the converter works as designed at the board conditions: monotonic, no
         missing codes and the LSB within a few percent of the ideal, as in the simulation.
+\ifdefined\PexBitEA
+  \item \textbf{Explained by the layout}: the bad static linearity. The schematic has binary weights
+        within \SI{0.1}{\percent}, the chip errors of \SIrange{-8}{7}{\percent} that cost about one bit of
+        ENOB. The post-layout simulation of the taped-out layout has the same sign of error on all five
+        bits, \PexInlRms{} of the \InlRms{} LSB rms of measured INL, and about half of the lost ENOB.
+        The cause is the wiring capacitance of the DAC plates to the comparator inputs, which differs
+        from bit to bit (bridges of bits 1 and 3, MSB plate next to its own top plate) and between the
+        two halves of the array. It is a property of the layout, not of the process or of the board.
+  \item \textbf{Not yet explained}: the remaining difference (bit 0 less reduced, bit 2 larger and
+        bit 3 smaller than post-layout, about \PexCmpInlRms{} LSB rms of INL). Its size is what random
+        mismatch of the unit capacitors (not simulated), the wiring resistance (not extracted) or the
+        undecoupled references of the board can give; a ramp with the references decoupled at the chip
+        would separate the board from the chip.
+\else
   \item \textbf{Not consistent}: the static linearity. The schematic has binary weights within
         \SI{0.1}{\percent}; the chip has errors of \SIrange{-8}{7}{\percent} that cost about one bit of
         ENOB. The simulation does not include the layout parasitics of the DAC, the impedance of the
         references on the board or the mismatch of the unit capacitors, and one of these is the cause.
         The post-layout simulation and a ramp measurement with the references decoupled at the chip
         (Section~\ref{sec:board}) will tell which.
+\fi
   \item \textbf{Not attributable to the ADC}: the loss of ENOB above \SI{100}{kHz} and the rise of H2,
         which the front end of the board explains. The simulation with the front-end model reproduces
         the loss of ENOB; the H2 needs the nonlinearity of the op-amps on top
