@@ -19,6 +19,17 @@ ADC on the adapter board and captures its codes.
 - The report compares with the simulation through `results/sweep_20261022/sim_summary.json`, written by
   `saradc_auto/sim/report/make_sim_report.py` (copy it here, then `make -C software/mso/report`).
 
+## RO measurement (this repo)
+- `software/ro/`: wiring and how to run (README), bench run (`ro_run.sh`), report (`report/`,
+  `make -C software/ro/report RESULTS=../results/ro_20261029`), data in `results/ro_20261029/` (bench
+  logs, and copies of `sim.csv`, `pex_summary.csv`, `pex_startup.csv` from `ro_reliability/sim`).
+- Firmware `src/ro.c` (`ro_test()`); SoC device `devices/rocounter/rocounter.scala` (`0x64005000`),
+  pins gn15..gn18 and gp27 (GPIO peripheral cut to 16 pins).
+- The chip SPI reset is `adc_rst` inverted: the RO configuration only survives while `adc_rst` is high,
+  so the ADC and the ROs cannot run together.
+- Simulation (ngspice sweep, SPI frame check, post-layout extraction in `pex/`) lives in
+  `asicone_sg13g2/ro_reliability/sim/`.
+
 ## Where the other files are
 All under `~/Documents/SymbioticEDA/`.
 

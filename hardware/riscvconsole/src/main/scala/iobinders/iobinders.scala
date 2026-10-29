@@ -5,6 +5,7 @@ import chisel3._
 import org.chipsalliance.diplomacy.lazymodule._
 import freechips.rocketchip.devices.debug.HasPeripheryDebug
 import riscvconsole.devices.adcfifo.HasPeripheryADCFIFO
+import riscvconsole.devices.rocounter.HasPeripheryROCounter
 import sifive.blocks.devices.spi.{HasPeripherySPIFlash, PeripherySPIFlashKey, SPIPortIO}
 
 class WithSPIFlashIOPunchthrough extends OverrideLazyIOBinder({
@@ -43,6 +44,17 @@ class WithADCFIFOIOPunchthrough extends OverrideIOBinder({
       val io_adcfifo = IO(s.cloneType).suggestName("adcfifo")
       io_adcfifo <> s
       ADCFIFOPort(() => io_adcfifo)
+    }
+    (ports.toSeq, Nil)
+  }
+})
+
+class WithROCounterIOPunchthrough extends OverrideIOBinder({
+  (system: HasPeripheryROCounter) => {
+    val ports = system.rocounterIO.zipWithIndex.map { case (s, i) =>
+      val io_rocounter = IO(s.cloneType).suggestName("rocounter")
+      io_rocounter <> s
+      ROCounterPort(() => io_rocounter)
     }
     (ports.toSeq, Nil)
   }

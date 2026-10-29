@@ -1,0 +1,137 @@
+% Bench measurement and comparison with the post-layout simulation. Macros from meas.tex
+% (written by make_report.py from the run*.uart.log of ../ro_run.sh and pex_summary.csv of
+% ro_reliability/sim/pex/run_all.sh).
+\section{Measurement}
+\label{sec:meas}
+Logs \MeasRuns{} of \texttt{ro\_run.sh} (firmware \texttt{ro\_test}, \texttt{ro\_diag}, \texttt{ro\_scan}),
+RO supplies from the on-board \SI{1.2}{V} regulator through JP3/JP4, room temperature. The versions of
+the firmware, the repository and the bitstream of every run are in \texttt{versions.txt}.
+
+\begin{center}\small
+\begin{tabular}{lcc}
+\toprule
+ & RO13 & RO101 \\
+\midrule
+Pad, ring alone (\SI{1}{s} gate) & \SI{\MeasAloneA}{MHz} & \SI{\MeasAloneB}{MHz} \\
+Pad, both rings on & \SI{\MeasBothA}{MHz} & \SI{\MeasBothB}{MHz} \\
+Ring (pad $\times$ 32), alone & \SI{\MeasRingAloneA}{MHz} & \SI{\MeasRingAloneB}{MHz} \\
+Change when the other ring runs & \SI{\MeasBothShiftA}{\percent} & \SI{\MeasBothShiftB}{\percent} \\
+Repeatability (both on, std.\ dev.) & \SI{\MeasBothSdA}{\percent} & \SI{\MeasBothSdB}{\percent} \\
+Spread over \MeasRestartsA{} restarts (\SI{100}{ms} gates) & \SI{\MeasRestartSpreadA}{\percent} & \SI{\MeasRestartSpreadB}{\percent} \\
+Duty cycle of the pad & \SI{\MeasDutyA}{\percent} & \SI{\MeasDutyB}{\percent} \\
+\bottomrule
+\end{tabular}
+\end{center}
+The ratio $f_{13}/f_{101}$ is \MeasRatio, against \RatioAB{} predicted.
+
+\subsection{Function}
+\begin{itemize}
+  \item The SPI writes arrive: the rings start and stop with the configuration (Table~\ref{tab:scan}).
+        They oscillate only with \texttt{RO\_control} = 1, \texttt{n\_RO\_control} = 0 and
+        \texttt{DUT\_Footer} = 1, as designed.
+  \item \texttt{RO\_RST\_B} low stops both outputs, and the outputs have a \SI{50}{\percent} duty cycle:
+        the counts come from the $\div 32$ dividers.
+  \item \texttt{DUT\_Header} (bit 3) has no visible function: with the header off (\texttt{0x0e}) the
+        rings keep running (RO13 \SI{\HdrOffShiftA}{\percent}, RO101 \SI{\HdrOffShiftB}{\percent}),
+        where the DUT can only pull down and the ring should stop. In the extracted cells the header
+        gate is on the \texttt{DUT\_Header} pin, so the suspect is the chip-level connection from
+        \texttt{R[3]}/\texttt{R[11]}.
+  \item With \texttt{RO\_control} = \texttt{n\_RO\_control} = 0 and \texttt{DUT\_gate} = 1
+        (\texttt{0x04}, \texttt{0x0c}) RO13 shows a slow oscillation of about \SI{10}{kHz} at the pad;
+        RO101 does not. Not understood; outside the oscillation mode.
+  \item \texttt{DUT\_gate}, disconnected from the ring in oscillation mode, still moves RO13 by about
+        \SI{0.6}{\percent} (coupling through the off transmission gate) and RO101 by \SI{0.05}{\percent}.
+\end{itemize}
+
+\begin{table}[H]\centering\scriptsize
+\input{table_scan.tex}
+\caption{Configuration scan: pad edges per second of both rings for every value of the 4 bits of
+the RO register (written to both rings), from a ring-open state.}
+\label{tab:scan}
+\end{table}
+
+\ifdefined\HavePex
+\section{Comparison with the post-layout simulation}
+\label{sec:cmp}
+The two cells were cut out of the fabricated chip GDS and extracted with KLayout-PEX 2.5D, coupling
+capacitances included (\texttt{ro\_reliability/sim/pex}); the extraction keeps the 13- and 101-stage
+loops (checked on the extracted netlists). They are simulated in the conditions of the bench, with the
+pad of \texttt{extra\_load}, from the restart of the firmware (the footer off, then on, which launches a
+single edge).
+\begin{table}[H]\centering\small
+\input{table_cmp.tex}
+\caption{Ring frequency: simulation against the board (pad $\times$ 32, ring alone).}
+\label{tab:cmpcases}
+\end{table}
+
+\subsection{RO13}
+The wiring of the layout lowers RO13 by \SI{\PexWireA}{\percent}, to \SI{\PexA}{MHz} at TT; the board
+gives \MeasOverPexA{} of that, below even the SS corner (\SI{\PexSsA}{MHz}). The post-layout ring would
+run at the measured frequency with a supply of about \SI{\EquivVdd}{V} (Figure~\ref{fig:vddpex}).
+The extraction has no resistance and the transistors are typical, so part of the difference may be
+the chip, but the bench points at the supply as well: RO13 slows by \SI{\MeasBothShiftA}{\percent}
+when RO101 also runs, which at about \SI{12}{\percent} per \SI{100}{mV} means some \SI{40}{mV} lost in
+the supply path for the \SI{0.5}{mA} of the other ring. Both RO supplies come from the same regulator
+through JP3 and JP4, and both rings share one ground pad.
+\begin{figure}[H]\centering
+\includegraphics{fig/vdd_pex.pdf}
+\caption{Post-layout RO13 against its supply, and the measured frequency.}
+\label{fig:vddpex}
+\end{figure}
+
+\subsection{RO101}
+RO101 cannot run at \SI{\MeasRingAloneB}{MHz} with one edge in the ring: that is \SI{37}{ps} per stage,
+and the post-layout fundamental is \SI{\PexB}{MHz}. Scaled by the factor RO13 shows
+(\MeasOverPexA), its fundamental would be \SI{\RoBFundEst}{MHz}, and the measurement is
+\RoBEdges{} times that: the ring would hold about seven edges at once (a harmonic mode), each still
+divided by 32 at the pad.
+
+The simulation does not keep such a mode. Started from all nodes at zero, the extracted ring does
+begin with several edges (\SI{\StartPexFirst}{MHz} of edges on \texttt{extra\_load}, \StartPexEdges{}
+edges), but they catch up with each other and vanish within \SI{\StartPexSettle}{\micro s}, and the
+ring ends at its fundamental (\SI{\PexUicB}{MHz}). Without the wiring capacitance the same start gives
+\StartDevEdges{} edges, gone within \SI{\StartDevSettle}{\micro s}. The board, on the other hand, always
+lands on the same frequency, over \MeasRestartsB{} restarts made in six different ways, including the
+footer-off restart that launches a single edge in simulation. So either the chip keeps creating edges
+until about seven circulate, or the ring that oscillates is not the 101-stage loop: seven edges in 101
+stages run at the same rate as one edge in a loop of about 14 stages, close to RO13's 13. The extracted
+cell has a single 101-stage loop (\texttt{ringloop.py}), so a short loop would have to come from outside
+the cell or from a defect. The \texttt{extra\_load} node, slow because of its pad, is the first suspect
+for extra edges: a slow edge with noise on it can switch the next stage twice.
+\fi
+
+\section{Reproducing this report}
+\label{sec:repro}
+Everything in this report comes from two repositories, both from scripts; the numbers in the text are
+macros computed from the data files by \texttt{make\_report.py}.
+\begin{description}
+  \item[Bench] (RISCVConsole) SoC with the \texttt{rocounter} device (\texttt{fpga/ULX3S}:
+        \texttt{make verilog bitstream program}, tools from \texttt{\textasciitilde/init\_openlane.sh}),
+        firmware \texttt{software/RISCVConsoleCode} (\texttt{make elf}, \texttt{src/ro.c}), wiring in
+        \texttt{software/ro/README.md}. \texttt{software/ro/ro\_run.sh <dir>} boots the firmware over
+        JTAG and stores \texttt{runN.uart.log} and the versions of firmware, repository and bitstream
+        in \texttt{versions.txt}.
+  \item[Schematic] (\texttt{asicone\_sg13g2/ro\_reliability}) \texttt{python3 sim/ro\_sim.py board}
+        $\rightarrow$ \texttt{sim.csv}; ngspice-47 with OSDI \cite{ngspice}, IHP-Open-PDK \cite{ihppdk}.
+        \texttt{sim/spi/run.sh} checks the SPI frame of the firmware against the chip RTL.
+  \item[Post-layout] (same repository) \texttt{sim/pex/run\_all.sh}: cuts \texttt{top\_13} and
+        \texttt{top\_101} out of the chip GDS, LVS and KLayout-PEX 2.5D, checks the ring loops,
+        simulates the cases of Table~\ref{tab:cmpcases} $\rightarrow$ \texttt{pex\_summary.csv}, and
+        the start-up of the all-zero starts $\rightarrow$ \texttt{pex\_startup.csv}
+        (about \SI{5}{h} on 32 cores).
+  \item[Report] copy the three CSV files into \texttt{software/ro/results/<dir>} next to the logs, then
+        \texttt{make -C software/ro/report RESULTS=../results/<dir>}.
+\end{description}
+This report: \texttt{results/\ResultsDir}.
+
+\section{Next steps}
+\begin{enumerate}
+  \item Measure ROVDD and RO2VDD (JP3, JP4) with a multimeter, with each ring off, alone and both on.
+  \item Feed ROVDD from a bench supply and sweep it: in a harmonic mode the frequency of RO101 jumps by
+        discrete ratios (7, 5, 3, 1 edges), while RO13 changes smoothly; a short loop would change smoothly
+        too, following RO13.
+  \item Look at \texttt{ro\_101\_ex} (J1 pin 28) with a scope, short ground: several pulses per period
+        instead of one square wave would confirm the harmonic mode.
+  \item Check the chip-level route of \texttt{R[3]}/\texttt{R[11]} to \texttt{DUT\_Header} (extraction of
+        the chip around the RO macros).
+\end{enumerate}

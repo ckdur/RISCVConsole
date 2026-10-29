@@ -1,0 +1,28 @@
+Open On-Chip Debugger 0.12.0
+Licensed under GNU GPL v2
+For bug reports, read
+	http://openocd.org/doc/doxygen/bugs.html
+DEPRECATED! use 'ftdi vid_pid' not 'ftdi_vid_pid'
+DEPRECATED! use 'ftdi layout_init' not 'ftdi_layout_init'
+DEPRECATED! use 'ftdi layout_signal' not 'ftdi_layout_signal'
+DEPRECATED! use 'ftdi layout_signal' not 'ftdi_layout_signal'
+DEPRECATED! use 'ftdi layout_signal' not 'ftdi_layout_signal'
+Info : auto-selecting first available session transport "jtag". To override use 'transport select <transport>'.
+Info : Hardware thread awareness created
+Info : clock speed 100 kHz
+Info : JTAG tap: riscv.cpu tap/device found: 0x00000001 (mfg: 0x000 (<invalid>), part: 0x0000, ver: 0x0)
+Info : datacount=8 progbufsize=16
+Info : Disabling abstract command reads from CSRs.
+Info : Core 0 could not be made part of halt group 1.
+Info : Examined RISC-V core; found 1 harts
+Info :  hart 0: XLEN=64, misa=0x8000000000941105
+Info : starting gdb server for riscv.cpu0 on 3333
+Info : Listening on port 3333 for gdb connections
+Ready for Remote Connections
+Info : JTAG tap: riscv.cpu tap/device found: 0x00000001 (mfg: 0x000 (<invalid>), part: 0x0000, ver: 0x0)
+25558 bytes written at address 0x80000000
+3880 bytes written at address 0x800063d8
+downloaded 29438 bytes in 4.214077s (6.822 KiB/s)
+
+Info : Disabling abstract command writes to CSRs.
+shutdown command invoked

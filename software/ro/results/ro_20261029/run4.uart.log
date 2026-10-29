@@ -1,0 +1,35 @@
+
+RATONA Demo:       2026-10-29-20:07:21-96a42d6-dirty
+Got TL_CLK: 50000000
+Got NUM_CORES: 1
+Got TIMEBASE: 50000Found 'sifive,gpio0'
+Found '/soc/spi@64002000'
+Found 'console,adcfifo0'
+Found 'console,rocounter0'
+
+
+
+Welcome! Doing the test!
+
+RO config scan (cfg: RO101/RO13 edges in 100 ms, DUT_gate=0 | DUT_gate=1)
+  0x00: 0/0 | 0/0
+  0x01: 0/0 | 0/0
+  0x02: 0/0 | 0/0
+  0x03: 0/0 | 0/0
+  0x04: 0/0 | 0/766
+  0x05: 0/0 | 0/0
+  0x06: 424565/391929 | 424669/397690
+  0x07: 0/0 | 0/0
+  0x08: 0/0 | 0/0
+  0x09: 0/0 | 0/0
+  0x0a: 0/0 | 0/0
+  0x0b: 0/0 | 0/0
+  0x0c: 0/0 | 0/801
+  0x0d: 0/0 | 0/0
+  0x0e: 423685/408029 | 423952/415175
+  0x0f: 0/0 | 0/0
+RO config scan done
+Finished!
+BOOT FAILED
+CODE: 00000007
+TRAP: 00000001

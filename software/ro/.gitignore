@@ -1,0 +1,4 @@
+results/*/report/
+__pycache__/
+# The bench logs are the measurement data
+!results/*/*.log

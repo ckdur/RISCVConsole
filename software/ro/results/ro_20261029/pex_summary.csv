@@ -1,0 +1,16 @@
+cell,corner,vdd,temp,start,pex,f_ring,f_out
+top_101,mos_ff,1.2,27,footer,1,3.06228e+07,956961
+top_101,mos_ss,1.2,27,footer,1,2.50234e+07,781979
+top_101,mos_tt,1.0,27,footer,1,2.0723e+07,nan
+top_101,mos_tt,1.2,27,footer,0,3.26117e+07,1.01911e+06
+top_101,mos_tt,1.2,27,footer,1,2.77309e+07,866591
+top_101,mos_tt,1.2,27,uic,0,3.26117e+07,1.63996e+06
+top_101,mos_tt,1.2,27,uic,1,2.77308e+07,1.02707e+06
+top_13,mos_ff,1.2,27,footer,1,2.09766e+08,6.55512e+06
+top_13,mos_ss,1.2,27,footer,1,1.69309e+08,5.29089e+06
+top_13,mos_tt,0.9,27,footer,1,1.13971e+08,3.56158e+06
+top_13,mos_tt,1.0,27,footer,1,1.39485e+08,4.35889e+06
+top_13,mos_tt,1.1,27,footer,1,1.64567e+08,5.14273e+06
+top_13,mos_tt,1.2,27,footer,0,2.23481e+08,6.98374e+06
+top_13,mos_tt,1.2,27,footer,1,1.8881e+08,5.90033e+06
+top_13,mos_tt,1.2,75,footer,1,1.69539e+08,5.29806e+06

@@ -1,0 +1,53 @@
+
+RATONA Demo:       2026-10-29-20:07:21-96a42d6-dirty
+Got TL_CLK: 50000000
+Got NUM_CORES: 1
+Got TIMEBASE: 50000Found 'sifive,gpio0'
+Found '/soc/spi@64002000'
+Found 'console,adcfifo0'
+Found 'console,rocounter0'
+
+
+
+Welcome! Doing the test!
+
+RO test
+Both off (gate 50000000 cycles at 50000000 Hz):
+  RO101: 0 edges, pad 0 Hz, ring 0 Hz
+  RO13: 0 edges, pad 0 Hz, ring 0 Hz
+RO101 on (gate 50000000 cycles at 50000000 Hz):
+  RO101: 4226872 edges, pad 4226872 Hz, ring 135259904 Hz
+  RO13: 0 edges, pad 0 Hz, ring 0 Hz
+RO13 on (gate 50000000 cycles at 50000000 Hz):
+  RO101: 0 edges, pad 0 Hz, ring 0 Hz
+  RO13: 4111122 edges, pad 4111122 Hz, ring 131555904 Hz
+Both on (gate 50000000 cycles at 50000000 Hz):
+  RO101: 4239038 edges, pad 4239038 Hz, ring 135649216 Hz
+  RO13: 3923002 edges, pad 3923002 Hz, ring 125536064 Hz
+  RO101: 4240078 edges, pad 4240078 Hz, ring 135682496 Hz
+  RO13: 3919621 edges, pad 3919621 Hz, ring 125427872 Hz
+  RO101: 4239633 edges, pad 4239633 Hz, ring 135668256 Hz
+  RO13: 3919983 edges, pad 3919983 Hz, ring 125439456 Hz
+  RO101: 4238527 edges, pad 4238527 Hz, ring 135632864 Hz
+  RO13: 3921244 edges, pad 3921244 Hz, ring 125479808 Hz
+  RO101: 4237791 edges, pad 4237791 Hz, ring 135609312 Hz
+  RO13: 3922131 edges, pad 3922131 Hz, ring 125508192 Hz
+RO test done
+RO diagnostics
+  both on        : RO101 423788, RO13 392216 edges/5000000 cycles; duty 496, 496 per mille
+  RO_RST_B low   : RO101 0, RO13 0 edges/5000000 cycles; duty 0, 0 per mille
+  RO_RST_B high  : RO101 423775, RO13 392232 edges/5000000 cycles; duty 496, 496 per mille
+  DUT header off : RO101 423281, RO13 406117 edges/5000000 cycles; duty 497, 491 per mille
+  DUT footer off : RO101 0, RO13 0 edges/5000000 cycles; duty 0, 0 per mille
+  both on again  : RO101 424022, RO13 391913 edges/5000000 cycles; duty 498, 499 per mille
+Restarts open, DUT_gate=0:
+  423965/392001 423949/392000 424001/391919 423971/391967 423945/392017 423968/391978 424000/391927 423925/392079 423982/391960 423986/391937 423992/391920 423991/391921
+Restarts open, DUT_gate=1:
+  424275/391259 424284/391206 424282/391222 424289/391204 424278/391272 424287/391231 424283/391251 424280/391225 424261/391206 424280/391232 424283/391224 424269/391218
+Restarts via 0x00 (rovcel3 pull-up):
+  424351/391660 424339/391620 424367/391599 424333/391624 424398/391590 424369/391626 424343/391596 424323/391616 424343/391644 424337/391632 424342/391624 424308/391626
+RO diagnostics done
+Finished!
+BOOT FAILED
+CODE: 00000007
+TRAP: 00000001

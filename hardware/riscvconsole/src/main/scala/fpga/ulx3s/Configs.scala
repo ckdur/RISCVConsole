@@ -27,7 +27,7 @@ class WithDefaultPeripherals extends Config((site, here, up) => {
     SPIParams(rAddress = BigInt(0x64002000L))
   )
   case PeripherySPIFlashKey => Nil
-  case PeripheryGPIOKey => Seq(GPIOParams(address = 0x64006000L, width = 32))
+  case PeripheryGPIOKey => Seq(GPIOParams(address = 0x64006000L, width = 16)) // gp5..gp20, the gn pins go to the ROs
   case testchipip.tsi.UARTTSIClientKey => None
   case testchipip.serdes.SerialTLKey => Nil
 })
@@ -51,11 +51,13 @@ class WithULX3SModifiers extends Config(
   // Devices
   new WithDefaultPeripherals ++
   new riscvconsole.devices.adcfifo.WithADCFIFO ++
+  new riscvconsole.devices.rocounter.WithROCounter ++
   new testchipip.serdes.WithNoSerialTL ++                                          // No serial TL
   new riscvconsole.config.WithoutClockGating ++                                 // No clock gating
   new riscvconsole.config.WithSDBootBootROM ++
   // Harness binders (From ChipTop to Harness)
   new riscvconsole.fpga.ulx3s.WithULX3SADCFIFOBinder ++
+  new riscvconsole.fpga.ulx3s.WithULX3SROCounterBinder ++
   new riscvconsole.fpga.ulx3s.WithULX3SJTAG ++
   new riscvconsole.fpga.ulx3s.WithULX3SDebugNDReset ++
   new riscvconsole.fpga.ulx3s.WithULX3SUART ++
@@ -65,6 +67,7 @@ class WithULX3SModifiers extends Config(
   new riscvconsole.fpga.ulx3s.WithULX3SSDBinder ++
   // IO Cells (From DigitalTop to ChipTop)
   new riscvconsole.iobinders.WithADCFIFOIOPunchthrough ++
+  new riscvconsole.iobinders.WithROCounterIOPunchthrough ++
   new chipyard.iobinders.WithSPIIOPunchthrough ++
   new riscvconsole.iobinders.WithSPIFlashIOPunchthrough ++
   new chipyard.iobinders.WithGPIOPunchthrough ++

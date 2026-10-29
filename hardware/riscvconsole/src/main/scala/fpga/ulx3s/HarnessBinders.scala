@@ -122,3 +122,14 @@ class WithULX3SADCFIFOBinder extends HarnessBinder({
     port.io.io.bits := VecInit(extraio_io_bits.map { a => AnalogToUInt(a).asBool }.reverse).asUInt
   }
 })
+
+class WithULX3SROCounterBinder extends HarnessBinder({
+  case (th: HasHarnessInstantiators, port: ROCounterPort, chipId: Int) => {
+    val ath = th.asInstanceOf[LazyRawModuleImp].wrapper.asInstanceOf[ULX3SHarness]
+    val roio = ath.roOverlay.head.getWrappedValue
+    val n = port.io.vout.getWidth
+    UIntToAnalog(port.io.rstb, roio(0), true.B)
+    (0 until n).foreach { i => UIntToAnalog(port.io.dut_gate(i), roio(1 + i), true.B) }
+    port.io.vout := VecInit((0 until n).map { i => AnalogToUInt(roio(1 + n + i)).asBool }).asUInt
+  }
+})

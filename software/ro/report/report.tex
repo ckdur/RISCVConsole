@@ -1,0 +1,230 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{verbatim}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, calc}
+\usepackage[hidelinks]{hyperref}
+\sisetup{detect-all}
+\setlength{\emergencystretch}{2em}
+
+\input{results.tex}
+
+\IfFileExists{meas.tex}{\title{ASICONE ring oscillators: measurement and simulation}}{\title{ASICONE ring oscillators: expected results}}
+\author{RISCVConsole bench, ULX3S + IHP130 QFN48 adapter}
+\date{\today\\[2pt]\small Simulation data set: \texttt{\ResultsDir}}
+
+\begin{document}
+\maketitle
+
+\section*{Summary}
+\IfFileExists{meas.tex}{The measurement on the bench and its comparison with the post-layout simulation are in
+Sections~\ref{sec:meas} and~\ref{sec:cmp}. }{}The first sections give the results expected \emph{before} the measurement, from transistor-level simulation of
+the two ring oscillators of ASICONE (typical corner, \SI{1.2}{V}, \SI{27}{\celsius}). The bench reads
+the output pads, which carry the ring divided by 32, with a counter in the FPGA over a \SI{1}{s} window.
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+ & RO13 & RO101 \\
+\midrule
+Ring frequency, TT & \SI{\RingA}{MHz} & \SI{\RingB}{MHz} \\
+Ring frequency, all corners & \SIrange{\RingMinA}{\RingMaxA}{MHz} & \SIrange{\RingMinB}{\RingMaxB}{MHz} \\
+Output pad (ring / 32), TT & \SI{\PadA}{MHz} & \SI{\PadB}{MHz} \\
+Counts in \SI{1}{s} (\texttt{ro\_test}), TT & \CountA & \CountB \\
+Stage delay, TT & \SI{\StageA}{ps} & \SI{\StageB}{ps} \\
+Ring supply current, TT & \SI{\CurA}{mA} on RO2VDD & \SI{\CurB}{mA} on ROVDD \\
+Supply sensitivity near \SI{1.2}{V} & \SI{\VddSensA}{\percent} per \SI{100}{mV} & \SI{\VddSensB}{\percent} per \SI{100}{mV} \\
+Temperature coefficient & \SI{\TempSensA}{\percent/\celsius} & \SI{\TempSensB}{\percent/\celsius} \\
+\bottomrule
+\end{tabular}
+\end{center}
+The ratio $f_{13}/f_{101}$ is \RatioAB{} at TT and stays within \RatioMin--\RatioMax{} over the five
+corners. Measuring both rings on the same chip therefore gives a check that does not depend on the
+process corner.
+
+\section{The circuit}
+Each RO (\texttt{ro\_reliability}, cells \texttt{top\_13} and \texttt{top\_101}) is a ring of 13 or 101
+inverting stages followed by a 5-flop ripple divider (\texttt{div\_sg13g2\_stdcells}, $\div 32$, reset by
+\texttt{RO\_RST\_B}, active low) that drives a \SI{16}{mA} output pad. All stages are \texttt{lv} MOS with
+$L = \SI{0.45}{\micro m}$, $W_p/W_n = 4 \times \SI{3.4}{\micro m} / 4 \times \SI{1.3}{\micro m}$. Three
+stages are special:
+\begin{itemize}
+  \item \texttt{rovcel3}: inverter with header and footer driven by \texttt{n\_RO\_control} and
+        \texttt{RO\_control}; it closes or opens the ring. When the ring is open, a transmission gate
+        connects its output (the DUT input) to the \texttt{DUT\_gate} pin.
+  \item \texttt{rovcel1}, the device under test: inverter with a PMOS header (gate \texttt{DUT\_Header},
+        on when 0) and an NMOS footer (gate \texttt{DUT\_Footer}, on when 1). Its output is the
+        \texttt{extra\_load} node, wired directly to an analog pad, and, when the ring is open, to
+        \texttt{Drain\_Force}/\texttt{Drain\_Sense} through transmission gates.
+  \item \texttt{rovcel4}: inverter with a PMOS header driven by \texttt{n\_RO\_control}.
+\end{itemize}
+
+\begin{figure}[H]\centering
+\begin{tikzpicture}[font=\scriptsize, node distance=4mm,
+  blk/.style={draw, rounded corners=1pt, minimum height=8mm, align=center, inner sep=2pt},
+  >={Stealth[length=1.6mm]}]
+  \node[blk] (c3) {rovcel3\\enable};
+  \node[blk, right=of c3, fill=orange!20] (c1) {rovcel1\\DUT};
+  \node[blk, right=of c1] (c4) {rovcel4\\header};
+  \node[blk, right=of c4] (inv) {$N-3$ inverters\\(rovcel2)};
+  \node[blk, right=12mm of inv] (div) {$\div 32$};
+  \node[blk, right=of div] (pad) {pad\\Vout};
+  \draw[->] (c3) -- (c1);
+  \draw[->] (c1) -- node[pos=0.45, below=5mm, align=center] (ex) {} (c4);
+  \draw[->] (c4) -- (inv);
+  \draw[->] (inv) -- (div);
+  \draw[->] (div) -- (pad);
+  \draw[->] ($(inv.east)+(4mm,0)$) -- ++(0,-12mm) -| (c3.south);
+  \node[above=6mm of c3] (dg) {DUT\_gate};
+  \draw[->, dashed] (dg) -- (c3.north);
+  \coordinate (n1) at ($(c1.east)!0.5!(c4.west)$);
+  \node[above=6mm of n1, align=center] (exl) {extra\_load pad;\\Drain\_Force/Sense (dashed)};
+  \draw[-] (n1) -- (exl);
+  \node[below=7mm of div] (rst) {RO\_RST\_B};
+  \draw[->] (rst) -- (div.south);
+\end{tikzpicture}
+\caption{Structure of each RO ($N = 13$ or 101). Dashed: connections made only when the ring is open.}
+\end{figure}
+
+The control bits come from the chip SPI: register 0 for RO101 (\texttt{R[7:0]}), register 1 for RO13
+(\texttt{R[15:8]}), bits [0] \texttt{n\_RO\_control}, [1] \texttt{RO\_control}, [2] \texttt{DUT\_Footer},
+[3] \texttt{DUT\_Header}.
+\begin{center}
+\begin{tabular}{lcp{0.62\linewidth}}
+\toprule
+Mode & Register & Use \\
+\midrule
+Oscillation & \texttt{0x06} & ring closed, DUT header and footer on; frequency at \texttt{Vout} \\
+Ring open & \texttt{0x01} & \texttt{DUT\_gate} drives the DUT, its drain on \texttt{Drain\_Force}/\texttt{Sense}
+  (stress, I--V with an SMU) \\
+After reset & \texttt{0x00} & undefined: rovcel3 pull-up only, ring stopped \\
+\bottomrule
+\end{tabular}
+\end{center}
+Each RO has its own supply (RO101 on ROVDD, RO13 on RO2VDD), fed from the \SI{1.2}{V} regulator through
+jumpers JP3/JP4, so a ring can be powered from a bench supply for a supply sweep or for stress.
+
+\subsection{Two facts about the chip SPI}
+\begin{itemize}
+  \item \textbf{Shared reset.} The SPI reset is the ADC reset pin, with the opposite polarity: the SPI
+        clears its registers while \texttt{adc\_rst} is low, the ADC resets while it is high. The ROs only
+        keep their configuration while \texttt{adc\_rst} is high, so the ADC and the ROs cannot run together.
+  \item \textbf{Frame.} Sampled on the rising SCLK with CS low: write, read, \texttt{addr[2:0]},
+        \texttt{data[7:0]}, MSB first; the register is written on the 14th rising edge, and the bit counter
+        only returns to the start on an SCLK edge with CS high. The firmware sends a 16-clock frame and then
+        a dummy byte with CS released. A simulation of \texttt{spi.v} (\texttt{ro\_reliability/sim/spi}) shows that
+        this writes every register, and that the earlier \texttt{write\_spix} wrote nothing (its first bit
+        was 0, a read). MISO does not work on the chip, so the writes cannot be read back; the counts going
+        to zero and back as the rings are switched are the evidence that they arrive.
+\end{itemize}
+
+\section{Setup}
+The FPGA (ULX3S, RISCVConsole SoC at \SI{50}{MHz}) counts the rising edges of both output pads with the
+\texttt{rocounter} peripheral (\texttt{0x64005000}): the pad signals are synchronized with three flops and
+an edge detector counts during a gate of \BusHz{} bus cycles. The counter reads correctly up to about a
+third of the bus clock, around \SI{16}{MHz} at the pad, twice the fastest corner. A \SI{1}{s} gate gives a
+resolution of \SI{1}{Hz} at the pad, \SI{32}{Hz} at the ring, and the error is $\pm 1$ count plus the
+accuracy of the ULX3S oscillator.
+\begin{center}\small
+\begin{tabular}{rlll}
+\toprule
+Adapter J1 & Signal & ULX3S & Direction \\
+\midrule
+23 & \texttt{ro\_rstb} & gn15 (P16) & FPGA $\to$ chip \\
+24 & \texttt{ro\_101\_gate} & gn16 (M17) & FPGA $\to$ chip \\
+25 & \texttt{ro\_13\_gate} & gn17 (L17) & FPGA $\to$ chip \\
+35 & \texttt{ro\_101\_vout} & gn18 (H17) & chip $\to$ FPGA \\
+36 & \texttt{ro\_13\_vout} & gp27 (D13) & chip $\to$ FPGA \\
+26, 27, 31, 32 & \texttt{ro\_\{101,13\}\_\{df,ds\}} & \SI{1.2}{V} & \\
+28, 33 & \texttt{ro\_\{101,13\}\_ex} & open & \\
+\bottomrule
+\end{tabular}
+\end{center}
+The \texttt{df}/\texttt{ds} pins are isolated in oscillation mode (their transmission gates are off) and are
+tied to \SI{1.2}{V} only to avoid floating pins. The \texttt{ex} pins must stay open: they are the output of
+the DUT, and a load on them changes how the DUT switches (Section~\ref{sec:load}). None of the analog pins may see the \SI{3.3}{V} of
+the FPGA: their pads connect directly to \SI{1.2}{V} transistors.
+
+\section{Simulation}
+\texttt{ro\_reliability/sim/ro\_sim.py}: ngspice-47~\cite{ngspice} with the PSP103 models of the IHP SG13G2 PDK~\cite{ihppdk}, on the schematic
+netlists of \texttt{ro\_reliability}, in the oscillation mode set by the firmware. The \texttt{extra\_load}
+node carries the \texttt{sg13g2\_IOPadAnalog} model of the chip (secondary protection resistor and ESD
+diodes) with the pin open; without it the rings are \SI{\PadLossA}{\percent} (RO13) and
+\SI{\PadLossB}{\percent} (RO101) faster. Not included: the wiring capacitance of the layout (the extracted
+netlists in \texttt{ro\_reliability/gds} have devices only), mismatch and noise. The wiring capacitance
+can only lower the frequency, so the measurement should come out below the TT values here; it loads every
+stage alike, so it lowers both rings by a similar fraction and leaves $f_{13}/f_{101}$ nearly unchanged.
+
+\subsection{Corners, temperature and load}
+\begin{table}[H]\centering\small
+\input{table_cases.tex}
+\caption{Expected frequencies at \SI{1.2}{V}. Count: edges in the \SI{1}{s} gate of \texttt{ro\_test}.
+$I_{DD}$: average current of the ring alone (without the divider and the pad driver).}
+\end{table}
+The corners move the rings by \SsPctA/\FfPctA{}\,\% (RO13) and \SsPctB/\FfPctB{}\,\% (RO101) from TT
+for SS/FF. The divider follows the ring: the full path (ring, divider, pad node) gives \SI{\PadDivA}{MHz}
+and \SI{\PadDivB}{MHz} at TT, the ring frequency divided by 32.
+
+\subsection{Supply}
+\begin{figure}[H]\centering
+\includegraphics{fig/vdd.pdf}
+\caption{Frequency against the RO supply (TT, \SI{27}{\celsius}), from JP3/JP4 with a bench supply.}
+\end{figure}
+\begin{table}[H]\centering\small
+\input{table_vdd.tex}
+\caption{Expected frequency and ring current against the RO supply (TT, \SI{27}{\celsius}).}
+\end{table}
+
+\subsection{Load on the extra\_load pin}
+\label{sec:load}
+\begin{figure}[H]\centering
+\includegraphics{fig/load.pdf}
+\caption{Effect of a capacitance on the \texttt{ex} pin (a wire, a probe, an FPGA input), relative to the
+pin open.}
+\end{figure}
+The \texttt{ex} node reaches the pin through the \SI{587}{\ohm} resistor of the secondary protection of
+the pad. With the pin open, the pad side follows the node and the DUT output swings rail to rail
+(\SIrange{-0.07}{1.28}{V} for RO13). A capacitance on the pin holds the pad side near the middle of the
+supply (\SIrange{0.30}{0.74}{V} with \SI{2}{pF}, \SIrange{0.39}{0.52}{V} with \SI{10}{pF}), so the resistor
+becomes a load to mid-supply on the DUT output: its swing drops (\SIrange{0.14}{0.82}{V} with \SI{10}{pF}),
+the ring current rises, and the frequency moves either way, since the slower edges of the DUT compete
+with the smaller swing that the next stage needs. The DUT then no longer switches as the other stages do,
+which defeats the purpose of the ring, so the pins stay open.
+
+\section{Expected console output}
+\texttt{ro\_test()} (\texttt{src/ro.c}) at TT, \SI{1.2}{V}; the bench values will differ by the process,
+the layout and the supply, but not the pattern: zeros where a ring is open, the same frequency for a ring
+whether the other one runs or not (separate supplies).
+\begin{center}\scriptsize
+\verbatiminput{console.txt}
+\end{center}
+
+\IfFileExists{meas.tex}{\input{meas.tex}\input{measurement.tex}}{}
+
+\section{Reading the measurement}
+\begin{center}\small
+\begin{tabular}{p{0.38\linewidth}p{0.55\linewidth}}
+\toprule
+Observation & Meaning \\
+\midrule
+Counts stay at 0 in every step & no supply on ROVDD/RO2VDD, \texttt{adc\_rst} low (SPI cleared),
+  \texttt{RO\_RST\_B} low, or the SPI writes do not arrive (after reset the registers are \texttt{0x00}, rings stopped) \\
+One ring counts, the other stays at 0 & the supply jumper of the silent ring (JP3 for RO101, JP4 for
+  RO13), its \texttt{Vout} wire, or its SPI register (address bits) \\
+Frequency below TT, up to a few tens of \% & expected: layout wiring capacitance and the process \\
+Ring current above the table, frequency off in either direction & something on the \texttt{ex} pin
+  (J1 pin 28 or 33) \\
+$f_{13}/f_{101}$ far from \RatioAB & a problem in one of the rings or its divider \\
+Counts change between repetitions by more than a few & noise on the supply, or the pad signal near
+  the threshold of the FPGA input \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\input{references.tex}
+\end{document}

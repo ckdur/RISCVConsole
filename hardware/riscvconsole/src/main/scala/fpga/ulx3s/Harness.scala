@@ -14,6 +14,7 @@ import sifive.blocks.devices.uart._
 import chipyard._
 import chipyard.harness._
 import riscvconsole.devices.adcfifo.PeripheryADCFIFOKey
+import riscvconsole.devices.rocounter.PeripheryROCounterKey
 import riscvconsole.fpga.vcu108.{HasHarnessInstantiatorsEx, WithVisibleDigitalTopHarness}
 import sifive.blocks.devices.gpio._
 import sifive.blocks.devices.spi._
@@ -22,12 +23,17 @@ import sifive.fpgashells.ip.lattice.ecp5pllCompat
 import scala.collection.mutable.LinkedHashMap
 
 case object ExtraOverlayKey extends Field[Seq[DesignPlacer[GPIODirectLatticeDesignInput, GPIOShellInput, GPIODirectLatticeOverlayOutput]]](Nil)
+case object ROOverlayKey extends Field[Seq[DesignPlacer[GPIODirectLatticeDesignInput, GPIOShellInput, GPIODirectLatticeOverlayOutput]]](Nil)
 
 class ULX3SHarness(override implicit val p: Parameters) extends ULX3SShell with WithVisibleDigitalTopHarness {
   def dp = designParameters
 
   val extraseq = Seq(27 -> 1, 26 -> 1, 25 -> 1, 24 -> 1, 23 -> 1, 22 -> 1, 21 -> 1, 20 -> 1, 19 -> 1)
   val extra = Overlay(ExtraOverlayKey, new GPIO0ULX3SShellPlacer(this, ULX3SGPIOGroup(extraseq), GPIOShellInput()))
+  // Ring oscillators: RO_RST_B, RO_101_DUT_gate, RO_13_DUT_gate, RO_101_Vout, RO_13_Vout
+  // (gn15, gn16, gn17, gn18, gp27). Needs the GPIO peripheral at 16 pins or less (gp5..gp20)
+  val roseq = Seq(15 -> 1, 16 -> 1, 17 -> 1, 18 -> 1, 27 -> 0)
+  val ro = Overlay(ROOverlayKey, new GPIO0ULX3SShellPlacer(this, ULX3SGPIOGroup(roseq), GPIOShellInput()))
 
   val clockOverlay = dp(ClockInputOverlayKey).map(_.place(ClockInputDesignInput())).head
   val harnessSysPLL = dp(PLLFactoryKey)
@@ -88,6 +94,10 @@ class ULX3SHarness(override implicit val p: Parameters) extends ULX3SShell with 
   val extraOverlay = dp(ExtraOverlayKey).map { extr =>
     extr.place(GPIODirectLatticeDesignInput(extraseq.length)).overlayOutput.io
   }
+
+  val roOverlay = dp(PeripheryROCounterKey).toSeq.flatMap { _ => dp(ROOverlayKey).map { r =>
+    r.place(GPIODirectLatticeDesignInput(roseq.length)).overlayOutput.io
+  }}
 
   // Borrowed clocks go here
   val extClocks: Seq[(Double, ClockSinkNode)] = dp(PeripheryADCFIFOKey).map { case adc =>
